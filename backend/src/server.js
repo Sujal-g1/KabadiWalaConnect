@@ -1,0 +1,67 @@
+import Fastify from "fastify";
+import cors from "@fastify/cors";
+
+import { auth } from "./config/firebase.js";
+import authPlugin from "./plugins/auth.js";
+import authRoutes from "./modules/auth/auth.routes.js";
+import priceRoutes from "./modules/prices/price.routes.js";
+
+const app = Fastify({
+  logger: true,
+});
+
+// CORS
+await app.register(cors, {
+  origin: true,
+});
+
+// Authentication plugin
+await app.register(authPlugin);
+
+await app.register( authRoutes, { prefix: "/api/auth", });
+await app.register( priceRoutes, { prefix: "/api/prices", });
+
+// Basic health check
+app.get("/api/health", async () => {
+  return {
+    success: true,
+    message: "Kabadiwala Connect backend is running",
+  };
+});
+
+// Firebase health check
+app.get("/api/health/firebase", async () => {
+  try {
+    const firebaseUsers = await auth.listUsers(1);
+
+    return {
+      success: true,
+      message: "Firebase Admin is connected",
+      usersFound: firebaseUsers.users.length,
+    };
+  } catch (error) {
+    app.log.error(error);
+
+    return {
+      success: false,
+      message: "Firebase Admin connection failed",
+    };
+  }
+});
+
+// Start server
+const startServer = async () => {
+  try {
+    await app.listen({
+      port: 5003,
+      host: "0.0.0.0",
+    });
+
+    console.log("🚀 Server running on http://localhost:5003");
+  } catch (error) {
+    app.log.error(error);
+    process.exit(1);
+  }
+};
+
+startServer();

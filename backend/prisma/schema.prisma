@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  COLLECTOR
+  RECYCLER
+  ADMIN
+}
+
+model User {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Firebase identity
+  firebaseUid       String   @unique
+
+  // Authentication/contact
+  phoneNumber       String?  @unique
+  email             String?  @unique
+
+  // Personal information
+  firstName         String
+  lastName          String
+
+  // Account
+  role              UserRole
+
+  // Profile
+  preferredLanguage String
+  operatingLocation String
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model PriceHistory {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+
+  material      String
+  subcategory   String?
+
+  location      String
+
+  price         Float
+  minPrice      Float?
+  maxPrice      Float?
+
+  unit          String   @default("kg")
+
+  source        String?
+  recyclerName  String?
+
+  recordedAt    DateTime @default(now())
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
