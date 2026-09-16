@@ -10,7 +10,9 @@ import LotDescription from "./components/LotDescription";
 import ValuationPreview from "./components/ValuationPreview";
 import useCurrentLocation from "../../hooks/useCurrentLocation";
 import { calculateValuation, } from "../../services/prices/priceApi";
-import { createLot, } from "../../services/lots/lotApi";
+import { createLot,uploadLotPhoto, finalizeLot } from "../../services/lots/lotApi";
+import compressImage from"../../utils/compressImage";
+
 
 const CreateLot = () => {
   const navigate = useNavigate();
@@ -19,6 +21,7 @@ const CreateLot = () => {
 
   const [material, setMaterial] = useState("");
   const [subcategory, setSubcategory] = useState("");
+  const [photos, setPhotos] = useState([]);
   const [weight, setWeight] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [description, setDescription] = useState("");
@@ -30,7 +33,7 @@ const CreateLot = () => {
 
   const pricingLocation = selectedLocation ||location.city;
 
-  const canCalculate =
+  const canCalculate = photos.length > 0 &&
     material &&
     weight &&
     Number(weight) > 0 &&
@@ -62,60 +65,154 @@ const CreateLot = () => {
     }
   };
 
-    const handleCreateLot = async () => {
-    try {
-      setError("");
-      setCreating(true);
+const handleCreateLot = async () => {
+  try {
+    setError("");
+    setCreating(true);
 
-      const result = await createLot({
-        material,
-        subcategory,
-        approximateWeight:
-          Number(weight),
-
-        weightUnit: "kg",
-
-        latitude:
-          location.latitude,
-
-        longitude:
-          location.longitude,
-
-        location: pricingLocation,
-
-        description,
-        condition,
-
-        estimatedRate:
-          valuation?.rate ??
-          valuation?.estimatedRate,
-
-        minEstimatedValue:
-          valuation?.minEstimatedValue,
-
-        maxEstimatedValue:
-          valuation?.maxEstimatedValue,
-
-        estimatedValue:
-          valuation?.estimatedValue,
-      });
-
-      console.log(
-        "Created lot:",
-        result
+    if (photos.length === 0) {
+      throw new Error(
+        "Please add at least one photo."
       );
-
-      navigate("/collector/lots");
-
-    } catch (error) {
-      setError(
-        error.message ||
-          "Failed to create lot"
-      );
-    } finally {
-      setCreating(false);
     }
-  };
+
+    if (!valuation) {
+      throw new Error(
+        "Please calculate the estimated value first."
+      );
+    }
+
+    const result = await createLot({
+      material,
+      subcategory,
+
+      approximateWeight:
+        Number(weight),
+
+      weightUnit: "kg",
+
+      latitude:
+        typeof location.latitude === "number"
+          ? location.latitude
+          : null,
+
+      longitude:
+        typeof location.longitude === "number"
+          ? location.longitude
+          : null,
+
+      location:
+        pricingLocation,
+
+      description,
+      condition,
+
+      estimatedRate:
+        valuation?.rate ??
+        valuation?.estimatedRate ??
+        null,
+
+      minEstimatedValue:
+        valuation?.minEstimatedValue ??
+        null,
+
+      maxEstimatedValue:
+        valuation?.maxEstimatedValue ??
+        null,
+
+      estimatedValue:
+        valuation?.estimatedValue ??
+        null,
+    });
+
+    const lot = result.lot;
+
+    // Upload all photos
+    for (const photo of photos) {
+      await uploadLotPhoto(
+        lot.id,
+        photo.file
+      );
+    }
+
+    // Make lot visible to recyclers
+    await finalizeLot(lot.id);
+
+    navigate(
+      `/collector/lots/${lot.id}`
+    );
+  } catch (error) {
+    console.error(
+      "Lot creation/upload/finalization error:",
+      error
+    );
+
+    setError(
+      error.message ||
+        "Unable to complete lot creation"
+    );
+  } finally {
+    setCreating(false);
+  }
+};
+
+const handleAddPhotos = async (files) => {
+  const remainingSlots = 5 - photos.length;
+  const selectedFiles =files.slice(0, remainingSlots);
+
+  const compressedPhotos = [];
+
+  for (const file of selectedFiles) {
+    try {
+      const compressedFile = await compressImage(file);
+
+      compressedPhotos.push({
+        id: crypto.randomUUID(),
+        file: compressedFile,
+        preview:
+          URL.createObjectURL(
+            compressedFile
+          ),
+      });
+    } catch (error) {
+      console.error(
+        "Image compression failed:",
+        error
+      );
+
+      compressedPhotos.push({
+        id: crypto.randomUUID(),
+        file,
+        preview:
+          URL.createObjectURL(file),
+      });
+    }
+  }
+
+  setPhotos((prev) => [
+    ...prev,
+    ...compressedPhotos,
+  ]);
+};
+
+const handleRemovePhoto = (photoId) => {
+  setPhotos((prev) => {
+    const photoToRemove =
+      prev.find(
+        (photo) => photo.id === photoId
+      );
+
+    if (photoToRemove?.preview) {
+      URL.revokeObjectURL(
+        photoToRemove.preview
+      );
+    }
+
+    return prev.filter(
+      (photo) => photo.id !== photoId
+    );
+  });
+};
 
     return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
@@ -148,7 +245,11 @@ const CreateLot = () => {
           </div>
         )}
 
-        <LotPhotoSection />
+        <LotPhotoSection
+          photos={photos}
+          onAddPhotos={handleAddPhotos}
+          onRemovePhoto={handleRemovePhoto}
+        />
 
         <MaterialSelector
           material={material}

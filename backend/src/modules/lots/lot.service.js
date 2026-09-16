@@ -41,68 +41,54 @@ const createLot = async (firebaseUid, data) => {
   const referenceId = await generateLotReferenceId();
 
   const lot = await prisma.eWasteLot.create({
-    data: {
-      referenceId,
+  data: {
+    referenceId,
 
-      collectorId: collector.id,
+    collectorId: collector.id,
 
-      material: data.material.trim(),
+    material: data.material.trim(),
+    subcategory: data.subcategory?.trim() || null,
 
-      subcategory:
-        data.subcategory?.trim() || null,
+    description:
+      data.description?.trim() || null,
 
-      description:
-        data.description?.trim() || null,
+    condition:
+      data.condition?.trim() || null,
 
-      condition:
-        data.condition?.trim() || null,
+    approximateWeight:
+      Number(data.approximateWeight),
 
-      approximateWeight: Number(
-        data.approximateWeight
-      ),
+    weightUnit:
+      data.weightUnit?.trim() || "kg",
 
-      weightUnit:
-        data.weightUnit?.trim() || "kg",
+    latitude:
+      data.latitude ?? null,
 
-      latitude:
-        data.latitude !== undefined
-          ? Number(data.latitude)
-          : null,
+    longitude:
+      data.longitude ?? null,
 
-      longitude:
-        data.longitude !== undefined
-          ? Number(data.longitude)
-          : null,
+    location:
+      data.location.trim(),
 
-      location: data.location.trim(),
+    estimatedRate:
+      data.estimatedRate ?? null,
 
-      estimatedRate:
-        data.estimatedRate !== undefined
-          ? Number(data.estimatedRate)
-          : null,
+    minEstimatedValue:
+      data.minEstimatedValue ?? null,
 
-      minEstimatedValue:
-        data.minEstimatedValue !== undefined
-          ? Number(data.minEstimatedValue)
-          : null,
+    maxEstimatedValue:
+      data.maxEstimatedValue ?? null,
 
-      maxEstimatedValue:
-        data.maxEstimatedValue !== undefined
-          ? Number(data.maxEstimatedValue)
-          : null,
+    estimatedValue:
+      data.estimatedValue ?? null,
 
-      estimatedValue:
-        data.estimatedValue !== undefined
-          ? Number(data.estimatedValue)
-          : null,
+    status: "CREATED",
+  },
 
-      status: "CREATED",
-    },
-
-    include: {
-      photos: true,
-    },
-  });
+  include: {
+    photos: true,
+  },
+});
 
   return lot;
 };
@@ -267,10 +253,69 @@ const updateLot = async (
   return updatedLot;
 };
 
+const finalizeLot = async (firebaseUid, lotId) => {
+  const collector = await prisma.user.findUnique({
+    where: {
+      firebaseUid,
+    },
+  });
+
+  if (!collector) {
+    throw new Error("Collector account not found.");
+  }
+
+  if (collector.role !== "COLLECTOR") {
+    throw new Error("Only collectors can finalize lots.");
+  }
+
+  const lot = await prisma.eWasteLot.findFirst({
+    where: {
+      id: lotId,
+      collectorId: collector.id,
+    },
+    include: {
+      photos: true,
+    },
+  });
+
+  if (!lot) {
+    throw new Error("Lot not found.");
+  }
+
+  if (lot.status !== "CREATED") {
+    throw new Error(
+      "Only newly created lots can be finalized."
+    );
+  }
+
+  if (lot.photos.length === 0) {
+    throw new Error(
+      "At least one photo is required before finalizing the lot."
+    );
+  }
+
+  const updatedLot = await prisma.eWasteLot.update({
+    where: {
+      id: lot.id,
+    },
+
+    data: {
+      status: "AVAILABLE",
+    },
+
+    include: {
+      photos: true,
+    },
+  });
+
+  return updatedLot;
+};
+
 
 export default {
   createLot,
   getLots,
   getLotById,
   updateLot,
+  finalizeLot
 };

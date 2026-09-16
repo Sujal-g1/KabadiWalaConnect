@@ -1,5 +1,5 @@
 import lotService from "./lot.service.js";
-
+import lotPhotoService from "./lot.photo.service.js";
 import { validateCreateLot, } from "./lot.validation.js";
 
 
@@ -133,10 +133,92 @@ const updateLot = async (
   }
 };
 
+const uploadPhoto = async (
+  request,
+  reply
+) => {
+  try {
+    const { id } =
+      request.params;
+
+    const file =
+      await request.file();
+
+    if (!file) {
+      return reply.code(400).send({
+        success: false,
+        message: "Photo is required",
+      });
+    }
+
+    if (
+      !file.mimetype.startsWith(
+        "image/"
+      )
+    ) {
+      return reply.code(400).send({
+        success: false,
+        message: "Only image files are allowed",
+      });
+    }
+
+    const buffer =
+      await file.toBuffer();
+
+    const photo =
+      await lotPhotoService.uploadLotPhoto(
+        id,
+        request.user.uid,
+        buffer
+      );
+
+    return reply.code(201).send({
+      success: true,
+      message:
+        "Photo uploaded successfully",
+      photo,
+    });
+  } catch (error) {
+    request.log.error(error);
+
+    return reply.code(400).send({
+      success: false,
+      message:
+        error.message ||
+        "Failed to upload photo",
+    });
+  }
+};
+
+const finalizeLot = async (request, reply) => {
+  try {
+    const lot = await lotService.finalizeLot(
+      request.user.uid,
+      request.params.id
+    );
+
+    return reply.code(200).send({
+      success: true,
+      message: "Lot is now available to recyclers.",
+      lot,
+    });
+  } catch (error) {
+    request.log.error(error);
+
+    return reply.code(400).send({
+      success: false,
+      message:
+        error.message ||
+        "Failed to finalize lot.",
+    });
+  }
+};
 
 export default {
   createLot,
   getLots,
   getLotById,
   updateLot,
+  uploadPhoto,
+  finalizeLot
 };

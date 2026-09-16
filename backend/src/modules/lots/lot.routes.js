@@ -65,6 +65,32 @@ const lotRoutes = async (app) => {
     },
     lotController.updateLot
   );
+
+  app.post(
+  "/:id/photos",
+  {
+    preHandler: async (
+      request,
+      reply
+    ) => {
+      await app.authenticate(
+        request,
+        reply
+      );
+    },
+  },
+  lotController.uploadPhoto
+);
+
+app.post(
+  "/:id/finalize",
+  {
+    preHandler: async (request, reply) => {
+      await app.authenticate(request, reply);
+    },
+  },
+  lotController.finalizeLot
+);
 };
 
 export default lotRoutes;

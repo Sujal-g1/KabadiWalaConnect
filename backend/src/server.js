@@ -1,3 +1,4 @@
+import "dotenv/config";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 
@@ -7,6 +8,7 @@ import authRoutes from "./modules/auth/auth.routes.js";
 import priceRoutes from "./modules/prices/price.routes.js";
 import aiRoutes from "./modules/ai/ai.routes.js";
 import lotRoutes from "./modules/lots/lot.routes.js";
+import multipart from "@fastify/multipart";
 
 const app = Fastify({
   logger: true,
@@ -19,6 +21,8 @@ await app.register(cors, {
 
 // Authentication plugin
 await app.register(authPlugin);
+// cloudinary
+await app.register(multipart);
 
 await app.register( authRoutes, { prefix: "/api/auth", });
 await app.register( priceRoutes, { prefix: "/api/prices", });
