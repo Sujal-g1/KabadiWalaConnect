@@ -59,9 +59,8 @@ const Signup = () => {
 
     const firebaseUser = await signInWithGoogle();
 
-    const token = await getFirebaseIdToken(
-      firebaseUser
-    );
+    const token = await getFirebaseIdToken(firebaseUser);
+    console.log("Firebase ID Token:", token);
 
     const response = await fetch(
       "http://localhost:5003/api/auth/sync",
@@ -550,11 +549,8 @@ const Signup = () => {
           >
 
             {/* First + Last Name */}
-
             <div className="grid grid-cols-2 gap-3">
-
               <div>
-
                 <label
                   className="
                     block
@@ -584,6 +580,7 @@ const Signup = () => {
                     py-2.5
                     text-sm
                     bg-gray-50
+                    text-gray-800
                     border
                     border-transparent
                     rounded-xl
@@ -627,6 +624,7 @@ const Signup = () => {
                     py-2.5
                     text-sm
                     bg-gray-50
+                    text-gray-800
                     border
                     border-transparent
                     rounded-xl
@@ -703,6 +701,7 @@ const Signup = () => {
                     py-2.5
                     text-sm
                     bg-gray-50
+                    text-gray-800
                     border
                     border-transparent
                     focus:border-emerald-500
@@ -760,6 +759,7 @@ const Signup = () => {
                   py-2.5
                   text-sm
                   bg-gray-50
+                  text-gray-800
                   border
                   border-transparent
                   focus:border-emerald-500
@@ -809,6 +809,7 @@ const Signup = () => {
                     py-2.5
                     text-sm
                     bg-gray-50
+                    text-gray-800
                     border
                     border-transparent
                     focus:border-emerald-500
@@ -848,6 +849,7 @@ const Signup = () => {
                     py-2.5
                     text-sm
                     bg-gray-50
+                    text-gray-800
                     border
                     border-transparent
                     focus:border-emerald-500
@@ -980,7 +982,7 @@ const Signup = () => {
             Already have an account?{" "}
 
             <Link
-              to="/login"
+              to="/collector/login"
               state={{
                 role,
               }}

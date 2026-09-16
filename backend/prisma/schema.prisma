@@ -13,50 +13,117 @@ enum UserRole {
   ADMIN
 }
 
+enum LotStatus {
+  CREATED
+  AVAILABLE
+  OFFER_RECEIVED
+  PICKUP_SCHEDULED
+  PICKED_UP
+  HANDED_OVER
+  COMPLETED
+  CANCELLED
+}
+
 model User {
-  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
   // Firebase identity
-  firebaseUid       String   @unique
+  firebaseUid String @unique
 
   // Authentication/contact
-  phoneNumber       String?  @unique
-  email             String?  @unique
+  phoneNumber String? @unique
+  email       String? @unique
 
   // Personal information
-  firstName         String
-  lastName          String
+  firstName String
+  lastName  String
 
   // Account
-  role              UserRole
+  role UserRole
 
   // Profile
   preferredLanguage String
   operatingLocation String
 
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  lots EWasteLot[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model PriceHistory {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  material      String
-  subcategory   String?
+  material    String
+  subcategory String?
 
-  location      String
+  location String
 
-  price         Float
-  minPrice      Float?
-  maxPrice      Float?
+  price    Float
+  minPrice Float?
+  maxPrice Float?
 
-  unit          String   @default("kg")
+  unit String @default("kg")
 
-  source        String?
-  recyclerName  String?
+  source       String?
+  recyclerName String?
 
-  recordedAt    DateTime @default(now())
+  recordedAt DateTime @default(now())
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EWasteLot {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  referenceId String @unique
+
+  collectorId String @db.ObjectId
+  collector   User   @relation(fields: [collectorId], references: [id])
+
+  material    String
+  subcategory String?
+
+  description String?
+  condition   String?
+
+  approximateWeight Float
+  weightUnit        String @default("kg")
+
+  latitude  Float?
+  longitude Float?
+  location  String
+
+  estimatedRate     Float?
+  minEstimatedValue Float?
+  maxEstimatedValue Float?
+  estimatedValue    Float?
+
+  status LotStatus @default(CREATED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  photos LotPhoto[]
+
+  @@index([collectorId])
+  @@index([status])
+  @@index([material])
+  @@index([location])
+  @@index([createdAt])
+}
+
+model LotPhoto {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  lotId String    @db.ObjectId
+  lot   EWasteLot @relation(fields: [lotId], references: [id])
+
+  url        String
+  storageKey String?
+
+  createdAt DateTime @default(now())
+
+  @@index([lotId])
 }

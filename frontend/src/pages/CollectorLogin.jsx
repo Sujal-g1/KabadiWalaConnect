@@ -32,9 +32,8 @@ const Login = () => {
 
     const firebaseUser = await signInWithGoogle();
 
-    const token = await getFirebaseIdToken(
-      firebaseUser
-    );
+    const token = await getFirebaseIdToken(firebaseUser);
+    console.log("Firebase ID Token:", token);
 
     const response = await fetch(
       "http://localhost:5003/api/auth/sync",

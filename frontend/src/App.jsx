@@ -7,10 +7,12 @@ import {
 import Start from "./pages/Start";
 import CollectorLogin from "./pages/CollectorLogin";
 import CollectorSignup from "./pages/CollectorSignup";
-import CollectorDashboard from "./pages/CollectorDashboard/CollectorDashboard";
 import CollectorSettings from "./pages/CollectorSettings";
 import PriceBoard from "./pages/PriceBoard/PriceBoard";
 import ValuationTest from "./pages/ValuationTest";
+import CreateLot from "./pages/CreateLot/CreateLot";
+import CollectorDashboard from "./pages/CollectorDashboard/CollectorDashboard";
+import CollectorValuation from "./pages/CollectorValuation/CollectorValuation";
 
 const App = () => {
   return (
@@ -50,8 +52,18 @@ const App = () => {
   />
 
   <Route
-  path="/collector/valuation-test"
-  element={<ValuationTest />}
+    path="/collector/valuation-test"
+    element={<ValuationTest />}
+  />
+
+  <Route
+    path="/collector/valuation"
+    element={<CollectorValuation />}
+  />
+
+  <Route
+  path="/collector/lots/create"
+  element={<CreateLot />}
 />
 
       {/* Fallback */}

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import DashboardHeader from "./components/DashboardHeader";
@@ -7,11 +8,13 @@ import ActivitySummary from "./components/ActivitySummary";
 import EarningsCard from "./components/EarningsCard";
 import RecyclerPreview from "./components/RecyclerPreview";
 import BottomNavigation from "./components/BottomNavigation";
-
+import AIChatbot from "../../components/AI/AIChatbot";
+import AIAssistantButton from "../../components/AI/AIAssistantButton";
 import dashboardData from "./dashboardData";
 
 const CollectorDashboard = () => {
   const navigate = useNavigate();
+  const [showAI, setShowAI] = useState(false);
 
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
@@ -34,7 +37,7 @@ const CollectorDashboard = () => {
 
         <div className="mt-7 space-y-8">
           <QuickAction
-            onClick={() => navigate("/collector/lots/new")}
+            onClick={() => navigate("/collector/lots/create")}
           />
 
           <PriceSnapshot
@@ -59,6 +62,16 @@ const CollectorDashboard = () => {
       </main>
 
       <BottomNavigation />
+
+      <AIAssistantButton
+  onClick={() => setShowAI(true)}
+/>
+
+{showAI && (
+  <AIChatbot
+    close={() => setShowAI(false)}
+  />
+)}
     </div>
   );
 };

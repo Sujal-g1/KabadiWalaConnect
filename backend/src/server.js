@@ -5,6 +5,8 @@ import { auth } from "./config/firebase.js";
 import authPlugin from "./plugins/auth.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import priceRoutes from "./modules/prices/price.routes.js";
+import aiRoutes from "./modules/ai/ai.routes.js";
+import lotRoutes from "./modules/lots/lot.routes.js";
 
 const app = Fastify({
   logger: true,
@@ -20,6 +22,8 @@ await app.register(authPlugin);
 
 await app.register( authRoutes, { prefix: "/api/auth", });
 await app.register( priceRoutes, { prefix: "/api/prices", });
+await app.register( aiRoutes, { prefix: "/api/ai",});
+await app.register(lotRoutes,{ prefix: "/api/lots", });
 
 // Basic health check
 app.get("/api/health", async () => {
