@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, ArrowRight } from "lucide-react";
-import axios from "axios";
+
 
 import { signInWithGoogle, getFirebaseIdToken, logoutFirebase } from "../services/auth/googleAuth";
 import useAuthStore from "../store/authStore";
@@ -26,18 +26,22 @@ const Login = () => {
   // ----------------------------------------
   // GOOGLE LOGIN
   // ----------------------------------------
-  const handleGoogleLogin = async () => {
+ const handleGoogleLogin = async () => {
   try {
     setIsLoading(true);
     setError("");
 
+    // 1. Google login
     const firebaseUser = await signInWithGoogle();
 
+    // 2. Get Firebase ID token
     const token = await getFirebaseIdToken(firebaseUser);
+
     console.log("Firebase ID Token:", token);
 
+    // 3. Send token to backend
     const response = await fetch(
-      axios.post(`${import.meta.env.VITE_API_URL}/api/auth/sync`),
+      `${import.meta.env.VITE_API_URL}/api/auth/sync`,
       {
         method: "POST",
 
@@ -52,7 +56,10 @@ const Login = () => {
       }
     );
 
+    // 4. Read backend response
     const data = await response.json();
+
+    console.log("Backend response:", data);
 
     if (!response.ok || !data.success) {
       await logoutFirebase();
@@ -62,11 +69,13 @@ const Login = () => {
       );
     }
 
+    // 5. Store user
     setUser(data.user);
 
+    // 6. Navigate
     navigate("/collector");
   } catch (error) {
-    console.error(error);
+    console.error("Google login error:", error);
 
     setError(
       error.message ||

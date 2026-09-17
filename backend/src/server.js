@@ -14,7 +14,16 @@ import handoverRoutes from "./modules/handovers/handover.routes.js";
 const app = Fastify({ logger: true,});
 
 // CORS
-await app.register(cors, { origin: true,});
+// await app.register(cors, { origin: true,});
+import cors from "@fastify/cors";
+
+await Fastify.register(cors, {
+  origin: [
+    "http://localhost:5173",
+    "https://kabadiwalaconnect-theta.vercel.app",
+  ],
+  credentials: true,
+});
 
 // Authentication plugin
 await app.register(authPlugin);
