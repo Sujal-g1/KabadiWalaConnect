@@ -1,6 +1,8 @@
-import axios from "axios";
 import { auth } from "../../config/firebase";
 
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5003";
 
 const getAuthToken = async () => {
   const user = auth.currentUser;
@@ -21,7 +23,7 @@ const createHandover = async (
   const token = await getAuthToken();
 
   const response = await fetch(
-    axios.post(`${import.meta.env.VITE_API_URL}/api/handovers/lots/${lotId}`),
+    `${API_URL}/api/handovers/lots/${lotId}`,
     {
       method: "POST",
       headers: {
