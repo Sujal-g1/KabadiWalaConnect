@@ -11,6 +11,7 @@ import {
 import useAuthStore from "../store/authStore";
 
 import firstpage from "../assets/images/cover1.webp";
+import axios from "axios";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ const Signup = () => {
     console.log("Firebase ID Token:", token);
 
     const response = await fetch(
-      "http://localhost:5003/api/auth/sync",
+      axios.post(`${import.meta.env.VITE_API_URL}/api/sync`),
       {
         method: "POST",
 

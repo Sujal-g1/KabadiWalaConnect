@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, ArrowRight } from "lucide-react";
+import axios from "axios";
 
 import { signInWithGoogle, getFirebaseIdToken, logoutFirebase } from "../services/auth/googleAuth";
 import useAuthStore from "../store/authStore";
@@ -36,7 +37,7 @@ const Login = () => {
     console.log("Firebase ID Token:", token);
 
     const response = await fetch(
-      "http://localhost:5003/api/auth/sync",
+      axios.post(`${import.meta.env.VITE_API_URL}/api/auth/sync`),
       {
         method: "POST",
 
