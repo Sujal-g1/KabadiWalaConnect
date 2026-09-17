@@ -37,12 +37,11 @@ const Signup = () => {
   // GOOGLE SIGNUP
   // ----------------------------------------
 
-  const handleGoogleSignup = async () => {
+const handleGoogleSignup = async () => {
   try {
     setIsLoading(true);
     setError("");
 
-    // Validate profile information BEFORE Google authentication
     if (
       !firstName.trim() ||
       !lastName.trim() ||
@@ -50,21 +49,22 @@ const Signup = () => {
       !city.trim() ||
       !language
     ) {
-      setError(
-        "Please fill all required information first."
-      );
-
+      setError("Please fill all required information first.");
       setIsLoading(false);
       return;
     }
 
+    // 1. Google authentication
     const firebaseUser = await signInWithGoogle();
 
+    // 2. Get Firebase ID token
     const token = await getFirebaseIdToken(firebaseUser);
+
     console.log("Firebase ID Token:", token);
 
+    // 3. Send data to backend
     const response = await fetch(
-      axios.post(`${import.meta.env.VITE_API_URL}/api/sync`),
+      `${import.meta.env.VITE_API_URL}/api/auth/sync`,
       {
         method: "POST",
 
@@ -75,7 +75,6 @@ const Signup = () => {
 
         body: JSON.stringify({
           mode: "signup",
-
           firstName,
           lastName,
           phoneNumber: phone,
@@ -87,6 +86,8 @@ const Signup = () => {
     );
 
     const data = await response.json();
+
+    console.log("Backend response:", data);
 
     if (!response.ok || !data.success) {
       await logoutFirebase();
@@ -100,7 +101,7 @@ const Signup = () => {
 
     navigate("/collector");
   } catch (error) {
-    console.error(error);
+    console.error("Google signup error:", error);
 
     setError(
       error.message ||
