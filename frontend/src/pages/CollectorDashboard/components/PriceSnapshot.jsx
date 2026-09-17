@@ -2,84 +2,101 @@ import {
   ArrowDownRight,
   ArrowRight,
   ArrowUpRight,
+  IndianRupee,
 } from "lucide-react";
+
 import { useNavigate } from "react-router-dom";
-import useTranslation from "../../../i18n/useTranslation";
 
-const trendIcons = {
-  rising: ArrowUpRight,
-  falling: ArrowDownRight,
-  stable: ArrowRight,
-};
+import { priceSnapshot } from "../dashboardData";
 
-const PriceSnapshot = ({ prices }) => {
-  const { t } = useTranslation();
+const PriceSnapshot = () => {
   const navigate = useNavigate();
 
   return (
-    <section>
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">
-          {t("dashboard.todaysPrices")}
-        </h2>
+    <section
+      className="
+        rounded-2xl border border-[var(--border)]
+        bg-[var(--surface)] p-5 sm:p-6
+      "
+    >
+      <div className="mb-5 flex items-center justify-between">
+        <div>
+          <p className="text-base font-bold text-[var(--foreground)]">
+            Local price board
+          </p>
 
-       <button
-            type="button"
-            onClick={() =>
-                navigate("/collector/prices")
-            }
-            className="
-                flex items-center gap-1
-                text-sm
-                text-[var(--muted)]
-                transition
-                hover:text-[var(--foreground)]
-            "
-            >
-            {t("common.viewAll")}
-            <ArrowRight size={15} />
-            </button>
+          <p className="mt-1 text-xs text-[var(--muted)]">
+            Current buying prices
+          </p>
+        </div>
+
+        <button
+          onClick={() =>
+            navigate("/collector/prices")
+          }
+          className="
+            flex items-center gap-1 text-xs
+            font-semibold text-[var(--primary)]
+          "
+        >
+          See all
+          <ArrowRight size={14} />
+        </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {prices.map((item) => {
-          const TrendIcon = trendIcons[item.trend];
+      <div className="space-y-1">
+        {priceSnapshot.map((item) => {
+          const rising = item.direction === "up";
 
           return (
             <div
-              key={item.id}
+              key={item.material}
               className="
-                rounded-[24px]
-                border border-[var(--border)]
-                bg-[var(--surface)]
-                p-4
-                transition
-                hover:-translate-y-0.5
+                flex items-center justify-between
+                rounded-xl px-2 py-3
+                transition hover:bg-[var(--surface-soft)]
               "
             >
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-[var(--muted)]">
-                  {item.material}
-                </span>
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--accent)] text-[var(--primary)]">
+                  <IndianRupee size={16} />
+                </div>
 
-                <TrendIcon
-                  size={17}
-                  strokeWidth={1.8}
-                  className="text-[var(--primary)]"
-                />
+                <div>
+                  <p className="text-sm font-semibold text-[var(--foreground)]">
+                    {item.material}
+                  </p>
+
+                  <p className="text-[10px] text-[var(--muted)]">
+                    per {item.unit}
+                  </p>
+                </div>
               </div>
 
-              <p className="mt-5 text-2xl font-semibold tracking-tight">
-                ₹{item.price}
-              </p>
+              <div className="text-right">
+                <p className="text-sm font-bold text-[var(--foreground)]">
+                  {item.price}
+                </p>
 
-              <p className="mt-1 text-xs text-[var(--muted)]">
-                {t("prices.perKg")}
-              </p>
+                <p
+                  className={`
+                    flex items-center justify-end gap-0.5 text-[10px] font-semibold
+                    ${
+                      rising
+                        ? "text-[var(--primary)]"
+                        : "text-[var(--danger)]"
+                    }
+                  `}
+                >
+                  {rising ? (
+                    <ArrowUpRight size={11} />
+                  ) : (
+                    <ArrowDownRight size={11} />
+                  )}
 
-              <p className="mt-3 text-xs font-medium text-[var(--primary)]">
-                {t(`prices.${item.trend}`)}
-              </p>
+                  {item.trend}
+                </p>
+              </div>
             </div>
           );
         })}

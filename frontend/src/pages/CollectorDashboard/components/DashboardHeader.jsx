@@ -1,50 +1,76 @@
-import { Settings } from "lucide-react";
+import {
+  Bell,
+  MapPin,
+} from "lucide-react";
+
+import { useNavigate } from "react-router-dom";
 
 import useAuthStore from "../../../store/authStore";
-import useTranslation from "../../../i18n/useTranslation";
-import LanguageSelector from "../../../components/LanguageSelector";
 
-const DashboardHeader = ({ onSettings }) => {
-  const user = useAuthStore((state) => state.user);
-  const { t } = useTranslation();
+const DashboardHeader = () => {
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
 
-  const firstName = user?.firstName || "Collector";
+  const firstName =
+    user?.firstName || "Collector";
+
+  const initials =
+    `${user?.firstName?.charAt(0) || ""}${user?.lastName?.charAt(0) || ""}`
+      .trim()
+      .toUpperCase() || "U";
 
   return (
-    <header className="flex items-center justify-between gap-4">
+    <div className="mb-7 flex items-start justify-between gap-4">
       <div className="min-w-0">
-        <p className="text-sm text-[var(--muted)]">
-          {t("dashboard.greeting")}
-        </p>
+        <div className="mb-2 flex items-center gap-1.5 text-xs text-[var(--muted)]">
+          <MapPin size={14} />
 
-        <h1 className="mt-1 truncate text-[clamp(1.5rem,5vw,2rem)] font-semibold tracking-tight">
-          {firstName}
+          <span>
+            {user?.operatingLocation ||
+              "Your location"}
+          </span>
+        </div>
+
+        <h1 className="text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl">
+          Good morning, {firstName}
         </h1>
+
+        <p className="mt-1 text-sm text-[var(--muted)]">
+          Here's what's happening with your collection.
+        </p>
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
-        <LanguageSelector />
-
         <button
-          type="button"
-          onClick={onSettings}
           className="
-            flex h-11 w-11
-            items-center justify-center
-            rounded-full
-            border border-[var(--border)]
+            relative hidden h-10 w-10 items-center
+            justify-center rounded-xl border
+            border-[var(--border)]
             bg-[var(--surface)]
             text-[var(--muted)]
-            transition
-            hover:text-[var(--foreground)]
-            active:scale-95
+            transition hover:bg-[var(--surface-soft)]
+            sm:flex
           "
-          aria-label={t("navigation.settings")}
         >
-          <Settings size={19} strokeWidth={1.8} />
+          <Bell size={19} />
+
+          <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[var(--danger)]" />
+        </button>
+
+        <button
+          onClick={() =>
+            navigate("/collector/settings")
+          }
+          className="
+            flex h-10 w-10 items-center justify-center
+            rounded-xl bg-[var(--surface-soft)]
+            text-xs font-bold text-[var(--foreground)]
+          "
+        >
+          {initials}
         </button>
       </div>
-    </header>
+    </div>
   );
 };
 

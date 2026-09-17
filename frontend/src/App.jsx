@@ -17,17 +17,26 @@ import MyLots from "./pages/MyLots/MyLots";
 import LotDetails from "./pages/LotDetails/LotDetails";
 import Handover from "./pages/Handover/Handover";
 
+import AppShell from "./mainComponents/layouts/AppShell";
+
 const App = () => {
   return (
     <Routes>
 
-      {/* Landing */}
+      {/* =========================
+          LANDING
+      ========================= */}
+
       <Route
         path="/"
         element={<Start />}
       />
 
-      {/* Collector Authentication */}
+
+      {/* =========================
+          COLLECTOR AUTH
+      ========================= */}
+
       <Route
         path="/collector/login"
         element={<CollectorLogin />}
@@ -38,56 +47,85 @@ const App = () => {
         element={<CollectorSignup />}
       />
 
-      {/* Collector Dashboard */}
-      <Route
-        path="/collector"
-        element={<CollectorDashboard />}
-      />
 
-      <Route
-      path="/collector/settings"
-      element={<CollectorSettings />}
-    />
+      {/* =========================
+          COLLECTOR APPLICATION
+          AppShell provides:
+          - Desktop Sidebar
+          - Mobile Header
+          - Mobile Bottom Navigation
+          - Page Container
+      ========================= */}
 
-    <Route
-    path="/collector/prices"
-    element={<PriceBoard />}
-  />
+      <Route element={<AppShell />}>
 
-  <Route
-    path="/collector/valuation-test"
-    element={<ValuationTest />}
-  />
+        {/* Dashboard */}
+        <Route
+          path="/collector"
+          element={<CollectorDashboard />}
+        />
 
-  <Route
-    path="/collector/valuation"
-    element={<CollectorValuation />}
-  />
+        {/* Settings */}
+        <Route
+          path="/collector/settings"
+          element={<CollectorSettings />}
+        />
 
-  <Route
-  path="/collector/lots"
-  element={<MyLots />}
-/>
+        {/* Prices */}
+        <Route
+          path="/collector/prices"
+          element={<PriceBoard />}
+        />
 
-<Route
-  path="/collector/lots/:id"
-  element={<LotDetails />}
-/>
+        {/* Valuation */}
+        <Route
+          path="/collector/valuation"
+          element={<CollectorValuation />}
+        />
 
-<Route
-  path="/collector/lots/:id/handover"
-  element={<Handover />}
-/>
+        {/* Valuation Test */}
+        <Route
+          path="/collector/valuation-test"
+          element={<ValuationTest />}
+        />
 
-  <Route
-  path="/collector/lots/create"
-  element={<CreateLot />}
-/>
+        {/* Lots */}
+        <Route
+          path="/collector/lots"
+          element={<MyLots />}
+        />
 
-      {/* Fallback */}
+        <Route
+          path="/collector/lots/create"
+          element={<CreateLot />}
+        />
+
+        <Route
+          path="/collector/lots/:id"
+          element={<LotDetails />}
+        />
+
+        {/* Handover */}
+        <Route
+          path="/collector/lots/:id/handover"
+          element={<Handover />}
+        />
+
+      </Route>
+
+
+      {/* =========================
+          FALLBACK
+      ========================= */}
+
       <Route
         path="*"
-        element={<Navigate to="/" replace />}
+        element={
+          <Navigate
+            to="/"
+            replace
+          />
+        }
       />
 
     </Routes>

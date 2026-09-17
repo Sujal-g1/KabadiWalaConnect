@@ -1,81 +1,120 @@
 import {
   ArrowUpRight,
-  Wallet,
+  IndianRupee,
 } from "lucide-react";
 
-import useTranslation from "../../../i18n/useTranslation";
+import {
+  Area,
+  AreaChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+} from "recharts";
 
-const EarningsCard = ({ earnings }) => {
-  const { t } = useTranslation();
+import { monthlyEarnings } from "../dashboardData";
 
+const EarningsCard = () => {
   return (
     <section
       className="
-        rounded-[28px]
-        border border-[var(--border)]
+        overflow-hidden rounded-2xl border
+        border-[var(--border)]
         bg-[var(--surface)]
-        p-5
       "
     >
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between p-5 sm:p-6">
         <div>
-          <p className="text-sm text-[var(--muted)]">
-            {t("dashboard.totalEarnings")}
-          </p>
+          <div className="mb-3 flex items-center gap-2 text-xs font-medium text-[var(--muted)]">
+            <IndianRupee size={15} />
 
-          <p className="mt-2 text-[clamp(2rem,8vw,2.5rem)] font-semibold tracking-tight">
-            ₹{earnings.total.toLocaleString("en-IN")}
-          </p>
+            <span>This month's earnings</span>
+          </div>
+
+          <div className="flex items-end gap-2">
+            <h2 className="text-3xl font-bold tracking-tight text-[var(--foreground)]">
+              ₹8,420
+            </h2>
+
+            <span className="mb-1 flex items-center gap-0.5 text-xs font-semibold text-[var(--primary)]">
+              <ArrowUpRight size={13} />
+              12%
+            </span>
+          </div>
         </div>
 
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--accent)] text-[var(--primary)]">
-          <Wallet size={20} strokeWidth={1.8} />
-        </div>
+        <button className="text-xs font-semibold text-[var(--primary)]">
+          View details
+        </button>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-3">
-        <div className="rounded-2xl bg-[var(--surface-soft)] p-3">
-          <p className="text-xs text-[var(--muted)]">
-            {t("dashboard.todayEarnings")}
-          </p>
+      <div className="h-[180px] w-full px-2 pb-3 sm:h-[200px] sm:px-4">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart
+            data={monthlyEarnings}
+            margin={{
+              top: 10,
+              right: 10,
+              left: 0,
+              bottom: 0,
+            }}
+          >
+            <defs>
+              <linearGradient
+                id="earningsFill"
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop
+                  offset="0%"
+                  stopColor="var(--primary)"
+                  stopOpacity={0.18}
+                />
 
-          <p className="mt-1 font-semibold">
-            ₹{earnings.today.toLocaleString("en-IN")}
-          </p>
-        </div>
+                <stop
+                  offset="100%"
+                  stopColor="var(--primary)"
+                  stopOpacity={0}
+                />
+              </linearGradient>
+            </defs>
 
-        <div className="rounded-2xl bg-[var(--surface-soft)] p-3">
-          <p className="text-xs text-[var(--muted)]">
-            {t("dashboard.pendingPayments")}
-          </p>
+            <XAxis
+              dataKey="month"
+              axisLine={false}
+              tickLine={false}
+              tick={{
+                fill: "var(--muted)",
+                fontSize: 11,
+              }}
+            />
 
-          <p className="mt-1 font-semibold">
-            ₹{earnings.pending.toLocaleString("en-IN")}
-          </p>
-        </div>
+            <Tooltip
+              contentStyle={{
+                borderRadius: "12px",
+                border: "1px solid var(--border)",
+                background: "var(--surface)",
+                color: "var(--foreground)",
+                boxShadow:
+                  "0 10px 30px rgba(0,0,0,0.08)",
+              }}
+              formatter={(value) => [
+                `₹${value}`,
+                "Earnings",
+              ]}
+            />
+
+            <Area
+              type="monotone"
+              dataKey="value"
+              stroke="var(--primary)"
+              strokeWidth={2.5}
+              fill="url(#earningsFill)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
-
-      <button
-        type="button"
-        className="
-          mt-4
-          flex
-          w-full
-          items-center
-          justify-between
-          rounded-2xl
-          border border-[var(--border)]
-          px-4 py-3
-          text-sm
-          font-medium
-          transition
-          hover:bg-[var(--surface-soft)]
-        "
-      >
-        {t("navigation.earnings")}
-
-        <ArrowUpRight size={17} />
-      </button>
     </section>
   );
 };

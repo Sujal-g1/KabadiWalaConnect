@@ -2,27 +2,44 @@ import {
   ArrowRight,
   MapPin,
   ShieldCheck,
-  Truck,
 } from "lucide-react";
 
-import useTranslation from "../../../i18n/useTranslation";
+import { useNavigate } from "react-router-dom";
 
-const RecyclerPreview = ({ recyclers }) => {
-  const { t } = useTranslation();
+import { recyclers } from "../dashboardData";
+
+const RecyclerPreview = () => {
+  const navigate = useNavigate();
 
   return (
-    <section>
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">
-          {t("dashboard.nearbyRecyclers")}
-        </h2>
+    <section
+      className="
+        rounded-2xl border border-[var(--border)]
+        bg-[var(--surface)] p-5 sm:p-6
+      "
+    >
+      <div className="mb-5 flex items-center justify-between">
+        <div>
+          <p className="text-base font-bold text-[var(--foreground)]">
+            Nearby recyclers
+          </p>
+
+          <p className="mt-1 text-xs text-[var(--muted)]">
+            Verified buyers near you
+          </p>
+        </div>
 
         <button
-          type="button"
-          className="flex items-center gap-1 text-sm text-[var(--muted)]"
+          onClick={() =>
+            navigate("/collector/recyclers")
+          }
+          className="
+            flex items-center gap-1 text-xs
+            font-semibold text-[var(--primary)]
+          "
         >
-          {t("common.viewAll")}
-          <ArrowRight size={15} />
+          See all
+          <ArrowRight size={14} />
         </button>
       </div>
 
@@ -31,64 +48,55 @@ const RecyclerPreview = ({ recyclers }) => {
           <div
             key={recycler.id}
             className="
-              rounded-[26px]
-              border border-[var(--border)]
-              bg-[var(--surface)]
-              p-4
-              transition
-              hover:-translate-y-0.5
+              rounded-xl bg-[var(--surface-soft)]
+              p-3.5
             "
           >
-            <div className="flex items-center gap-3">
-              <div
-                className="
-                  flex h-12 w-12 shrink-0
-                  items-center justify-center
-                  rounded-2xl
-                  bg-[var(--accent)]
-                  text-[var(--primary)]
-                  font-semibold
-                "
-              >
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--accent)] text-sm font-bold text-[var(--primary)]">
                 {recycler.name.charAt(0)}
               </div>
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
-                  <h3 className="truncate font-medium">
+                  <p className="truncate text-sm font-semibold text-[var(--foreground)]">
                     {recycler.name}
-                  </h3>
+                  </p>
 
                   {recycler.verified && (
                     <ShieldCheck
-                      size={16}
+                      size={14}
                       className="shrink-0 text-[var(--primary)]"
                     />
                   )}
                 </div>
 
-                <div className="mt-1 flex items-center gap-3 text-xs text-[var(--muted)]">
-                  <span className="flex items-center gap-1">
-                    <MapPin size={13} />
+                <div className="mt-1 flex items-center gap-1 text-[10px] text-[var(--muted)]">
+                  <MapPin size={11} />
+                  <span>
+                    {recycler.location} ·{" "}
                     {recycler.distance}
                   </span>
+                </div>
 
-                  <span>★ {recycler.rating}</span>
+                <div className="mt-2 flex gap-1.5">
+                  {recycler.materials.map(
+                    (material) => (
+                      <span
+                        key={material}
+                        className="
+                          rounded-full bg-[var(--surface)]
+                          px-2 py-1 text-[9px]
+                          font-medium text-[var(--muted)]
+                        "
+                      >
+                        {material}
+                      </span>
+                    )
+                  )}
                 </div>
               </div>
-
-              <ArrowRight
-                size={18}
-                className="shrink-0 text-[var(--muted)]"
-              />
             </div>
-
-            {recycler.pickup && (
-              <div className="mt-4 flex items-center gap-1.5 text-xs text-[var(--muted)]">
-                <Truck size={14} />
-                {t("dashboard.pickupAvailable")}
-              </div>
-            )}
           </div>
         ))}
       </div>

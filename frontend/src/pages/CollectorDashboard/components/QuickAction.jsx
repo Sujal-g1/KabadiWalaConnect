@@ -1,88 +1,58 @@
-import { ArrowUpRight, Camera } from "lucide-react";
+import {
+  ArrowRight,
+  Camera,
+  Plus,
+} from "lucide-react";
 
-import useTranslation from "../../../i18n/useTranslation";
+import { useNavigate } from "react-router-dom";
 
-const QuickAction = ({ onClick }) => {
-  const { t } = useTranslation();
+const QuickAction = () => {
+  const navigate = useNavigate();
 
   return (
     <button
-      type="button"
-      onClick={onClick}
+      onClick={() =>
+        navigate("/collector/lots/create")
+      }
       className="
-        group
-        relative
-        w-full
-        overflow-hidden
-        rounded-[30px]
-        bg-[var(--primary)]
-        p-5
-        text-left
-        text-[var(--primary-foreground)]
-        shadow-[0_16px_40px_rgba(0,0,0,0.08)]
-        transition
+        group relative w-full overflow-hidden
+        rounded-2xl bg-[var(--primary)]
+        p-5 text-left text-[var(--primary-foreground)]
+        transition duration-200
         hover:-translate-y-0.5
         active:scale-[0.99]
+        sm:p-6
       "
     >
-      <div className="relative z-10 flex items-center justify-between gap-5">
-        <div>
-          <div
-            className="
-              mb-5
-              flex h-11 w-11
-              items-center justify-center
-              rounded-2xl
-              bg-[var(--primary-foreground)]/12
-            "
-          >
-            <Camera size={21} strokeWidth={1.8} />
-          </div>
-
-          <h2 className="text-xl font-semibold">
-            {t("dashboard.sellEwaste")}
-          </h2>
-
-          <p className="mt-1 text-sm opacity-65">
-            {t("dashboard.sellEwasteSubtitle")}
-          </p>
+      <div className="relative z-10">
+        <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-white/15">
+          <Camera size={20} />
         </div>
 
-        <div
-          className="
-            flex h-12 w-12 shrink-0
-            items-center justify-center
-            rounded-full
-            bg-[var(--primary-foreground)]/10
-            transition-transform
-            group-hover:translate-x-1
-          "
-        >
-          <ArrowUpRight size={21} />
+        <p className="text-lg font-bold">
+          Add new e-waste
+        </p>
+
+        <p className="mt-1 max-w-[260px] text-sm opacity-75">
+          Photograph your material and create a new lot.
+        </p>
+
+        <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold">
+          <span>Create Lot</span>
+
+          <ArrowRight
+            size={16}
+            className="transition-transform duration-200 group-hover:translate-x-1"
+          />
         </div>
       </div>
 
-      <div
+      <Plus
+        size={170}
+        strokeWidth={0.7}
         className="
-          absolute
-          -right-16
-          -top-16
-          h-40
-          w-40
-          rounded-full
-          border border-[var(--primary-foreground)]/10
-        "
-      />
-
-      <div
-        className="
-          absolute
-          -bottom-24
-          right-8
-          h-48
-          w-48
-          rounded-full
-          border border-[var(--primary-foreground)]/5
+          absolute -bottom-14 -right-10
+          rotate-12 opacity-[0.07]
         "
       />
     </button>

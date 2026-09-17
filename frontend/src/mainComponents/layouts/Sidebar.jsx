@@ -151,16 +151,15 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
             onClick={() => navigate("/collector")}
             className="flex items-center gap-3"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--primary)] text-[var(--primary-foreground)]">
-              <Recycle size={20} />
-            </div>
+            <img src="./favicon.svg" alt="" 
+            className="flex h-13 w-13" />
 
             <div className="text-left">
-              <p className="text-sm font-bold tracking-tight text-[var(--foreground)]">
-                KabadiWala
+              <p className="text-lg font-bold tracking-tight text-[var(--foreground)]">
+                Kabadiwala
               </p>
 
-              <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-[var(--muted)]">
+              <p className="text-sm font-medium uppercase tracking-[0.16em] text-[var(--muted)]">
                 Connect
               </p>
             </div>

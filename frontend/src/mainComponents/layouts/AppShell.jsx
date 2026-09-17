@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Outlet,useNavigate } from "react-router-dom";
 
 import Sidebar from "./Sidebar";
 import MobileHeader from "./MobileHeader";
@@ -29,7 +29,7 @@ const AppShell = ({ children }) => {
           />
 
           <PageContainer>
-            {children}
+             <Outlet />
           </PageContainer>
         </div>
       </div>
