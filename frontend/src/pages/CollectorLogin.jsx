@@ -101,23 +101,13 @@ const Login = () => {
       return;
     }
 
-    /*
-      Firebase Phone Authentication currently requires
-      billing for real SMS in this project.
-
-      We are intentionally NOT calling Firebase Phone Auth.
-
-      The mobile number UI remains available so this
-      authentication method can be enabled later.
-    */
-
     setError(
       "Mobile verification is currently unavailable. Please continue with Google."
     );
   };
 
   return (
-    <div className="min-h-screen w-full flex items-end md:items-center justify-center bg-[#f3f7f4] relative overflow-hidden">
+    <div className="min-h-screen w-full flex items-end md:items-center justify-center bg-[#043b12] relative overflow-hidden">
 
       {/* Background */}
       <motion.div
@@ -135,7 +125,7 @@ const Login = () => {
         }}
       >
         {/* Desktop overlay */}
-        <div className="hidden md:block absolute inset-0 bg-[#eef5f0]/88" />
+        <div className="hidden md:block absolute inset-0 bg-[#105f24]/88" />
 
         {/* Mobile overlay */}
         <div className="md:hidden absolute inset-0 bg-black/30" />

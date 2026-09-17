@@ -168,7 +168,7 @@ const handleGoogleSignup = async () => {
         items-end
         md:items-center
         justify-center
-        bg-[#f3f7f4]
+        bg-[#043b12]
         relative
         overflow-hidden
       "
@@ -210,7 +210,7 @@ const handleGoogleSignup = async () => {
             md:block
             absolute
             inset-0
-            bg-[#eef5f0]/88
+            bg-[#105f24]/88
           "
         />
 
