@@ -27,6 +27,10 @@ await app.register( aiRoutes, { prefix: "/api/ai",});
 await app.register(lotRoutes,{ prefix: "/api/lots", });
 await app.register(handoverRoutes, { prefix: "/api/handovers",});
 
+app.get("/", async (request, reply) => {
+  return { message: "Kabadiwala Connect API is running" };
+});
+
 // Basic health check
 app.get("/api/health", async () => {
   return {
