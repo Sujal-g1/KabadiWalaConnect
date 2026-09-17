@@ -312,6 +312,7 @@ const finalizeLot = async (firebaseUid, lotId) => {
 };
 
 
+
 export default {
   createLot,
   getLots,

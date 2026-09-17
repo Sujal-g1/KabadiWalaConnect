@@ -13,6 +13,13 @@ enum UserRole {
   ADMIN
 }
 
+enum HandoverStatus {
+  PENDING
+  CONFIRMED
+  DISPUTED
+  CANCELLED
+}
+
 enum LotStatus {
   CREATED
   AVAILABLE
@@ -45,7 +52,8 @@ model User {
   preferredLanguage String
   operatingLocation String
 
-  lots EWasteLot[]
+  lots              EWasteLot[]
+  recyclerHandovers Handover[]  @relation("RecyclerHandovers")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -105,7 +113,8 @@ model EWasteLot {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  photos LotPhoto[]
+  photos   LotPhoto[]
+  handover Handover?
 
   @@index([collectorId])
   @@index([status])
@@ -126,4 +135,50 @@ model LotPhoto {
   createdAt DateTime @default(now())
 
   @@index([lotId])
+}
+
+model Handover {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  referenceId String @unique
+
+  lotId String    @unique @db.ObjectId
+  lot   EWasteLot @relation(fields: [lotId], references: [id])
+
+  actualWeight Float
+  weightUnit   String @default("kg")
+
+  latitude  Float?
+  longitude Float?
+  location  String?
+
+  handedOverAt DateTime @default(now())
+
+  finalValue Float?
+
+  recyclerId String? @db.ObjectId
+  recycler   User?   @relation("RecyclerHandovers", fields: [recyclerId], references: [id])
+
+  recyclerConfirmedAt DateTime?
+
+  status HandoverStatus @default(PENDING)
+
+  photos HandoverPhoto[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HandoverPhoto {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  handoverId String   @db.ObjectId
+  handover   Handover @relation(fields: [handoverId], references: [id])
+
+  url        String
+  storageKey String?
+
+  createdAt DateTime @default(now())
+
+  @@index([handoverId])
 }

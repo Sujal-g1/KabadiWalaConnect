@@ -55,6 +55,29 @@ const CollectorDashboard = () => {
             earnings={dashboardData.earnings}
           />
 
+          <button
+            type="button"
+            onClick={() => navigate("/collector/lots")}
+            className="
+              w-full
+              rounded-2xl
+              border
+              border-[var(--border)]
+              bg-[var(--surface)]
+              px-5
+              py-4
+              text-left
+              font-semibold
+              text-[var(--foreground)]
+              transition
+              hover:border-[var(--primary)]/40
+              hover:bg-[var(--surface-soft)]
+              active:scale-[0.99]
+            "
+          >
+  View All My Lots
+</button>
+
           <RecyclerPreview
             recyclers={dashboardData.recyclers}
           />

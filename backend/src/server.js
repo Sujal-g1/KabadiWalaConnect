@@ -9,15 +9,12 @@ import priceRoutes from "./modules/prices/price.routes.js";
 import aiRoutes from "./modules/ai/ai.routes.js";
 import lotRoutes from "./modules/lots/lot.routes.js";
 import multipart from "@fastify/multipart";
+import handoverRoutes from "./modules/handovers/handover.routes.js";
 
-const app = Fastify({
-  logger: true,
-});
+const app = Fastify({ logger: true,});
 
 // CORS
-await app.register(cors, {
-  origin: true,
-});
+await app.register(cors, { origin: true,});
 
 // Authentication plugin
 await app.register(authPlugin);
@@ -28,6 +25,7 @@ await app.register( authRoutes, { prefix: "/api/auth", });
 await app.register( priceRoutes, { prefix: "/api/prices", });
 await app.register( aiRoutes, { prefix: "/api/ai",});
 await app.register(lotRoutes,{ prefix: "/api/lots", });
+await app.register(handoverRoutes, { prefix: "/api/handovers",});
 
 // Basic health check
 app.get("/api/health", async () => {

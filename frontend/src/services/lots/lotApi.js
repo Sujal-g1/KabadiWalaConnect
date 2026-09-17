@@ -234,8 +234,62 @@ const finalizeLot = async (lotId) => {
   return data;
 };
 
+ const getLots = async () => {
+  const token = await getAuthToken();
+
+  const response = await fetch(
+    `${API_URL}/api/lots`,
+    {
+      method: "GET",
+
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message ||
+        "Failed to fetch lots"
+    );
+  }
+
+  return data;
+};
+
+const getLotById = async (lotId) => {
+  const token = await getAuthToken();
+
+  const response = await fetch(
+    `${API_URL}/api/lots/${lotId}`,
+    {
+      method: "GET",
+
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message ||
+        "Failed to fetch lot"
+    );
+  }
+
+  return data;
+};
+
 export {
   createLot,
   uploadLotPhoto,
   finalizeLot,
+  getLots,
+  getLotById,
 };

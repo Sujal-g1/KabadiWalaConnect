@@ -13,6 +13,9 @@ import ValuationTest from "./pages/ValuationTest";
 import CreateLot from "./pages/CreateLot/CreateLot";
 import CollectorDashboard from "./pages/CollectorDashboard/CollectorDashboard";
 import CollectorValuation from "./pages/CollectorValuation/CollectorValuation";
+import MyLots from "./pages/MyLots/MyLots";
+import LotDetails from "./pages/LotDetails/LotDetails";
+import Handover from "./pages/Handover/Handover";
 
 const App = () => {
   return (
@@ -60,6 +63,21 @@ const App = () => {
     path="/collector/valuation"
     element={<CollectorValuation />}
   />
+
+  <Route
+  path="/collector/lots"
+  element={<MyLots />}
+/>
+
+<Route
+  path="/collector/lots/:id"
+  element={<LotDetails />}
+/>
+
+<Route
+  path="/collector/lots/:id/handover"
+  element={<Handover />}
+/>
 
   <Route
   path="/collector/lots/create"
