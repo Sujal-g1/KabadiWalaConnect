@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ArrowLeft, Check } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowLeft, Check, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import LotPhotoSection from "./components/LotPhotoSection";
@@ -8,11 +8,21 @@ import WeightInput from "./components/WeightInput";
 import LocationSection from "./components/LocationSection";
 import LotDescription from "./components/LotDescription";
 import ValuationPreview from "./components/ValuationPreview";
-import useCurrentLocation from "../../hooks/useCurrentLocation";
-import { calculateValuation, } from "../../services/prices/priceApi";
-import { createLot,uploadLotPhoto, finalizeLot } from "../../services/lots/lotApi";
-import compressImage from"../../utils/compressImage";
 
+import useCurrentLocation from "../../hooks/useCurrentLocation";
+import {
+  calculateValuation,
+} from "../../services/prices/priceApi";
+
+import {
+  createLot,
+  uploadLotPhoto,
+  finalizeLot,
+} from "../../services/lots/lotApi";
+
+import compressImage from "../../utils/compressImage";
+
+const MAX_PHOTOS = 5;
 
 const CreateLot = () => {
   const navigate = useNavigate();
@@ -20,208 +30,477 @@ const CreateLot = () => {
   const location = useCurrentLocation();
 
   const [material, setMaterial] = useState("");
-  const [subcategory, setSubcategory] = useState("");
+  const [subcategory, setSubcategory] =
+    useState("");
+
   const [photos, setPhotos] = useState([]);
+
   const [weight, setWeight] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("");
-  const [description, setDescription] = useState("");
-  const [condition, setCondition] = useState("");
-  const [valuation, setValuation] = useState(null);
-  const [valuationLoading, setValuationLoading] = useState(false);
-  const [creating, setCreating] = useState(false);
-  const [error, setError] = useState("");
 
-  const pricingLocation = selectedLocation ||location.city;
+  const [selectedLocation, setSelectedLocation] =
+    useState("");
 
-  const canCalculate = photos.length > 0 &&
-    material &&
-    weight &&
-    Number(weight) > 0 &&
-    pricingLocation;
+  const [description, setDescription] =
+    useState("");
+
+  const [condition, setCondition] =
+    useState("");
+
+  const [valuation, setValuation] =
+    useState(null);
+
+  const [valuationLoading, setValuationLoading] =
+    useState(false);
+
+  const [creating, setCreating] =
+    useState(false);
+
+  const [error, setError] =
+    useState("");
+
+  const pricingLocation =
+    selectedLocation ||
+    location?.city ||
+    "";
+
+  /*
+   * --------------------------------------------------
+   * Reset valuation whenever important lot data changes
+   * --------------------------------------------------
+   */
+
+  useEffect(() => {
+    setValuation(null);
+  }, [
+    material,
+    subcategory,
+    weight,
+    pricingLocation,
+  ]);
+
+  /*
+   * --------------------------------------------------
+   * Cleanup photo preview URLs
+   * --------------------------------------------------
+   */
+
+  useEffect(() => {
+    return () => {
+      photos.forEach((photo) => {
+        if (photo.preview) {
+          URL.revokeObjectURL(photo.preview);
+        }
+      });
+    };
+  }, []);
+
+  /*
+   * --------------------------------------------------
+   * Validation
+   * --------------------------------------------------
+   */
+
+  const weightNumber = Number(weight);
+
+  const canCalculate =
+    photos.length > 0 &&
+    material.trim() !== "" &&
+    weight.trim() !== "" &&
+    Number.isFinite(weightNumber) &&
+    weightNumber > 0 &&
+    pricingLocation.trim() !== "";
+
+  const validateLot = () => {
+    if (photos.length === 0) {
+      return "Please add at least one photo.";
+    }
+
+    if (!material) {
+      return "Please select a material.";
+    }
+
+    if (!weight || !Number.isFinite(weightNumber)) {
+      return "Please enter a valid weight.";
+    }
+
+    if (weightNumber <= 0) {
+      return "Weight must be greater than 0 kg.";
+    }
+
+    if (!pricingLocation) {
+      return "Collection location is required.";
+    }
+
+    if (!valuation) {
+      return "Please calculate the estimated value first.";
+    }
+
+    return null;
+  };
+
+  /*
+   * --------------------------------------------------
+   * Calculate valuation
+   * --------------------------------------------------
+   */
 
   const handleCalculate = async () => {
+    setError("");
+
+    if (!canCalculate) {
+      setError(
+        "Please add a photo, select material, enter weight, and provide a location."
+      );
+
+      return;
+    }
+
     try {
-      setError("");
       setValuationLoading(true);
 
       const result =
         await calculateValuation({
           material,
           subcategory,
-          weight: Number(weight),
+          weight: weightNumber,
           location: pricingLocation,
         });
 
+      const calculatedValuation =
+        result?.valuation || result;
+
+      if (!calculatedValuation) {
+        throw new Error(
+          "Unable to calculate valuation."
+        );
+      }
+
       setValuation(
-        result.valuation || result
+        calculatedValuation
       );
     } catch (error) {
+      console.error(
+        "Valuation error:",
+        error
+      );
+
+      setValuation(null);
+
       setError(
-        error.message ||
-          "Unable to calculate valuation"
+        error?.message ||
+          "Unable to calculate valuation."
       );
     } finally {
       setValuationLoading(false);
     }
   };
 
-const handleCreateLot = async () => {
-  try {
+  /*
+   * --------------------------------------------------
+   * Create + upload + finalize
+   * --------------------------------------------------
+   */
+
+  const handleCreateLot = async () => {
     setError("");
-    setCreating(true);
 
-    if (photos.length === 0) {
-      throw new Error(
-        "Please add at least one photo."
-      );
+    const validationError =
+      validateLot();
+
+    if (validationError) {
+      setError(validationError);
+      return;
     }
 
-    if (!valuation) {
-      throw new Error(
-        "Please calculate the estimated value first."
-      );
-    }
-
-    const result = await createLot({
-      material,
-      subcategory,
-
-      approximateWeight:
-        Number(weight),
-
-      weightUnit: "kg",
-
-      latitude:
-        typeof location.latitude === "number"
-          ? location.latitude
-          : null,
-
-      longitude:
-        typeof location.longitude === "number"
-          ? location.longitude
-          : null,
-
-      location:
-        pricingLocation,
-
-      description,
-      condition,
-
-      estimatedRate:
-        valuation?.rate ??
-        valuation?.estimatedRate ??
-        null,
-
-      minEstimatedValue:
-        valuation?.minEstimatedValue ??
-        null,
-
-      maxEstimatedValue:
-        valuation?.maxEstimatedValue ??
-        null,
-
-      estimatedValue:
-        valuation?.estimatedValue ??
-        null,
-    });
-
-    const lot = result.lot;
-
-    // Upload all photos
-    for (const photo of photos) {
-      await uploadLotPhoto(
-        lot.id,
-        photo.file
-      );
-    }
-
-    // Make lot visible to recyclers
-    await finalizeLot(lot.id);
-
-    navigate(
-      `/collector/lots/${lot.id}`
-    );
-  } catch (error) {
-    console.error(
-      "Lot creation/upload/finalization error:",
-      error
-    );
-
-    setError(
-      error.message ||
-        "Unable to complete lot creation"
-    );
-  } finally {
-    setCreating(false);
-  }
-};
-
-const handleAddPhotos = async (files) => {
-  const remainingSlots = 5 - photos.length;
-  const selectedFiles =files.slice(0, remainingSlots);
-
-  const compressedPhotos = [];
-
-  for (const file of selectedFiles) {
     try {
-      const compressedFile = await compressImage(file);
+      setCreating(true);
 
-      compressedPhotos.push({
-        id: crypto.randomUUID(),
-        file: compressedFile,
-        preview:
-          URL.createObjectURL(
-            compressedFile
-          ),
+      /*
+       * STEP 1
+       * Create database lot
+       */
+
+      const result = await createLot({
+        material,
+        subcategory:
+          subcategory || null,
+
+        approximateWeight:
+          weightNumber,
+
+        weightUnit: "kg",
+
+        latitude:
+          typeof location?.latitude ===
+          "number"
+            ? location.latitude
+            : null,
+
+        longitude:
+          typeof location?.longitude ===
+          "number"
+            ? location.longitude
+            : null,
+
+        location:
+          pricingLocation,
+
+        description:
+          description.trim() || null,
+
+        condition:
+          condition || null,
+
+        estimatedRate:
+          valuation?.rate ??
+          valuation?.estimatedRate ??
+          null,
+
+        minEstimatedValue:
+          valuation?.minEstimatedValue ??
+          null,
+
+        maxEstimatedValue:
+          valuation?.maxEstimatedValue ??
+          null,
+
+        estimatedValue:
+          valuation?.estimatedValue ??
+          null,
       });
+
+      const lot = result?.lot;
+
+      if (!lot?.id) {
+        throw new Error(
+          "Lot was created but no lot ID was returned."
+        );
+      }
+
+      /*
+       * STEP 2
+       * Upload photos
+       */
+
+      for (
+        let index = 0;
+        index < photos.length;
+        index++
+      ) {
+        const photo = photos[index];
+
+        if (!photo?.file) {
+          continue;
+        }
+
+        await uploadLotPhoto(
+          lot.id,
+          photo.file
+        );
+      }
+
+      /*
+       * STEP 3
+       * Finalize lot
+       *
+       * Backend changes:
+       * CREATED → AVAILABLE
+       */
+
+      await finalizeLot(lot.id);
+
+      /*
+       * STEP 4
+       * Navigate to lot details
+       */
+
+      navigate(
+        `/collector/lots/${lot.id}`,
+        {
+          replace: true,
+        }
+      );
     } catch (error) {
       console.error(
-        "Image compression failed:",
+        "Lot creation flow failed:",
         error
       );
 
-      compressedPhotos.push({
-        id: crypto.randomUUID(),
-        file,
-        preview:
-          URL.createObjectURL(file),
-      });
+      setError(
+        error?.message ||
+          "Unable to complete lot creation."
+      );
+    } finally {
+      setCreating(false);
     }
-  }
+  };
 
-  setPhotos((prev) => [
-    ...prev,
-    ...compressedPhotos,
-  ]);
-};
+  /*
+   * --------------------------------------------------
+   * Add photos
+   * --------------------------------------------------
+   */
 
-const handleRemovePhoto = (photoId) => {
-  setPhotos((prev) => {
-    const photoToRemove =
-      prev.find(
-        (photo) => photo.id === photoId
-      );
-
-    if (photoToRemove?.preview) {
-      URL.revokeObjectURL(
-        photoToRemove.preview
-      );
+  const handleAddPhotos = async (
+    files
+  ) => {
+    if (!files?.length) {
+      return;
     }
 
-    return prev.filter(
-      (photo) => photo.id !== photoId
-    );
-  });
-};
+    setError("");
 
-    return (
+    const remainingSlots =
+      MAX_PHOTOS - photos.length;
+
+    if (remainingSlots <= 0) {
+      setError(
+        `You can add a maximum of ${MAX_PHOTOS} photos.`
+      );
+
+      return;
+    }
+
+    const selectedFiles =
+      files.slice(0, remainingSlots);
+
+    const compressedPhotos = [];
+
+    for (
+      const file of selectedFiles
+    ) {
+      if (
+        !file.type.startsWith("image/")
+      ) {
+        continue;
+      }
+
+      try {
+        const compressedFile =
+          await compressImage(file);
+
+        compressedPhotos.push({
+          id: crypto.randomUUID(),
+          file: compressedFile,
+          preview:
+            URL.createObjectURL(
+              compressedFile
+            ),
+        });
+      } catch (error) {
+        console.error(
+          "Image compression failed:",
+          error
+        );
+
+        compressedPhotos.push({
+          id: crypto.randomUUID(),
+          file,
+          preview:
+            URL.createObjectURL(file),
+        });
+      }
+    }
+
+    if (
+      compressedPhotos.length === 0
+    ) {
+      setError(
+        "No valid image files were selected."
+      );
+
+      return;
+    }
+
+    setPhotos((previous) => [
+      ...previous,
+      ...compressedPhotos,
+    ]);
+  };
+
+  /*
+   * --------------------------------------------------
+   * Remove photo
+   * --------------------------------------------------
+   */
+
+  const handleRemovePhoto = (
+    photoId
+  ) => {
+    setPhotos((previous) => {
+      const photo =
+        previous.find(
+          (item) =>
+            item.id === photoId
+        );
+
+      if (photo?.preview) {
+        URL.revokeObjectURL(
+          photo.preview
+        );
+      }
+
+      return previous.filter(
+        (item) =>
+          item.id !== photoId
+      );
+    });
+  };
+
+  /*
+   * --------------------------------------------------
+   * UI
+   * --------------------------------------------------
+   */
+
+  return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
-      <header className="sticky top-0 z-20 border-b border-[var(--border)] bg-[var(--background)]/95 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-2xl items-center gap-3 px-4">
+
+      {/* Header */}
+      <header
+        className="
+          sticky
+          top-0
+          z-20
+          border-b
+          border-[var(--border)]
+          bg-[var(--background)]/95
+          backdrop-blur
+        "
+      >
+        <div
+          className="
+            mx-auto
+            flex
+            h-16
+            max-w-2xl
+            items-center
+            gap-3
+            px-4
+          "
+        >
           <button
             type="button"
-            onClick={() => navigate(-1)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)]"
+            disabled={creating}
+            onClick={() =>
+              navigate(-1)
+            }
+            className="
+              flex
+              h-10
+              w-10
+              shrink-0
+              items-center
+              justify-center
+              rounded-xl
+              border
+              border-[var(--border)]
+              bg-[var(--surface)]
+              transition
+              active:scale-95
+              disabled:cursor-not-allowed
+              disabled:opacity-50
+            "
           >
             <ArrowLeft size={20} />
           </button>
@@ -238,33 +517,68 @@ const handleRemovePhoto = (photoId) => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl space-y-7 px-4 py-6 pb-32">
+      {/* Content */}
+      <main
+        className="
+          mx-auto
+          max-w-2xl
+          space-y-7
+          px-4
+          py-6
+          pb-32
+        "
+      >
+
+        {/* Error */}
         {error && (
-          <div className="rounded-2xl border border-[var(--danger)]/30 bg-[var(--danger)]/10 p-4 text-sm text-[var(--danger)]">
+          <div
+            role="alert"
+            className="
+              rounded-2xl
+              border
+              border-[var(--danger)]/30
+              bg-[var(--danger)]/10
+              p-4
+              text-sm
+              text-[var(--danger)]
+            "
+          >
             {error}
           </div>
         )}
 
+        {/* Photos */}
         <LotPhotoSection
           photos={photos}
-          onAddPhotos={handleAddPhotos}
-          onRemovePhoto={handleRemovePhoto}
+          onAddPhotos={
+            handleAddPhotos
+          }
+          onRemovePhoto={
+            handleRemovePhoto
+          }
         />
 
+        {/* Material */}
         <MaterialSelector
           material={material}
-          subcategory={subcategory}
-          onMaterialChange={setMaterial}
+          subcategory={
+            subcategory
+          }
+          onMaterialChange={
+            setMaterial
+          }
           onSubcategoryChange={
             setSubcategory
           }
         />
 
+        {/* Weight */}
         <WeightInput
           weight={weight}
           onChange={setWeight}
         />
 
+        {/* Location */}
         <LocationSection
           location={location}
           selectedLocation={
@@ -275,6 +589,7 @@ const handleRemovePhoto = (photoId) => {
           }
         />
 
+        {/* Description */}
         <LotDescription
           description={description}
           condition={condition}
@@ -286,47 +601,109 @@ const handleRemovePhoto = (photoId) => {
           }
         />
 
+        {/* Valuation */}
         <div className="space-y-3">
+
           <button
             type="button"
             disabled={
               !canCalculate ||
-              valuationLoading
+              valuationLoading ||
+              creating
             }
-            onClick={handleCalculate}
-            className="w-full rounded-2xl bg-[var(--primary)] px-5 py-4 font-semibold text-[var(--primary-foreground)] disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={
+              handleCalculate
+            }
+            className="
+              flex
+              min-h-14
+              w-full
+              items-center
+              justify-center
+              gap-2
+              rounded-2xl
+              bg-[var(--primary)]
+              px-5
+              py-4
+              font-semibold
+              text-[var(--primary-foreground)]
+              transition
+              active:scale-[0.99]
+              disabled:cursor-not-allowed
+              disabled:opacity-50
+            "
           >
-            {valuationLoading
-              ? "Calculating..."
-              : "Calculate Estimated Value"}
+            {valuationLoading ? (
+              <>
+                <Loader2
+                  size={19}
+                  className="animate-spin"
+                />
+
+                Calculating...
+              </>
+            ) : (
+              "Calculate Estimated Value"
+            )}
           </button>
 
           <ValuationPreview
             valuation={valuation}
-            loading={valuationLoading}
+            loading={
+              valuationLoading
+            }
           />
         </div>
 
+        {/* Create Lot */}
         {valuation && (
           <button
             type="button"
             disabled={creating}
-            onClick={handleCreateLot}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--primary)] px-5 py-4 font-semibold text-[var(--primary-foreground)] disabled:opacity-50"
+            onClick={
+              handleCreateLot
+            }
+            className="
+              flex
+              min-h-14
+              w-full
+              items-center
+              justify-center
+              gap-2
+              rounded-2xl
+              bg-[var(--primary)]
+              px-5
+              py-4
+              font-semibold
+              text-[var(--primary-foreground)]
+              transition
+              active:scale-[0.99]
+              disabled:cursor-not-allowed
+              disabled:opacity-60
+            "
           >
-            <Check size={20} />
+            {creating ? (
+              <>
+                <Loader2
+                  size={19}
+                  className="animate-spin"
+                />
 
-            {creating
-              ? "Creating Lot..."
-              : "Create Lot"}
+                Creating Lot...
+              </>
+            ) : (
+              <>
+                <Check size={20} />
+
+                Create Lot
+              </>
+            )}
           </button>
         )}
+
       </main>
     </div>
   );
 };
 
 export default CreateLot;
-
-
-

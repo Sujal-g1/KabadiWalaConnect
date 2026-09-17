@@ -4,12 +4,13 @@ import {
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
-
 import useAuthStore from "../../../store/authStore";
+import AIAssistantButton from "../../../components/AI/AIAssistantButton.jsx";
 
 const DashboardHeader = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
+
 
   const firstName =
     user?.firstName || "Collector";
@@ -41,6 +42,9 @@ const DashboardHeader = () => {
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
+
+      <AIAssistantButton />
+
         <button
           className="
             relative hidden h-10 w-10 items-center

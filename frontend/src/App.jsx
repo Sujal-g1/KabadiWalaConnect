@@ -18,6 +18,8 @@ import LotDetails from "./pages/LotDetails/LotDetails";
 import Handover from "./pages/Handover/Handover";
 
 import AppShell from "./mainComponents/layouts/AppShell";
+import CollectorProfile from "./pages/CollectorProfile";
+import AIChatbot from "./components/AI/AIChatbot";
 
 const App = () => {
   return (
@@ -109,6 +111,16 @@ const App = () => {
         <Route
           path="/collector/lots/:id/handover"
           element={<Handover />}
+        />
+
+        <Route
+          path="/collector/profile"
+          element={<CollectorProfile />}
+        />
+
+        <Route
+          path="/seva-ai"
+          element={<AIChatbot />}
         />
 
       </Route>

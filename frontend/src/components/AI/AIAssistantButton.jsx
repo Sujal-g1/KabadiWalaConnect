@@ -6,13 +6,21 @@ import {
   motion,
 } from "framer-motion";
 
-const AIAssistantButton = ({
-  onClick,
-}) => {
+import {
+  useNavigate,
+} from "react-router-dom";
+
+const AIAssistantButton = () => {
+
+  const navigate = useNavigate();
+
   return (
     <motion.button
       type="button"
-      onClick={onClick}
+      onClick={() => {
+        console.log("SEVA AI clicked");
+        navigate("/seva-ai");
+      }}
       whileHover={{
         scale: 1.05,
       }}
@@ -20,31 +28,25 @@ const AIAssistantButton = ({
         scale: 0.95,
       }}
       className="
-        fixed
-        bottom-6
-        right-5
-        z-40
-
         flex
+        h-10
         items-center
         gap-2
+        rounded-xl
+        border
+        border-[var(--border)]
+        bg-[var(--surface)]
+        px-3
+        text-[var(--primary)]
+        transition
 
-        rounded-full
-        bg-[var(--primary)]
-
-        px-4
-        py-3
-
-        text-sm
-        font-semibold
-        text-[var(--primary-foreground)]
-
-        shadow-xl
+        hover:bg-[var(--accent)]
+        active:scale-95
       "
     >
       <Sparkles size={18} />
 
-      <span>
+      <span className="text-sm font-semibold">
         SEVA-AI
       </span>
     </motion.button>

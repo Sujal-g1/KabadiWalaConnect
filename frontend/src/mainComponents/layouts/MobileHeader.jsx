@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
-
+import logo from "../../assets/images/logo.webp";
 import useAuthStore from "../../store/authStore";
 
 const MobileHeader = ({ onMenuClick }) => {
@@ -43,27 +43,18 @@ const MobileHeader = ({ onMenuClick }) => {
           onClick={() => navigate("/collector")}
           className="flex items-center gap-2"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)]">
-            <span className="text-sm">♻</span>
-          </div>
+             <img 
+                       src={logo}
+                        alt="Logo" 
+                        className="flex h-10 w-10" />
 
           <span className="text-sm font-bold tracking-tight text-[var(--foreground)]">
-            KabadiWala
+            Kabadiwala Connect
           </span>
         </button>
       </div>
 
       <div className="flex items-center gap-1">
-        <button
-          className="
-            flex h-10 w-10 items-center justify-center
-            rounded-xl text-[var(--muted)]
-            hover:bg-[var(--surface-soft)]
-          "
-        >
-          <Search size={19} />
-        </button>
-
         <button
           className="
             relative flex h-10 w-10 items-center justify-center

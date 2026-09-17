@@ -7,7 +7,7 @@ const HandoverWeight = ({
   return (
     <section
       className="
-        rounded-2xl
+        rounded-3xl
         border border-[var(--border)]
         bg-[var(--surface)]
         p-5
@@ -23,7 +23,7 @@ const HandoverWeight = ({
             text-[var(--primary)]
           "
         >
-          <Scale size={20} />
+          <Scale size={19} />
         </div>
 
         <div>
@@ -31,14 +31,13 @@ const HandoverWeight = ({
             Actual Weight
           </h2>
 
-          <p className="mt-1 text-xs text-[var(--muted)]">
-            Enter the weight measured during
-            handover.
+          <p className="mt-1 text-xs leading-5 text-[var(--muted)]">
+            Enter the weight measured during handover.
           </p>
         </div>
       </div>
 
-      <div className="mt-4 flex items-center gap-3">
+      <div className="mt-5 flex items-center gap-3">
         <input
           type="number"
           min="0"
@@ -50,27 +49,40 @@ const HandoverWeight = ({
           }
           placeholder="12.4"
           className="
-            w-full rounded-xl
+            h-14
+            min-w-0
+            flex-1
+            rounded-2xl
             border border-[var(--border)]
             bg-[var(--surface-soft)]
-            px-4 py-3
-            text-lg font-medium
+            px-4
+            text-xl
+            font-semibold
             text-[var(--foreground)]
             outline-none
             transition
+            placeholder:text-[var(--muted)]
             focus:border-[var(--primary)]
+            focus:ring-2
+            focus:ring-[var(--primary)]/10
           "
         />
 
-        <span
+        <div
           className="
-            shrink-0
-            text-sm font-medium
+            flex h-14
+            items-center
+            rounded-2xl
+            border border-[var(--border)]
+            bg-[var(--surface-soft)]
+            px-4
+            text-sm
+            font-semibold
             text-[var(--muted)]
           "
         >
           kg
-        </span>
+        </div>
       </div>
     </section>
   );

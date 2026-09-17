@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import { useLocation, useNavigate } from "react-router-dom";
-
+import logo from "../../assets/images/logo.webp";
 import useAuthStore from "../../store/authStore";
 import { logoutFirebase } from "../../services/auth/googleAuth";
 import useTranslation from "../../i18n/useTranslation";
@@ -151,7 +151,9 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
             onClick={() => navigate("/collector")}
             className="flex items-center gap-3"
           >
-            <img src="./favicon.svg" alt="" 
+            <img 
+           src={logo}
+            alt="Logo" 
             className="flex h-13 w-13" />
 
             <div className="text-left">
@@ -169,9 +171,11 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
         {collapsed && (
           <button
             onClick={() => navigate("/collector")}
-            className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--primary)] text-[var(--primary-foreground)]"
           >
-            <Recycle size={20} />
+          <img 
+           src={logo}
+            alt="Logo" 
+            className="flex h-13 w-13" />
           </button>
         )}
 
