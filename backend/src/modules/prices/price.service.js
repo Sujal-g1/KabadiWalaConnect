@@ -20,18 +20,21 @@ const getPrices = async ({
     };
   }
 
-  const prices = await prisma.priceHistory.findMany({
-    where,
-    orderBy: {
-      recordedAt: "desc",
-    },
-  });
+  const prices =
+    await prisma.priceHistory.findMany({
+      where,
+
+      orderBy: {
+        recordedAt: "desc",
+      },
+    });
 
   return prices;
 };
 
 const getPriceHistory = async ({
   material,
+  subcategory,
   location,
   limit = 30,
 }) => {
@@ -40,6 +43,13 @@ const getPriceHistory = async ({
   if (material) {
     where.material = {
       equals: material,
+      mode: "insensitive",
+    };
+  }
+
+  if (subcategory) {
+    where.subcategory = {
+      equals: subcategory,
       mode: "insensitive",
     };
   }
@@ -53,9 +63,11 @@ const getPriceHistory = async ({
 
   return prisma.priceHistory.findMany({
     where,
+
     orderBy: {
       recordedAt: "desc",
     },
+
     take: Number(limit),
   });
 };

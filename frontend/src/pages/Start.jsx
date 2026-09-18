@@ -155,11 +155,12 @@ const Start = () => {
             <button
               type="button"
               aria-label="Login as Recycler"
-              onClick={() =>
-              navigate("/login", {
-                state: { role: "recycler" },
-              })
-            }
+              onClick={()=> navigate("/recycler")}
+            //   onClick={() =>
+            //   navigate("/login", {
+            //     state: { role: "recycler" },
+            //   })
+            // }
               className="group relative flex min-h-[68px] w-full items-center gap-4 rounded-2xl bg-emerald-800/80 p-4 text-left shadow-lg shadow-black/20 backdrop-blur-md ring-1 ring-emerald-400/30 transition-all duration-300 hover:-translate-y-1 hover:bg-emerald-700 hover:ring-emerald-400 hover:shadow-2xl hover:shadow-emerald-950/50 focus:outline-none focus:ring-2 focus:ring-emerald-400 active:scale-[0.98]"
             >
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-700/60 text-2xl ring-1 ring-emerald-400/30 transition-transform duration-300 group-hover:scale-110">

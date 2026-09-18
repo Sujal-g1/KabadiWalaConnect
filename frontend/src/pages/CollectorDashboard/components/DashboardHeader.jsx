@@ -6,6 +6,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../../../store/authStore";
 import AIAssistantButton from "../../../components/AI/AIAssistantButton.jsx";
+import EWasteAIButton from "../../../components/EWasteAIButton.jsx";
 
 const DashboardHeader = () => {
   const navigate = useNavigate();
@@ -20,6 +21,16 @@ const DashboardHeader = () => {
       .trim()
       .toUpperCase() || "U";
 
+      const getGreeting = () => {
+  const hour = new Date().getHours();
+
+  if (hour < 12) return "Good Morning";
+  if (hour < 17) return "Good Afternoon";
+  if (hour < 21) return "Good Evening";
+
+  return "Good night";
+};
+
   return (
     <div className="mb-7 flex items-start justify-between gap-4">
       <div className="min-w-0">
@@ -33,7 +44,7 @@ const DashboardHeader = () => {
         </div>
 
         <h1 className="text-2xl font-bold tracking-tight text-[var(--foreground)] sm:text-3xl">
-          Good morning, {firstName}
+         {getGreeting()}, {firstName}
         </h1>
 
         <p className="mt-1 text-sm text-[var(--muted)]">
@@ -44,6 +55,8 @@ const DashboardHeader = () => {
       <div className="flex shrink-0 items-center gap-2">
 
       <AIAssistantButton />
+
+       <EWasteAIButton />
 
         <button
           className="

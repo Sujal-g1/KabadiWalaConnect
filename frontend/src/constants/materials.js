@@ -5,7 +5,8 @@ const materials = [
     icon: "🖥️",
     subcategories: [
       "CRT Monitor",
-      "CRT Television",
+      "CRT TV",
+      "CRT Tube",
     ],
   },
 
@@ -14,9 +15,9 @@ const materials = [
     label: "LCD",
     icon: "📺",
     subcategories: [
-      "LCD Monitor",
-      "LCD Television",
+      "LCD Panel",
       "LED Panel",
+      "Display Assembly",
     ],
   },
 
@@ -25,21 +26,20 @@ const materials = [
     label: "PCB",
     icon: "🔌",
     subcategories: [
+      "Mixed PCB",
       "Computer PCB",
       "Mobile PCB",
       "TV PCB",
-      "Mixed PCB",
     ],
   },
 
   {
-    id: "CABLE",
-    label: "Cable",
+    id: "CABLES",
+    label: "Cables",
     icon: "🔗",
     subcategories: [
-      "Copper Wire",
-      "Power Cable",
-      "Data Cable",
+      "Copper Cable",
+      "Aluminium Cable",
       "Mixed Cable",
     ],
   },
@@ -51,7 +51,7 @@ const materials = [
     subcategories: [
       "Lead Acid Battery",
       "Lithium Battery",
-      "Mixed Battery",
+      "UPS Battery",
     ],
   },
 
@@ -60,8 +60,8 @@ const materials = [
     label: "Motor",
     icon: "⚙️",
     subcategories: [
-      "Electric Motor",
-      "Fan Motor",
+      "Copper Motor",
+      "Aluminium Motor",
       "Mixed Motor",
     ],
   },
@@ -71,8 +71,42 @@ const materials = [
     label: "Mixed Plastic",
     icon: "♻️",
     subcategories: [
-      "Hard Plastic",
-      "Mixed Plastic",
+      "E-Waste Plastic",
+      "ABS Plastic",
+      "Mixed Hard Plastic",
+    ],
+  },
+
+  {
+    id: "COPPER",
+    label: "Copper",
+    icon: "🟠",
+    subcategories: [
+      "Bare Copper",
+      "Copper Scrap",
+      "Insulated Copper",
+    ],
+  },
+
+  {
+    id: "ALUMINIUM",
+    label: "Aluminium",
+    icon: "⚪",
+    subcategories: [
+      "Aluminium Scrap",
+      "Aluminium Sheet",
+      "Aluminium Mixed",
+    ],
+  },
+
+  {
+    id: "IRON",
+    label: "Iron",
+    icon: "🔩",
+    subcategories: [
+      "Iron Scrap",
+      "Steel Scrap",
+      "Mixed Ferrous",
     ],
   },
 ];
