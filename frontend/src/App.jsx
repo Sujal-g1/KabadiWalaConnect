@@ -15,11 +15,10 @@ import Start from "./pages/Start";
 // =========================
 
 import CollectorLogin from "./pages/CollectorLogin";
-import CollectorTrainer from "./pages/CollectorTrainer";
 import CollectorSignup from "./pages/CollectorSignup";
 import CollectorSettings from "./pages/CollectorSettings";
 import CollectorProfile from "./pages/CollectorProfile";
-
+import RewardsPage from "./pages/Rewards/RewardsPage";
 import PriceBoard from "./pages/PriceBoard/PriceBoard";
 import ValuationTest from "./pages/ValuationTest";
 import CreateLot from "./pages/CreateLot/CreateLot";
@@ -169,9 +168,9 @@ const App = () => {
         />
 
         <Route
-          path="/collector/trainer"
-          element={<CollectorTrainer />}
-        />
+            path="/collector/rewards"
+            element={<RewardsPage />}
+            />
 
       </Route>
 

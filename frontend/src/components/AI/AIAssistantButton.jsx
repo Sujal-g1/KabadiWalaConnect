@@ -47,7 +47,7 @@ const AIAssistantButton = () => {
       <Sparkles size={18} />
 
       <span className="text-sm font-semibold">
-        SEVA-AI
+        ECO-MITRA
       </span>
     </motion.button>
   );

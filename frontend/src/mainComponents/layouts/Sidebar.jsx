@@ -9,7 +9,15 @@ import {
   Settings,
   LogOut,
   ChevronLeft,
+   Home,
+  PlusCircle,
+  TrendingUp,
+  Calculator,
+  Gift,
+  Store,
+  User,
 } from "lucide-react";
+
 
 import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/images/logo.webp";
@@ -40,6 +48,11 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       icon: IndianRupee,
       path: "/collector/prices",
     },
+    {
+    label: "Rewards",
+    icon: Gift,
+    path: "/collector/rewards",
+  },
     {
       label: t("navigation.recyclers"),
       icon: Recycle,

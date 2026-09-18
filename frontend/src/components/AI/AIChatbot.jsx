@@ -40,7 +40,7 @@ const AIChatbot = () => {
   const [messages, setMessages] = useState([
     {
       role: "assistant",
-      text: "Namaste! I'm SEVA-AI. I can help you with e-waste prices, collections, recyclers and more.",
+      text: "Namaste! I'm ECO-MITRA. I can help you with e-waste prices, collections, recyclers and more.",
     },
   ]);
 
@@ -499,7 +499,7 @@ const AIChatbot = () => {
 
               <img
                 src={Logo}
-                alt="SEVA-AI"
+                alt="ECO-MITRA"
                 className="
                   h-8
                   w-8
@@ -526,7 +526,7 @@ const AIChatbot = () => {
                     text-[var(--foreground)]
                   "
                 >
-                  SEVA-AI
+                  ECO-MITRA
                 </h1>
 
                 <Sparkles
@@ -847,9 +847,9 @@ const AIChatbot = () => {
                 {isListening
                   ? "I'm listening..."
                   : isSpeaking
-                    ? "SEVA-AI is speaking"
+                    ? "ECO-MITRA is speaking"
                     : loading
-                      ? "SEVA-AI is thinking..."
+                      ? "ECO-MITRA is thinking..."
                       : "Tap the mic to speak"}
 
               </h2>
@@ -1288,7 +1288,7 @@ const AIChatbot = () => {
 
                 </div>
 
-                SEVA-AI is thinking...
+                ECO-MITRA is thinking...
 
               </motion.div>
 
@@ -1346,7 +1346,7 @@ const AIChatbot = () => {
                 }
 
               }}
-              placeholder="Ask SEVA-AI..."
+              placeholder="Ask ECO-MITRA..."
               className="
                 min-w-0
                 flex-1
