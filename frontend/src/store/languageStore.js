@@ -1,30 +1,59 @@
 import { create } from "zustand";
 
-const SUPPORTED_LANGUAGES = ["hi", "mr", "en"];
+import {
+  DEFAULT_LANGUAGE,
+  SUPPORTED_LANGUAGE_CODES,
+} from "../i18n/languages.js";
 
 const getStoredLanguage = () => {
   if (typeof window === "undefined") {
-    return "hi";
+    return DEFAULT_LANGUAGE;
   }
 
-  const storedLanguage =
-    localStorage.getItem("kabadiwala_language");
+  const stored =
+    localStorage.getItem(
+      "kabadiwala_language"
+    );
 
   if (
-    storedLanguage &&
-    SUPPORTED_LANGUAGES.includes(storedLanguage)
+    stored &&
+    SUPPORTED_LANGUAGE_CODES.includes(stored)
   ) {
-    return storedLanguage;
+    return stored;
   }
 
-  return "hi";
+  return DEFAULT_LANGUAGE;
+};
+
+const getStoredSource = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return localStorage.getItem(
+    "kabadiwala_language_source"
+  );
 };
 
 const useLanguageStore = create((set) => ({
   language: getStoredLanguage(),
 
-  setLanguage: (language) => {
-    if (!SUPPORTED_LANGUAGES.includes(language)) {
+  /*
+    null   → never detected
+    region → automatically selected
+    user   → manually selected
+  */
+  languageSource: getStoredSource(),
+
+  setLanguage: (
+    language,
+    source = "user"
+  ) => {
+    if (
+      !SUPPORTED_LANGUAGE_CODES.includes(
+        language
+      )
+    ) {
       return;
     }
 
@@ -33,8 +62,14 @@ const useLanguageStore = create((set) => ({
       language
     );
 
+    localStorage.setItem(
+      "kabadiwala_language_source",
+      source
+    );
+
     set({
       language,
+      languageSource: source,
     });
   },
 }));

@@ -1,18 +1,19 @@
 import {
-  ArrowRight,
   CircleHelp,
-  IndianRupee,
-  LocateFixed,
+  LogIn,
   Package,
+  IndianRupee,
   Recycle,
-  ShieldCheck,
-  Sparkles,
+  Truck,
   WalletCards,
+  ShieldCheck,
   WifiOff,
+  Sparkles,
 } from "lucide-react";
 
 export const LEARNING_STEPS = [
   {
+    id: "what",
     icon: CircleHelp,
 
     titleKey: "learning.steps.what.title",
@@ -25,10 +26,24 @@ export const LEARNING_STEPS = [
       "learning.steps.what.point2",
       "learning.steps.what.point3",
     ],
+
+    voice: {
+      intro:
+        "learning.voice.what.intro",
+
+      sections: [
+        "learning.voice.what.explain",
+        "learning.voice.what.how",
+        "learning.voice.what.benefit",
+        "learning.voice.what.example",
+        "learning.voice.what.remember",
+      ],
+    },
   },
 
   {
-    icon: ArrowRight,
+    id: "login",
+    icon: LogIn,
 
     titleKey: "learning.steps.login.title",
 
@@ -40,9 +55,23 @@ export const LEARNING_STEPS = [
       "learning.steps.login.point2",
       "learning.steps.login.point3",
     ],
+
+    voice: {
+      intro:
+        "learning.voice.login.intro",
+
+      sections: [
+        "learning.voice.login.first",
+        "learning.voice.login.mobile",
+        "learning.voice.login.account",
+        "learning.voice.login.example",
+        "learning.voice.login.remember",
+      ],
+    },
   },
 
   {
+    id: "lot",
     icon: Package,
 
     titleKey: "learning.steps.lot.title",
@@ -55,9 +84,23 @@ export const LEARNING_STEPS = [
       "learning.steps.lot.point2",
       "learning.steps.lot.point3",
     ],
+
+    voice: {
+      intro:
+        "learning.voice.lot.intro",
+
+      sections: [
+        "learning.voice.lot.photo",
+        "learning.voice.lot.category",
+        "learning.voice.lot.weight",
+        "learning.voice.lot.example",
+        "learning.voice.lot.remember",
+      ],
+    },
   },
 
   {
+    id: "price",
     icon: IndianRupee,
 
     titleKey: "learning.steps.price.title",
@@ -70,9 +113,23 @@ export const LEARNING_STEPS = [
       "learning.steps.price.point2",
       "learning.steps.price.point3",
     ],
+
+    voice: {
+      intro:
+        "learning.voice.price.intro",
+
+      sections: [
+        "learning.voice.price.current",
+        "learning.voice.price.history",
+        "learning.voice.price.offers",
+        "learning.voice.price.example",
+        "learning.voice.price.remember",
+      ],
+    },
   },
 
   {
+    id: "recycler",
     icon: Recycle,
 
     titleKey:
@@ -86,10 +143,24 @@ export const LEARNING_STEPS = [
       "learning.steps.recycler.point2",
       "learning.steps.recycler.point3",
     ],
+
+    voice: {
+      intro:
+        "learning.voice.recycler.intro",
+
+      sections: [
+        "learning.voice.recycler.material",
+        "learning.voice.recycler.location",
+        "learning.voice.recycler.compare",
+        "learning.voice.recycler.example",
+        "learning.voice.recycler.remember",
+      ],
+    },
   },
 
   {
-    icon: LocateFixed,
+    id: "handover",
+    icon: Truck,
 
     titleKey:
       "learning.steps.handover.title",
@@ -102,9 +173,23 @@ export const LEARNING_STEPS = [
       "learning.steps.handover.point2",
       "learning.steps.handover.point3",
     ],
+
+    voice: {
+      intro:
+        "learning.voice.handover.intro",
+
+      sections: [
+        "learning.voice.handover.pickup",
+        "learning.voice.handover.weight",
+        "learning.voice.handover.record",
+        "learning.voice.handover.example",
+        "learning.voice.handover.remember",
+      ],
+    },
   },
 
   {
+    id: "payment",
     icon: WalletCards,
 
     titleKey:
@@ -118,9 +203,23 @@ export const LEARNING_STEPS = [
       "learning.steps.payment.point2",
       "learning.steps.payment.point3",
     ],
+
+    voice: {
+      intro:
+        "learning.voice.payment.intro",
+
+      sections: [
+        "learning.voice.payment.amount",
+        "learning.voice.payment.status",
+        "learning.voice.payment.history",
+        "learning.voice.payment.example",
+        "learning.voice.payment.remember",
+      ],
+    },
   },
 
   {
+    id: "safety",
     icon: ShieldCheck,
 
     titleKey:
@@ -134,9 +233,23 @@ export const LEARNING_STEPS = [
       "learning.steps.safety.point2",
       "learning.steps.safety.point3",
     ],
+
+    voice: {
+      intro:
+        "learning.voice.safety.intro",
+
+      sections: [
+        "learning.voice.safety.battery",
+        "learning.voice.safety.burning",
+        "learning.voice.safety.acid",
+        "learning.voice.safety.example",
+        "learning.voice.safety.remember",
+      ],
+    },
   },
 
   {
+    id: "offline",
     icon: WifiOff,
 
     titleKey:
@@ -150,9 +263,23 @@ export const LEARNING_STEPS = [
       "learning.steps.offline.point2",
       "learning.steps.offline.point3",
     ],
+
+    voice: {
+      intro:
+        "learning.voice.offline.intro",
+
+      sections: [
+        "learning.voice.offline.network",
+        "learning.voice.offline.saved",
+        "learning.voice.offline.sync",
+        "learning.voice.offline.example",
+        "learning.voice.offline.remember",
+      ],
+    },
   },
 
   {
+    id: "ai",
     icon: Sparkles,
 
     titleKey:
@@ -166,5 +293,18 @@ export const LEARNING_STEPS = [
       "learning.steps.ai.point2",
       "learning.steps.ai.point3",
     ],
+
+    voice: {
+      intro:
+        "learning.voice.ai.intro",
+
+      sections: [
+        "learning.voice.ai.seva",
+        "learning.voice.ai.photo",
+        "learning.voice.ai.help",
+        "learning.voice.ai.example",
+        "learning.voice.ai.remember",
+      ],
+    },
   },
 ];

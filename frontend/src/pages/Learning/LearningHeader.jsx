@@ -6,9 +6,10 @@ import {
   Monitor,
   Moon,
   Sun,
-  Languages,
+  MapPin,
   Sparkles,
 } from "lucide-react";
+
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
@@ -18,7 +19,8 @@ import Logo from "../../assets/images/logo.webp";
 import useTranslation from "../../i18n/useTranslation";
 import useLanguageStore from "../../store/languageStore";
 import useThemeStore from "../../store/themeStore";
-import AIAssistantButton from "../../components/AI/AIAssistantButton";
+import useRegionStore from "../../store/regionStore";
+import { SUPPORTED_LANGUAGES } from "../../i18n/languages";
 
 const LearningHeader = ({
   currentStep = 0,
@@ -29,56 +31,22 @@ const LearningHeader = ({
 
   const { language, setLanguage } = useLanguageStore();
   const { theme, setTheme } = useThemeStore();
+  const { city, state, status, } = useRegionStore();
 
   const [openDropdown, setOpenDropdown] = useState(null);
-
   const headerRef = useRef(null);
+
+ const locationLabel =
+  city && state
+    ? `${city}`
+    // ? `${city}, ${state}`
+    : state ||
+      t("learning.locationUnavailable");
 
   const current = currentStep + 1;
   const progress = (current / totalSteps) * 100;
 
-  /* ============================================================
-     CLOSE DROPDOWNS
-  ============================================================ */
 
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (
-        headerRef.current &&
-        !headerRef.current.contains(event.target)
-      ) {
-        setOpenDropdown(null);
-      }
-    };
-
-    const handleEscape = (event) => {
-      if (event.key === "Escape") {
-        setOpenDropdown(null);
-      }
-    };
-
-    document.addEventListener(
-      "mousedown",
-      handleOutsideClick
-    );
-
-    document.addEventListener(
-      "keydown",
-      handleEscape
-    );
-
-    return () => {
-      document.removeEventListener(
-        "mousedown",
-        handleOutsideClick
-      );
-
-      document.removeEventListener(
-        "keydown",
-        handleEscape
-      );
-    };
-  }, []);
 
   /* ============================================================
      TOGGLE DROPDOWN
@@ -90,27 +58,19 @@ const LearningHeader = ({
     );
   };
 
-  /* ============================================================
-     LANGUAGE DATA
-  ============================================================ */
-
-  const languageOptions = [
-    {
-      value: "hi",
-      short: "हि",
-      label: "हिन्दी",
-    },
-    {
-      value: "mr",
-      short: "म",
-      label: "मराठी",
-    },
-    {
-      value: "en",
-      short: "EN",
-      label: "English",
-    },
-  ];
+  const languageOptions =
+  SUPPORTED_LANGUAGES.map((item) => ({
+    value: item.code,
+    label: item.nativeLabel,
+    short:
+      item.code === "hi"
+        ? "हि"
+        : item.code === "mr"
+          ? "म"
+          : item.code === "en"
+            ? "EN"
+            : item.code.toUpperCase(),
+  }));
 
   const selectedLanguage =
     languageOptions.find(
@@ -120,7 +80,6 @@ const LearningHeader = ({
   /* ============================================================
      THEME DATA
   ============================================================ */
-
   const themeOptions = [
     {
       value: "system",
@@ -253,6 +212,31 @@ const LearningHeader = ({
           ================================================= */}
 
           <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+
+            <div
+            className="
+                flex max-w-[140px]
+                items-center gap-1
+                sm:max-w-none
+            "
+            title={locationLabel}
+            >
+            <MapPin
+                size={13}
+                className="shrink-0 text-[var(--primary)]"
+            />
+
+            <span className="truncate text-[9px] font-semibold text-[var(--muted)] sm:text-xs">
+                <span className="sm:hidden">
+                {state ||
+                    t("learning.locationUnavailable")}
+                </span>
+
+                <span className="hidden sm:inline">
+                {locationLabel}
+                </span>
+            </span>
+            </div>
 
           <button
             type="button"

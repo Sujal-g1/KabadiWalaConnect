@@ -4,15 +4,10 @@ import {
   Navigate,
 } from "react-router-dom";
 
-// =========================
 // COMMON / LANDING
-// =========================
-
 import Start from "./pages/Start";
 
-// =========================
 // COLLECTOR
-// =========================
 
 import CollectorLogin from "./pages/CollectorLogin";
 import CollectorSignup from "./pages/CollectorSignup";
@@ -30,21 +25,15 @@ import Handover from "./pages/Handover/Handover";
 
 import AppShell from "./mainComponents/layouts/AppShell";
 
-// =========================
-// AI
-// =========================
-
 import AIChatbot from "./components/AI/AIChatbot";
 
-// =========================
 // RECYCLER
-// =========================
-
 import RecyclerShell from "./Recycler/layouts/RecyclerShell";
 
 import RecyclerDashboard from "./Recycler/pages/RecyclerDashboard";
 import EWasteAI from "./pages/EWasteAI";
 import LearningPage from "./pages/Learning/LearningPage";
+import useRegionLanguage from "./hooks/useRegionLanguage";
 // import RecyclerMarketplace from "./Recycler/pages/RecyclerMarketplace";
 // import RecyclerOffers from "./Recycler/pages/RecyclerOffers";
 // import RecyclerPickups from "./pages/Recycler/RecyclerPickups";
@@ -60,12 +49,11 @@ import LearningPage from "./pages/Learning/LearningPage";
 
 
 const App = () => {
+  useRegionLanguage();
   return (
     <Routes>
 
-      {/* =====================================================
-          LANDING
-      ===================================================== */}
+      {/* LANDING */}
 
       <Route
         path="/"
@@ -180,7 +168,7 @@ const App = () => {
       </Route>
 
 
-      // ================ RECYCLER APPLICATION
+       {/* ================ RECYCLER APPLICATION */}
 
       <Route element={<RecyclerShell />}>
 

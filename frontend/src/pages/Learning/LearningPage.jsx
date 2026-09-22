@@ -6,58 +6,80 @@ import {
   CircleHelp,
   IndianRupee,
   Languages,
-  LocateFixed,
   LogIn,
-  Mic,
-  Package,
-  Play,
   Recycle,
   ShieldCheck,
-  Sparkles,
+  Square,
+  Volume2,
   WalletCards,
   WifiOff,
-  X,
+
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import useTranslation from "../../i18n/useTranslation";
-import { speakLearningText } from "./learningVoice";
+import useLanguageStore from "../../store/languageStore";
+import {
+  speakLearningText,
+  stopLearningSpeech,
+  isSpeechSupported,
+} from "./learningVoice";
 import { LEARNING_STEPS } from "./learningData";
 import LearningHeader from "./LearningHeader";
 
 const LearningPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { language } = useLanguageStore();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   const step = LEARNING_STEPS[currentStep];
 
-  const progress = useMemo(
-    () =>
+  const progress = useMemo(() =>
       Math.round(
         ((currentStep + 1) / LEARNING_STEPS.length) * 100
       ),
     [currentStep]
   );
 
-  const handleSpeak = () => {
-    const text = [
-      t(step.titleKey),
-      t(step.descriptionKey),
-      ...(step.points || []).map((point) => t(point)),
-    ].join(". ");
+const handleSpeak = () => {
+  if (isSpeaking) {
+    stopLearningSpeech();
+    setIsSpeaking(false);
+    return;
+  }
 
-    speakLearningText(text, {
-      lang:
-        document.documentElement.lang ||
-        "hi-IN",
-      onStart: () => setIsSpeaking(true),
-      onEnd: () => setIsSpeaking(false),
-      onError: () => setIsSpeaking(false),
-    });
-  };
+  const voiceContent = [
+    step.voice?.intro,
+    ...(step.voice?.sections || []),
+  ]
+    .filter(Boolean)
+    .map((key) => t(key))
+    .filter(Boolean);
+
+  speakLearningText(voiceContent, {
+    language,
+
+    onStart: () => {
+      setIsSpeaking(true);
+    },
+
+    onEnd: () => {
+      setIsSpeaking(false);
+    },
+
+    onError: (error) => {
+      console.error(
+        "Learning speech failed:",
+        error
+      );
+
+      setIsSpeaking(false);
+    },
+  });
+};
 
   const handleNext = () => {
     if (currentStep < LEARNING_STEPS.length - 1) {
@@ -153,32 +175,32 @@ const LearningPage = () => {
                 {t("learning.listenLabel")}
               </p>
 
-              <button
-                type="button"
-                onClick={handleSpeak}
-                className={`
-                  mt-3 inline-flex min-h-12 items-center gap-2 rounded-2xl px-5 py-3
-                  text-sm font-bold transition active:scale-[0.98]
-                  ${
-                    isSpeaking
-                      ? "bg-amber-100 text-amber-700"
-                      : "bg-[var(--primary)] text-[var(--primary-foreground)]"
-                  }
-                `}
-              >
-                <Mic
-                  size={18}
-                  className={
-                    isSpeaking
-                      ? "animate-pulse"
-                      : ""
-                  }
-                />
+            <button
+            type="button"
+            onClick={handleSpeak}
+            className={`
+                mt-3 inline-flex min-h-12 items-center gap-2
+                rounded-2xl px-5 py-3
+                text-sm font-bold
+                transition
+                active:scale-[0.98]
+                ${
+                isSpeaking
+                    ? "bg-amber-100 text-amber-700"
+                    : "bg-[var(--primary)] text-[var(--primary-foreground)]"
+                }
+            `}
+            >
+            {isSpeaking ? (
+                <Square size={16} fill="currentColor" />
+            ) : (
+                <Volume2 size={18} />
+            )}
 
-                {isSpeaking
-                  ? t("learning.stopListening")
-                  : t("learning.listen")}
-              </button>
+            {isSpeaking
+                ? t("learning.stopSpeaking")
+                : t("learning.listen")}
+            </button>
 
               <p className="mt-3 max-w-xs text-[11px] leading-5 text-[var(--muted)]">
                 {t("learning.voiceHint")}

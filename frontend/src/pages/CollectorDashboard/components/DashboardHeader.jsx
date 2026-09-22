@@ -12,9 +12,7 @@ const DashboardHeader = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
-
-  const firstName =
-    user?.firstName || "Collector";
+  const firstName = user?.firstName || "Collector";
 
   const initials =
     `${user?.firstName?.charAt(0) || ""}${user?.lastName?.charAt(0) || ""}`

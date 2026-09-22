@@ -1,6 +1,5 @@
-
 import useLanguageStore from "../store/languageStore";
-import { languages } from "../i18n/languages";
+import { SUPPORTED_LANGUAGES } from "../i18n/languages";
 
 const LanguageSelector = () => {
   const language = useLanguageStore(
@@ -12,8 +11,8 @@ const LanguageSelector = () => {
   );
 
   return (
-    <div className="flex gap-2">
-      {Object.values(languages).map((item) => {
+    <div className="flex flex-wrap gap-2">
+      {SUPPORTED_LANGUAGES.map((item) => {
         const active = language === item.code;
 
         return (
@@ -27,16 +26,16 @@ const LanguageSelector = () => {
               border
               px-3 py-2
               text-sm
-              transition
+              font-medium
+              transition-all duration-200
               ${
                 active
-                  ? "border-[var(--primary)] bg-[var(--accent)] text-[var(--primary)]"
-                  : "border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:border-[var(--primary)]/50 hover:text-[var(--primary)]"
+                  ? "border-[var(--primary)] bg-[var(--accent)] text-[var(--primary)] shadow-sm"
+                  : "border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:border-[var(--primary)]/50 hover:bg-[var(--surface-soft)] hover:text-[var(--primary)]"
               }
             `}
           >
-            <span>{item.icon}</span>
-            <span>{item.nativeName}</span>
+            <span>{item.nativeLabel}</span>
           </button>
         );
       })}
