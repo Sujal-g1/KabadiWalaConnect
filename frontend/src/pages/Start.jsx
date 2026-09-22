@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion,  } from "framer-motion";
 import {
   ArrowRight,
   BookOpen,
   Recycle,
 } from "lucide-react";
+
 
 import startImg from "../assets/images/cover1.webp";
 import startImg2 from "../assets/images/cover4.webp";
@@ -21,6 +22,7 @@ const Start = () => {
   const [desktopLoaded, setDesktopLoaded] = useState(false);
 
   const imagesLoaded = mobileLoaded || desktopLoaded;
+
 
   return (
     <main className="relative min-h-[100svh] w-full overflow-hidden bg-[#0a1813] text-white selection:bg-emerald-500 selection:text-white">

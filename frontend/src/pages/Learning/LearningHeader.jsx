@@ -228,7 +228,7 @@ const LearningHeader = ({
 
             <span className="truncate text-[9px] font-semibold text-[var(--muted)] sm:text-xs">
                 <span className="sm:hidden">
-                {state ||
+                {city ||
                     t("learning.locationUnavailable")}
                 </span>
 

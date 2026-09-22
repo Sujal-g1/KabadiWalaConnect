@@ -1,143 +1,50 @@
-const VOICE_LANGUAGE_MAP = {
+const VOICE_MAP = {
   en: "en-IN",
   hi: "hi-IN",
-  mr: "mr-IN",
-  pa: "pa-IN",
-  gu: "gu-IN",
   bn: "bn-IN",
   ta: "ta-IN",
   te: "te-IN",
   kn: "kn-IN",
-  ml: "ml-IN",
-  or: "or-IN",
-  as: "as-IN",
 };
 
-const getSpeechLanguage = (language) => {
+const getVoice = (language) => {
+  const voices = window.speechSynthesis.getVoices();
+
+  const targetLang = VOICE_MAP[language];
+
+  if (!targetLang) {
+    return null;
+  }
+
+  // Tamil: explicitly use Vani
+  if (language === "ta") {
+    return (
+      voices.find(
+        (voice) =>
+          voice.name === "Vani" &&
+          voice.lang === "ta-IN"
+      ) ||
+      voices.find(
+        (voice) =>
+          voice.lang === "ta-IN"
+      )
+    );
+  }
+
   return (
-    VOICE_LANGUAGE_MAP[language] ||
-    "en-IN"
-  );
-};
-
-/* ============================================================
-   FIND A MATCHING BROWSER VOICE
-============================================================ */
-
-const getBestVoice = (language) => {
-  if (
-    typeof window === "undefined" ||
-    !("speechSynthesis" in window)
-  ) {
-    return null;
-  }
-
-  const voices =
-    window.speechSynthesis.getVoices();
-
-  if (!voices.length) {
-    return null;
-  }
-
-  const targetLanguage =
-    getSpeechLanguage(language).toLowerCase();
-
-  /*
-    1. Exact match
-    Example:
-    ta-IN === ta-IN
-  */
-  const exactVoice = voices.find(
-    (voice) =>
-      voice.lang?.toLowerCase() ===
-      targetLanguage
-  );
-
-  if (exactVoice) {
-    return exactVoice;
-  }
-
-  /*
-    2. Regional match
-    Example:
-    ta-IN → ta
-  */
-  const baseLanguage =
-    language.toLowerCase();
-
-  const regionalVoice = voices.find(
-    (voice) =>
+    voices.find(
+      (voice) => voice.lang === targetLang
+    ) ||
+    voices.find((voice) =>
       voice.lang
         ?.toLowerCase()
-        .startsWith(baseLanguage)
+        .startsWith(language)
+    ) ||
+    null
   );
-
-  if (regionalVoice) {
-    return regionalVoice;
-  }
-
-  return null;
 };
 
-/* ============================================================
-   WAIT UNTIL BROWSER VOICES ARE AVAILABLE
-============================================================ */
-
-const getAvailableVoices = () => {
-  return new Promise((resolve) => {
-    if (
-      typeof window === "undefined" ||
-      !("speechSynthesis" in window)
-    ) {
-      resolve([]);
-      return;
-    }
-
-    const voices =
-      window.speechSynthesis.getVoices();
-
-    if (voices.length > 0) {
-      resolve(voices);
-      return;
-    }
-
-    const handleVoicesChanged = () => {
-      window.speechSynthesis.removeEventListener(
-        "voiceschanged",
-        handleVoicesChanged
-      );
-
-      resolve(
-        window.speechSynthesis.getVoices()
-      );
-    };
-
-    window.speechSynthesis.addEventListener(
-      "voiceschanged",
-      handleVoicesChanged
-    );
-
-    /*
-      Some browsers don't fire voiceschanged.
-    */
-    window.setTimeout(() => {
-      window.speechSynthesis.removeEventListener(
-        "voiceschanged",
-        handleVoicesChanged
-      );
-
-      resolve(
-        window.speechSynthesis.getVoices()
-      );
-    }, 1000);
-  });
-};
-
-/* ============================================================
-   SPEAK LEARNING CONTENT
-============================================================ */
-
-export const speakLearningText = async (
+export const speakLearningText = (
   sections,
   {
     language = "hi",
@@ -148,214 +55,149 @@ export const speakLearningText = async (
 ) => {
   if (
     typeof window === "undefined" ||
-    !("speechSynthesis" in window)
+    !window.speechSynthesis
   ) {
     onError?.(
       new Error(
-        "Speech synthesis is not supported by this browser."
+        "Speech synthesis is not supported."
       )
     );
-
     return;
   }
 
-  if (
-    !Array.isArray(sections) ||
-    sections.length === 0
-  ) {
+  if (!sections?.length) {
     onError?.(
       new Error(
         "There is no content to speak."
       )
     );
-
     return;
   }
 
-  /*
-    Stop previous speech.
-  */
+  // Stop previous speech
   window.speechSynthesis.cancel();
 
-  /*
-    Wait for browser voices.
-  */
-  const voices =
-    await getAvailableVoices();
-
-  const targetLanguage =
-    getSpeechLanguage(language);
-
-  console.log(
-    "Requested language:",
-    language
-  );
-
-  console.log(
-    "Speech language:",
-    targetLanguage
-  );
-
-  console.log(
-    "Available voices:",
-    voices.map(
-      (voice) =>
-        `${voice.name} (${voice.lang})`
-    )
-  );
-
-  /*
-    Find matching voice.
-  */
-  const voice = getBestVoice(language);
+  const voice = getVoice(language);
 
   if (!voice) {
-    onError?.(
-      new Error(
-        `No speech voice is available for ${targetLanguage}.`
-      )
-    );
-
-    console.warn(
-      `No voice found for ${targetLanguage}`
-    );
+    onError?.({
+      code: "VOICE_UNAVAILABLE",
+      language,
+      message: `No voice available for ${language}`,
+    });
 
     return;
   }
 
-  console.log(
-    "Selected voice:",
-    voice.name,
-    voice.lang
-  );
+  /*
+    Clean the text
+  */
+  const text = sections
+    .filter(Boolean)
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!text) {
+    onError?.(
+      new Error(
+        "There is no text to speak."
+      )
+    );
+    return;
+  }
+
+  console.log("===== SPEECH =====");
+  console.log("Language:", language);
+  console.log("Voice:", voice.name);
+  console.log("Voice language:", voice.lang);
+  console.log("Text:", text);
+  console.log("==================");
 
   /*
-    Clean sections.
+    IMPORTANT:
+    Tamil uses exactly the same structure
+    as the console test that worked.
   */
-  const cleanSections = sections
-    .map((section) =>
-      section
-        ?.replace(/\s+/g, " ")
-        .trim()
-    )
-    .filter(Boolean);
+  const utterance =
+    new SpeechSynthesisUtterance(text);
 
-  let sectionIndex = 0;
-  let started = false;
+  utterance.voice = voice;
+  utterance.lang = voice.lang;
 
-  const speakSection = () => {
-    if (
-      sectionIndex >=
-      cleanSections.length
-    ) {
-      onEnd?.();
-      return;
-    }
+  if (language === "ta") {
+    utterance.rate = 0.75;
+  } else if (language === "en") {
+    utterance.rate = 0.88;
+  } else {
+    utterance.rate = 0.8;
+  }
 
-    const text =
-      cleanSections[sectionIndex];
+  utterance.pitch = 1;
+  utterance.volume = 1;
 
-    const utterance =
-      new SpeechSynthesisUtterance(text);
+  utterance.onstart = () => {
+    console.log(
+      "Speech started:",
+      voice.name,
+      voice.lang
+    );
 
-    /*
-      Set BOTH the language and matching voice.
-    */
-    utterance.lang = targetLanguage;
-    utterance.voice = voice;
+    onStart?.();
+  };
 
-    /*
-      Slower speech for accessibility.
-    */
-    utterance.rate =
-      language === "en"
-        ? 0.88
-        : 0.78;
+  utterance.onend = () => {
+    console.log("Speech finished");
+    onEnd?.();
+  };
 
-    utterance.pitch = 1;
-    utterance.volume = 1;
+  utterance.onerror = (event) => {
+    console.error(
+      "Speech error:",
+      event.error,
+      event
+    );
 
-    utterance.onstart = () => {
-      if (!started) {
-        started = true;
-        onStart?.();
-      }
-    };
-
-    utterance.onend = () => {
-      sectionIndex += 1;
-
-      window.setTimeout(
-        speakSection,
-        350
-      );
-    };
-
-    utterance.onerror = (event) => {
-      if (
-        event.error === "canceled"
-      ) {
-        return;
-      }
-
-      console.error(
-        "Speech synthesis error:",
-        event
-      );
-
+    if (event.error !== "canceled") {
       onError?.(event);
-    };
+    }
+  };
 
+  /*
+    IMPORTANT:
+    Same delay as your successful manual test.
+  */
+  setTimeout(() => {
     window.speechSynthesis.speak(
       utterance
     );
-  };
 
-  speakSection();
+    /*
+      Safari/Chrome can occasionally leave
+      the speech engine paused.
+    */
+    setTimeout(() => {
+      if (
+        window.speechSynthesis.paused
+      ) {
+        window.speechSynthesis.resume();
+      }
+    }, 100);
+  }, 200);
 };
-
-/* ============================================================
-   STOP SPEECH
-============================================================ */
 
 export const stopLearningSpeech = () => {
   if (
     typeof window !== "undefined" &&
-    "speechSynthesis" in window
+    window.speechSynthesis
   ) {
     window.speechSynthesis.cancel();
   }
 };
-
-/* ============================================================
-   SPEECH SUPPORT
-============================================================ */
 
 export const isSpeechSupported = () => {
   return (
     typeof window !== "undefined" &&
     "speechSynthesis" in window
   );
-};
-
-/* ============================================================
-   DEBUG HELPER
-============================================================ */
-
-export const getAvailableSpeechLanguages = () => {
-  if (
-    typeof window === "undefined" ||
-    !("speechSynthesis" in window)
-  ) {
-    return [];
-  }
-
-  return [
-    ...new Set(
-      window.speechSynthesis
-        .getVoices()
-        .map((voice) => voice.lang)
-        .filter(Boolean)
-    ),
-  ];
 };

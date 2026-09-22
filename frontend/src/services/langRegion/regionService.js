@@ -1,5 +1,5 @@
 const STATE_LANGUAGE_MAP = {
-  "IN-UP": "ta", // TEMPORARY TEST
+  "IN-UP": "hi",
   "IN-UK": "hi",
   "IN-DL": "hi",
   "IN-HR": "hi",
