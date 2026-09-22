@@ -20,7 +20,7 @@ const EWasteAIButton = () => {
       />
 
       <span className="hidden sm:inline">
-        E-Waste AI
+        VidyutView
       </span>
     </motion.button>
   );

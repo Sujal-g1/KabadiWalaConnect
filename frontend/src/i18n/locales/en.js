@@ -188,6 +188,39 @@ dashboard: {
   settings: "Settings",
 },
 
+start: {
+  logoAlt: "Kabadiwala Connect Logo",
+
+  titleLine1: "Kabadiwala",
+  titleLine2: "Connect",
+
+  description:
+    "Empowering informal waste collectors by connecting them with transparent, responsible and authorized recycling networks.",
+
+  learningEyebrow:
+    "New here?",
+
+  learnHowItWorks:
+    "Learn How It Works",
+
+  collectorAria:
+    "Login as Collector",
+
+  collectorTitle:
+    "Collector",
+
+  collectorDescription:
+    "Sell e-waste, find better prices and manage your collections.",
+
+  recyclerAria:
+    "Open Recycler",
+
+  recyclerTitle:
+    "Recycler",
+
+  recyclerDescription:
+    "Source verified recyclable materials from collection partners.",
+},
 
 };
 

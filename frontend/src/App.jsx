@@ -44,6 +44,7 @@ import RecyclerShell from "./Recycler/layouts/RecyclerShell";
 
 import RecyclerDashboard from "./Recycler/pages/RecyclerDashboard";
 import EWasteAI from "./pages/EWasteAI";
+import LearningPage from "./pages/Learning/LearningPage";
 // import RecyclerMarketplace from "./Recycler/pages/RecyclerMarketplace";
 // import RecyclerOffers from "./Recycler/pages/RecyclerOffers";
 // import RecyclerPickups from "./pages/Recycler/RecyclerPickups";
@@ -69,6 +70,10 @@ const App = () => {
       <Route
         path="/"
         element={<Start />}
+      />
+      <Route
+        path="/learning"
+        element={<LearningPage />}
       />
 
 
