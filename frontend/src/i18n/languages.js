@@ -86,7 +86,7 @@ export const SUPPORTED_LANGUAGE_CODES =
 
 export const STATE_LANGUAGE_MAP = {
   /* Hindi */
-  "IN-UP": "mr",
+  "IN-UP": "hi",
   "IN-UK": "hi",
   "IN-DL": "hi",
   "IN-HR": "hi",
