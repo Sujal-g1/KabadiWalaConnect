@@ -11,7 +11,6 @@ import {
   ChevronLeft,
   Gift,
   Plus,
-  Sparkles,
   ChevronRight,
 } from "lucide-react";
 
@@ -29,7 +28,9 @@ import logo from "../../assets/images/logo.webp";
 
 import useAuthStore from "../../store/authStore";
 import useTranslation from "../../i18n/useTranslation";
-import { logoutFirebase } from "../../services/auth/googleAuth";
+import {
+  logoutFirebase,
+} from "../../services/auth/googleAuth";
 
 const Sidebar = ({
   collapsed,
@@ -38,8 +39,10 @@ const Sidebar = ({
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { user, clearUser } =
-    useAuthStore();
+  const {
+    user,
+    clearUser,
+  } = useAuthStore();
 
   const { t } =
     useTranslation();
@@ -50,27 +53,37 @@ const Sidebar = ({
 
   const mainItems = [
     {
-      label: t("navigation.dashboard"),
+      label: t(
+        "navigation.dashboard"
+      ),
       icon: LayoutDashboard,
       path: "/collector",
     },
     {
-      label: t("navigation.myLots"),
+      label: t(
+        "navigation.myLots"
+      ),
       icon: Package,
       path: "/collector/lots",
     },
     {
-      label: t("navigation.prices"),
+      label: t(
+        "navigation.prices"
+      ),
       icon: IndianRupee,
       path: "/collector/prices",
     },
     {
-      label: t("navigation.rewards"),
+      label: t(
+        "navigation.rewards"
+      ),
       icon: Gift,
       path: "/collector/rewards",
     },
     {
-      label: t("navigation.recyclers"),
+      label: t(
+        "navigation.recyclers"
+      ),
       icon: Recycle,
       path: "/collector/recyclers",
     },
@@ -78,12 +91,16 @@ const Sidebar = ({
 
   const activityItems = [
     {
-      label: t("navigation.earnings"),
+      label: t(
+        "navigation.earnings"
+      ),
       icon: Wallet,
       path: "/collector/earnings",
     },
     {
-      label: t("navigation.transactions"),
+      label: t(
+        "navigation.transactions"
+      ),
       icon: ShieldCheck,
       path: "/collector/transactions",
     },
@@ -91,12 +108,16 @@ const Sidebar = ({
 
   const accountItems = [
     {
-      label: t("navigation.profile"),
+      label: t(
+        "navigation.profile"
+      ),
       icon: UserRound,
       path: "/collector/profile",
     },
     {
-      label: t("navigation.settings"),
+      label: t(
+        "navigation.settings"
+      ),
       icon: Settings,
       path: "/collector/settings",
     },
@@ -108,10 +129,15 @@ const Sidebar = ({
 
   const isActive = (path) => {
     if (path === "/collector") {
-      return location.pathname === "/collector";
+      return (
+        location.pathname ===
+        "/collector"
+      );
     }
 
-    return location.pathname.startsWith(path);
+    return location.pathname.startsWith(
+      path
+    );
   };
 
   /* ==========================================================
@@ -141,7 +167,9 @@ const Sidebar = ({
     sectionIndex,
   }) => {
     const Icon = item.icon;
-    const active = isActive(item.path);
+    const active = isActive(
+      item.path
+    );
 
     return (
       <motion.button
@@ -429,14 +457,16 @@ const Sidebar = ({
     items,
     sectionIndex
   ) =>
-    items.map((item, index) => (
-      <NavItem
-        key={item.path}
-        item={item}
-        index={index}
-        sectionIndex={sectionIndex}
-      />
-    ));
+    items.map(
+      (item, index) => (
+        <NavItem
+          key={item.path}
+          item={item}
+          index={index}
+          sectionIndex={sectionIndex}
+        />
+      )
+    );
 
   /* ==========================================================
      SECTION TITLE
@@ -498,6 +528,7 @@ const Sidebar = ({
       className="
         hidden
         h-screen
+        min-h-0
         shrink-0
         overflow-hidden
         border-r
@@ -508,7 +539,8 @@ const Sidebar = ({
       "
     >
       {/* ======================================================
-          BRAND
+          HEADER / BRAND
+          Fixed
       ====================================================== */}
 
       <div
@@ -568,8 +600,6 @@ const Sidebar = ({
             }
           `}
         >
-          {/* LOGO */}
-
           <motion.div
             whileHover={{
               rotate: 3,
@@ -619,8 +649,6 @@ const Sidebar = ({
               "
             />
           </motion.div>
-
-          {/* BRAND NAME */}
 
           <AnimatePresence
             initial={false}
@@ -714,10 +742,11 @@ const Sidebar = ({
 
       {/* ======================================================
           QUICK ACTION
+          Fixed
       ====================================================== */}
 
       {!collapsed && (
-        <div className="px-3 pt-4">
+        <div className="shrink-0 px-3 pt-4">
           <motion.button
             type="button"
             whileHover={{
@@ -809,8 +838,6 @@ const Sidebar = ({
               "
             />
 
-            {/* ICON */}
-
             <span
               className="
                 relative
@@ -835,8 +862,6 @@ const Sidebar = ({
               />
             </span>
 
-            {/* TEXT */}
-
             <span
               className="
                 relative
@@ -849,8 +874,6 @@ const Sidebar = ({
             >
               Create New Lot
             </span>
-
-            {/* ARROW */}
 
             <ChevronRight
               size={15}
@@ -868,15 +891,20 @@ const Sidebar = ({
 
       {/* ======================================================
           NAVIGATION
+          ONLY THIS AREA SCROLLS
       ====================================================== */}
 
       <div
         className="
+          min-h-0
           flex-1
           overflow-y-auto
+          overflow-x-hidden
+          overscroll-contain
           px-3
           py-5
-          scrollbar-thin
+          [scrollbar-width:thin]
+          [scrollbar-color:var(--border)_transparent]
         "
       >
         <SectionTitle>
@@ -919,6 +947,7 @@ const Sidebar = ({
 
       {/* ======================================================
           USER AREA
+          Fixed
       ====================================================== */}
 
       <div
@@ -990,8 +1019,6 @@ const Sidebar = ({
                 gap-3
               "
             >
-              {/* AVATAR */}
-
               <div
                 className="
                   relative
@@ -1030,8 +1057,6 @@ const Sidebar = ({
                   "
                 />
               </div>
-
-              {/* USER */}
 
               <div className="min-w-0">
                 <p
@@ -1116,9 +1141,7 @@ const Sidebar = ({
           </motion.div>
         )}
 
-        {/* ======================================================
-            LOGOUT
-        ====================================================== */}
+        {/* LOGOUT */}
 
         <motion.button
           type="button"
@@ -1165,8 +1188,6 @@ const Sidebar = ({
             }
           `}
         >
-          {/* LOGOUT SPARK */}
-
           <motion.span
             initial={{
               x: "-120%",
@@ -1223,9 +1244,7 @@ const Sidebar = ({
           )}
         </motion.button>
 
-        {/* ======================================================
-            EXPAND
-        ====================================================== */}
+        {/* EXPAND */}
 
         {collapsed && (
           <motion.button

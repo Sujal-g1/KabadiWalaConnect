@@ -20,12 +20,11 @@ import {
   motion,
 } from "framer-motion";
 
-import {
-  useState,
-} from "react";
+import { useState } from "react";
 
 import {
   Outlet,
+  useLocation,
   useNavigate,
 } from "react-router-dom";
 
@@ -39,6 +38,7 @@ import logo from "../../assets/images/logo.webp";
 import useAuthStore from "../../store/authStore";
 import useRegionStore from "../../store/regionStore";
 import useTranslation from "../../i18n/useTranslation";
+
 import {
   logoutFirebase,
 } from "../../services/auth/googleAuth";
@@ -57,57 +57,86 @@ const AppShell = ({
   ] = useState(false);
 
   return (
-    <div className="
-      min-h-screen
-      bg-[var(--background)]
-      text-[var(--foreground)]
-    ">
-      <div className="
+    <div
+      className="
         flex
-        min-h-screen
-      ">
-        <Sidebar
-          collapsed={
-            sidebarCollapsed
-          }
-          setCollapsed={
-            setSidebarCollapsed
+        h-screen
+        min-h-0
+        overflow-hidden
+        bg-[var(--background)]
+        text-[var(--foreground)]
+      "
+    >
+      {/* ======================================================
+          DESKTOP SIDEBAR
+      ====================================================== */}
+
+      <Sidebar
+        collapsed={sidebarCollapsed}
+        setCollapsed={setSidebarCollapsed}
+      />
+
+      {/* ======================================================
+          MAIN APPLICATION AREA
+      ====================================================== */}
+
+      <main
+        className="
+          flex
+          min-w-0
+          min-h-0
+          flex-1
+          flex-col
+          overflow-hidden
+          bg-[var(--background)]
+        "
+      >
+        {/* MOBILE HEADER */}
+
+        <MobileHeader
+          onMenuClick={() =>
+            setMobileMenuOpen(true)
           }
         />
 
-        <div className="
-          min-w-0
-          flex-1
-        ">
-          <MobileHeader
-            onMenuClick={() =>
-              setMobileMenuOpen(
-                true
-              )
-            }
-          />
+        {/* MAIN PAGE SCROLL */}
 
+        <div
+          className="
+            min-h-0
+            flex-1
+            overflow-x-hidden
+            overflow-y-auto
+            overscroll-contain
+            [scrollbar-width:thin]
+            [scrollbar-color:var(--border)_transparent]
+          "
+        >
           <PageContainer>
             <Outlet />
           </PageContainer>
         </div>
-      </div>
+      </main>
+
+      {/* ======================================================
+          MOBILE BOTTOM NAV
+      ====================================================== */}
 
       <BottomNavigation
         onMoreClick={() =>
-          setMobileMenuOpen(
-            true
-          )
+          setMobileMenuOpen(true)
         }
       />
+
+      {/* ======================================================
+          MOBILE MENU
+      ====================================================== */}
 
       <AnimatePresence>
         {mobileMenuOpen && (
           <MobileMenu
             onClose={() =>
-              setMobileMenuOpen(
-                false
-              )
+              setMobileMenuOpen(false)
             }
           />
         )}
@@ -126,8 +155,13 @@ const MobileMenu = ({
   const navigate =
     useNavigate();
 
-  const { user, clearUser } =
-    useAuthStore();
+  const location =
+    useLocation();
+
+  const {
+    user,
+    clearUser,
+  } = useAuthStore();
 
   const { t } =
     useTranslation();
@@ -142,12 +176,55 @@ const MobileMenu = ({
       (state) => state.state
     );
 
-  const goTo = (
-    path
-  ) => {
+  /* ==========================================================
+     LOCATION
+  ========================================================== */
+
+  const locationLabel =
+    city && state
+      ? `${city}, ${state}`
+      : state ||
+        city ||
+        "Location unavailable";
+
+  /* ==========================================================
+     USER
+  ========================================================== */
+
+  const firstName =
+    user?.firstName ||
+    "Collector";
+
+  const initials =
+    `${user?.firstName?.charAt(0) || ""}${user?.lastName?.charAt(0) || ""}`
+      .trim()
+      .toUpperCase() || "U";
+
+  /* ==========================================================
+     NAVIGATION
+  ========================================================== */
+
+  const goTo = (path) => {
     navigate(path);
     onClose();
   };
+
+  const isActive = (path) => {
+    if (path === "/collector") {
+      return (
+        location.pathname ===
+        "/collector"
+      );
+    }
+
+    return location.pathname.startsWith(
+      path
+    );
+  };
+
+  /* ==========================================================
+     LOGOUT
+  ========================================================== */
 
   const handleLogout =
     async () => {
@@ -166,6 +243,10 @@ const MobileMenu = ({
         );
       }
     };
+
+  /* ==========================================================
+     NAV ITEMS
+  ========================================================== */
 
   const mainItems = [
     {
@@ -239,6 +320,10 @@ const MobileMenu = ({
     },
   ];
 
+  /* ==========================================================
+     RENDER NAV ITEMS
+  ========================================================== */
+
   const renderItems = (
     items
   ) =>
@@ -249,6 +334,9 @@ const MobileMenu = ({
       ) => {
         const Icon =
           item.icon;
+
+        const active =
+          isActive(item.path);
 
         return (
           <motion.button
@@ -263,72 +351,152 @@ const MobileMenu = ({
               x: 0,
             }}
             transition={{
-              duration: 0.24,
+              duration: 0.25,
               delay:
-                index * 0.035,
+                index * 0.045,
+              ease: "easeOut",
+            }}
+            whileHover={{
+              x: 2,
             }}
             whileTap={{
-              scale: 0.98,
+              scale: 0.985,
             }}
             onClick={() =>
               goTo(item.path)
             }
-            className="
-              group
+            className={`
+              group/item
+              relative
               flex
               w-full
               items-center
               gap-3
+              overflow-hidden
               rounded-2xl
+              border
               px-3
-              py-2.5
+              py-3
               text-left
               transition-all
-              duration-200
-              hover:bg-[var(--surface-soft)]
-            "
+              duration-300
+
+              ${
+                active
+                  ? `
+                    border-[var(--border)]
+                    bg-[var(--surface)]
+                    text-[var(--primary)]
+                    shadow-[0_10px_25px_rgba(18,63,45,0.08)]
+                  `
+                  : `
+                    border-transparent
+                    bg-transparent
+                    text-[var(--foreground)]
+                    hover:border-[var(--border)]
+                    hover:bg-[var(--surface)]
+                    hover:shadow-[0_8px_22px_rgba(18,63,45,0.055)]
+                  `
+              }
+            `}
           >
+            {/* ACTIVE INDICATOR */}
+
+            {active && (
+              <motion.span
+                layoutId="mobile-menu-active"
+                className="
+                  absolute
+                  left-0
+                  top-1/2
+                  h-8
+                  w-1
+                  -translate-y-1/2
+                  rounded-r-full
+                  bg-[var(--primary)]
+                  shadow-[0_0_12px_rgba(24,121,78,0.18)]
+                "
+                transition={{
+                  type: "spring",
+                  stiffness: 380,
+                  damping: 30,
+                }}
+              />
+            )}
+
+            {/* ICON */}
+
             <span
-              className="
+              className={`
+                relative
                 flex
-                h-10
-                w-10
+                h-11
+                w-11
                 shrink-0
                 items-center
                 justify-center
-                rounded-xl
-                bg-[var(--surface-soft)]
-                text-[var(--muted)]
+                rounded-[14px]
+                border
                 transition-all
-                duration-200
-                group-hover:bg-indigo-500/10
-                group-hover:text-indigo-500
-              "
+                duration-300
+
+                ${
+                  active
+                    ? `
+                      border-[var(--border)]
+                      bg-[var(--surface)]
+                      text-[var(--primary)]
+                      shadow-[0_7px_18px_rgba(18,63,45,0.07)]
+                    `
+                    : `
+                      border-[var(--border)]
+                      bg-[var(--surface-soft)]
+                      text-[var(--muted)]
+                      group-hover/item:scale-105
+                      group-hover/item:bg-[var(--surface)]
+                      group-hover/item:text-[var(--foreground)]
+                      group-hover/item:shadow-[0_7px_18px_rgba(18,63,45,0.06)]
+                    `
+                }
+              `}
             >
               <Icon
-                size={18}
-                strokeWidth={2}
+                size={19}
+                strokeWidth={
+                  active ? 2.35 : 2
+                }
               />
             </span>
 
-            <span className="
-              min-w-0
-              flex-1
-              truncate
-              text-sm
-              font-semibold
-              text-[var(--foreground)]
-            ">
+            {/* LABEL */}
+
+            <span
+              className="
+                min-w-0
+                flex-1
+                truncate
+                text-[13px]
+                font-bold
+              "
+            >
               {item.label}
             </span>
 
+            {/* ARROW */}
+
             <ChevronRight
               size={16}
-              className="
+              strokeWidth={2}
+              className={`
                 shrink-0
-                text-[var(--muted)]
-                opacity-50
-              "
+                transition-all
+                duration-300
+                ${
+                  active
+                    ? "text-[var(--primary)] opacity-100"
+                    : "text-[var(--muted)] opacity-35 group-hover/item:translate-x-0.5 group-hover/item:opacity-70"
+                }
+              `}
             />
           </motion.button>
         );
@@ -361,38 +529,36 @@ const MobileMenu = ({
           opacity: 0,
         }}
         transition={{
-          duration: 0.22,
+          duration: 0.25,
         }}
         onClick={onClose}
         className="
           absolute
           inset-0
-          bg-black/45
-          backdrop-blur-sm
+          bg-black/50
+          backdrop-blur-[2px]
         "
       />
 
       {/* ======================================================
-          SHEET
+          DRAWER
       ====================================================== */}
 
-      <motion.div
+      <motion.aside
         initial={{
           x: "100%",
-          opacity: 0.7,
         }}
         animate={{
           x: 0,
-          opacity: 1,
         }}
         exit={{
           x: "100%",
-          opacity: 0.7,
         }}
         transition={{
           type: "spring",
-          stiffness: 330,
+          stiffness: 340,
           damping: 32,
+          mass: 0.85,
         }}
         className="
           absolute
@@ -400,63 +566,113 @@ const MobileMenu = ({
           top-0
           flex
           h-full
-          w-[88%]
-          max-w-[390px]
+          w-[92%]
+          max-w-[420px]
           flex-col
           overflow-hidden
+          rounded-l-[30px]
           border-l
           border-[var(--border)]
-          bg-[var(--surface)]/96
-          shadow-2xl
-          backdrop-blur-2xl
+          bg-[var(--surface)]
+          shadow-[-20px_0_70px_rgba(0,0,0,0.16)]
         "
       >
         {/* ====================================================
-            HEADER
+            HERO HEADER
         ==================================================== */}
 
-        <div className="
-          relative
-          shrink-0
-          border-b
-          border-[var(--border)]
-          px-4
-          pb-4
-          pt-5
-        ">
-          <div className="
-            absolute
-            inset-x-8
-            top-0
-            h-px
-            bg-gradient-to-r
-            from-transparent
-            via-indigo-500/60
-            to-transparent
-          " />
+        <div
+          className="
+            relative
+            shrink-0
+            overflow-hidden
+            px-4
+            pb-4
+            pt-5
+          "
+        >
+          {/* DARK HERO BACKGROUND */}
 
-          <div className="
-            flex
-            items-center
-            justify-between
-          ">
-            <div className="
+          <div
+            className="
+              pointer-events-none
+              absolute
+              inset-0
+              bg-[linear-gradient(145deg,#04110b_0%,#092619_42%,#115337_100%)]
+            "
+          />
+
+          {/* SOFT GREEN LIGHT */}
+
+          <div
+            className="
+              pointer-events-none
+              absolute
+              -right-16
+              -top-20
+              h-44
+              w-44
+              rounded-full
+              bg-emerald-300/10
+              blur-[60px]
+            "
+          />
+
+          <div
+            className="
+              pointer-events-none
+              absolute
+              -bottom-20
+              left-1/3
+              h-32
+              w-32
+              rounded-full
+              bg-teal-300/[0.09]
+              blur-[50px]
+            "
+          />
+
+          {/* HEADER CONTENT */}
+
+          <div
+            className="
+              relative
+              z-10
               flex
-              items-center
+              items-start
+              justify-between
               gap-3
-            ">
-              <div className="
+            "
+          >
+            {/* USER / BRAND */}
+
+            <div
+              className="
                 flex
-                h-11
-                w-11
+                min-w-0
                 items-center
-                justify-center
-                rounded-2xl
-                bg-[var(--surface-soft)]
-                p-1.5
-                ring-1
-                ring-[var(--border)]
-              ">
+                gap-3
+              "
+            >
+              {/* LOGO */}
+
+              <div
+                className="
+                  flex
+                  h-12
+                  w-12
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-[16px]
+                  border
+                  border-white/15
+                  bg-white/[0.08]
+                  p-1.5
+                  shadow-[0_10px_25px_rgba(0,0,0,0.16)]
+                  backdrop-blur-md
+                "
+              >
                 <img
                   src={logo}
                   alt="Kabadiwala Connect"
@@ -468,27 +684,34 @@ const MobileMenu = ({
                 />
               </div>
 
-              <div>
-                <p className="
-                  text-[15px]
-                  font-black
-                  tracking-tight
-                  text-[var(--foreground)]
-                ">
+              <div className="min-w-0">
+                <p
+                  className="
+                    truncate
+                    text-lg
+                    font-black
+                    tracking-tight
+                    text-white
+                  "
+                >
                   Kabadiwala
                 </p>
 
-                <p className="
-                  text-[9px]
-                  font-black
-                  uppercase
-                  tracking-[0.2em]
-                  text-[var(--muted)]
-                ">
+                <p
+                  className="
+                    text-[9px]
+                    font-black
+                    uppercase
+                    tracking-[0.22em]
+                    text-white/55
+                  "
+                >
                   Connect
                 </p>
               </div>
             </div>
+
+            {/* CLOSE */}
 
             <motion.button
               type="button"
@@ -496,56 +719,158 @@ const MobileMenu = ({
                 scale: 0.9,
               }}
               onClick={onClose}
+              aria-label="Close menu"
               className="
                 flex
                 h-10
                 w-10
+                shrink-0
                 items-center
                 justify-center
                 rounded-xl
-                bg-[var(--surface-soft)]
-                text-[var(--muted)]
-                transition
-                hover:text-[var(--foreground)]
+                border
+                border-white/10
+                bg-white/[0.08]
+                text-white/75
+                backdrop-blur-md
+                transition-all
+                duration-200
+                hover:bg-white/[0.14]
+                hover:text-white
               "
             >
               <X size={19} />
             </motion.button>
           </div>
 
-          {/* LOCATION */}
+          {/* USER MESSAGE */}
 
-          <div className="
-            mt-4
-            flex
-            items-center
-            gap-1.5
-            text-[11px]
-            font-medium
-            text-[var(--muted)]
-          ">
-            <MapPin
-              size={12}
-              className="text-indigo-400"
-            />
+          <div
+            className="
+              relative
+              z-10
+              mt-5
+            "
+          >
+            <p
+              className="
+                text-[10px]
+                font-semibold
+                uppercase
+                tracking-[0.16em]
+                text-white/45
+              "
+            >
+              Welcome back
+            </p>
 
-            <span className="truncate">
-              {city && state
-                ? `${city}, ${state}`
-                : state ||
-                  city ||
-                  "Location unavailable"}
-            </span>
+            <div
+              className="
+                mt-1
+                flex
+                items-center
+                gap-2
+              "
+            >
+              <h2
+                className="
+                  truncate
+                  text-[22px]
+                  font-black
+                  tracking-tight
+                  text-white
+                "
+              >
+                {firstName}
+              </h2>
+
+              <span
+                className="
+                  flex
+                  h-5
+                  w-5
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-emerald-400
+                  text-[8px]
+                  font-black
+                  text-[#062015]
+                  shadow-[0_0_12px_rgba(52,211,153,0.3)]
+                "
+              >
+                ✓
+              </span>
+            </div>
           </div>
 
-          {/* ==================================================
-              QUICK CREATE
-          ================================================== */}
+          {/* LOCATION PILL */}
 
+          <div
+            className="
+              relative
+              z-10
+              mt-4
+              inline-flex
+              max-w-full
+              items-center
+              gap-2
+              rounded-full
+              border
+              border-white/10
+              bg-white/[0.07]
+              px-3
+              py-2
+              text-white/70
+              backdrop-blur-md
+            "
+          >
+            <MapPin
+              size={12}
+              className="shrink-0 text-emerald-300"
+            />
+
+            <span
+              className="
+                truncate
+                text-[10px]
+                font-bold
+              "
+            >
+              {locationLabel}
+            </span>
+
+            <span
+              className="
+                ml-1
+                h-1.5
+                w-1.5
+                shrink-0
+                rounded-full
+                bg-emerald-300
+              "
+            />
+          </div>
+        </div>
+
+        {/* ====================================================
+            QUICK ACTION
+        ==================================================== */}
+
+        <div
+          className="
+            shrink-0
+            px-4
+            pt-4
+          "
+        >
           <motion.button
             type="button"
+            whileHover={{
+              y: -2,
+            }}
             whileTap={{
-              scale: 0.98,
+              scale: 0.985,
             }}
             onClick={() =>
               goTo(
@@ -553,79 +878,158 @@ const MobileMenu = ({
               )
             }
             className="
-              mt-4
+              group/create
+              relative
               flex
               w-full
               items-center
               gap-3
-              rounded-2xl
-              bg-gradient-to-r
-              from-indigo-500
-              via-violet-500
-              to-purple-500
-              p-3
+              overflow-hidden
+              rounded-[22px]
+              border
+              border-white/10
+              bg-[linear-gradient(125deg,#03100a_0%,#082418_38%,#0c3a26_70%,#12553a_100%)]
+              p-3.5
               text-left
               text-white
-              shadow-lg
-              shadow-indigo-500/20
+              shadow-[0_14px_35px_rgba(3,18,12,0.22)]
+              transition-all
+              duration-300
+              hover:shadow-[0_18px_42px_rgba(3,18,12,0.28)]
             "
           >
-            <span className="
-              flex
-              h-10
-              w-10
-              items-center
-              justify-center
-              rounded-xl
-              bg-white/15
-            ">
+            {/* ACCENT LIGHT */}
+
+            <div
+              className="
+                pointer-events-none
+                absolute
+                -right-10
+                -top-10
+                h-28
+                w-28
+                rounded-full
+                bg-emerald-300/10
+                blur-[35px]
+              "
+            />
+
+            {/* ICON */}
+
+            <div
+              className="
+                relative
+                z-10
+                flex
+                h-11
+                w-11
+                shrink-0
+                items-center
+                justify-center
+                rounded-[15px]
+                border
+                border-white/10
+                bg-white/[0.08]
+                shadow-[0_8px_20px_rgba(0,0,0,0.16)]
+              "
+            >
               <Plus
-                size={19}
+                size={20}
                 strokeWidth={2.5}
               />
-            </span>
+            </div>
 
-            <span className="
-              flex-1
-            ">
-              <span className="
-                block
-                text-[9px]
-                font-bold
-                uppercase
-                tracking-[0.14em]
-                text-white/65
-              ">
+            {/* TEXT */}
+
+            <div
+              className="
+                relative
+                z-10
+                min-w-0
+                flex-1
+              "
+            >
+              <p
+                className="
+                  text-[9px]
+                  font-bold
+                  uppercase
+                  tracking-[0.16em]
+                  text-white/45
+                "
+              >
                 Quick action
-              </span>
+              </p>
 
-              <span className="
-                mt-0.5
-                block
-                text-sm
-                font-black
-              ">
+              <p
+                className="
+                  mt-0.5
+                  text-sm
+                  font-black
+                  tracking-tight
+                "
+              >
                 Create New Lot
-              </span>
-            </span>
+              </p>
 
-            <ChevronRight
-              size={17}
-              className="text-white/70"
-            />
+              <p
+                className="
+                  mt-0.5
+                  truncate
+                  text-[10px]
+                  font-medium
+                  text-white/55
+                "
+              >
+                Photograph and value your e-waste
+              </p>
+            </div>
+
+            {/* ARROW */}
+
+            <div
+              className="
+                relative
+                z-10
+                flex
+                h-9
+                w-9
+                shrink-0
+                items-center
+                justify-center
+                rounded-xl
+                border
+                border-white/10
+                bg-white/[0.06]
+                transition-transform
+                duration-300
+                group-hover/create:translate-x-1
+              "
+            >
+              <ChevronRight
+                size={17}
+                className="text-white/75"
+              />
+            </div>
           </motion.button>
         </div>
 
         {/* ====================================================
-            MENU CONTENT
+            NAVIGATION
         ==================================================== */}
 
-        <div className="
-          flex-1
-          overflow-y-auto
-          px-3
-          py-5
-        ">
+        <div
+          className="
+            min-h-0
+            flex-1
+            overflow-y-auto
+            overscroll-contain
+            px-4
+            py-5
+            [scrollbar-width:thin]
+            [scrollbar-color:var(--border)_transparent]
+          "
+        >
           <MenuSection
             title={t(
               "navigation.main"
@@ -652,69 +1056,133 @@ const MobileMenu = ({
         </div>
 
         {/* ====================================================
-            ACCOUNT FOOTER
+            FOOTER
         ==================================================== */}
 
-        <div className="
-          shrink-0
-          border-t
-          border-[var(--border)]
-          p-3
-        ">
-          <div className="
-            mb-2
-            flex
-            items-center
-            gap-3
-            rounded-2xl
-            bg-[var(--surface-soft)]
-            p-3
-          ">
-            <div className="
+        <div
+          className="
+            shrink-0
+            border-t
+            border-[var(--border)]
+            bg-[var(--surface)]
+            px-4
+            pb-4
+            pt-3
+          "
+        >
+          {/* USER CARD */}
+
+          <div
+            className="
+              mb-2.5
               flex
-              h-10
-              w-10
-              shrink-0
               items-center
-              justify-center
-              rounded-xl
-              bg-gradient-to-br
-              from-indigo-500
-              to-violet-500
-              text-sm
-              font-black
-              text-white
-            ">
-              {user?.firstName
-                ?.charAt(0)
-                ?.toUpperCase() ||
-                "U"}
+              gap-3
+              rounded-2xl
+              border
+              border-[var(--border)]
+              bg-[var(--surface-soft)]
+              p-3
+              shadow-[0_6px_18px_rgba(18,63,45,0.045)]
+            "
+          >
+            {/* AVATAR */}
+
+            <div
+              className="
+                relative
+                flex
+                h-11
+                w-11
+                shrink-0
+                items-center
+                justify-center
+                rounded-[14px]
+                border
+                border-[var(--border)]
+                bg-[linear-gradient(145deg,#071a11_0%,#0b3021_50%,#18794e_100%)]
+                text-sm
+                font-black
+                text-white
+                shadow-[0_8px_20px_rgba(18,63,45,0.14)]
+              "
+            >
+              {initials}
+
+              <span
+                className="
+                  absolute
+                  bottom-0.5
+                  right-0.5
+                  h-2.5
+                  w-2.5
+                  rounded-full
+                  border-2
+                  border-[var(--surface-soft)]
+                  bg-emerald-300
+                "
+              />
             </div>
 
-            <div className="
-              min-w-0
-              flex-1
-            ">
-              <p className="
-                truncate
-                text-sm
-                font-bold
-                text-[var(--foreground)]
-              ">
+            <div className="min-w-0 flex-1">
+              <p
+                className="
+                  truncate
+                  text-sm
+                  font-black
+                  text-[var(--foreground)]
+                "
+              >
                 {user?.firstName ||
                   "Collector"}
               </p>
 
-              <p className="
-                truncate
-                text-[10px]
-                text-[var(--muted)]
-              ">
+              <p
+                className="
+                  truncate
+                  text-[10px]
+                  font-medium
+                  text-[var(--muted)]
+                "
+              >
                 {user?.email ||
                   "Collector account"}
               </p>
             </div>
+
+            {/* PROFILE ARROW */}
+
+            <button
+              type="button"
+              onClick={() =>
+                goTo(
+                  "/collector/settings"
+                )
+              }
+              className="
+                flex
+                h-8
+                w-8
+                shrink-0
+                items-center
+                justify-center
+                rounded-lg
+                border
+                border-[var(--border)]
+                bg-[var(--surface)]
+                text-[var(--muted)]
+                transition-all
+                duration-200
+                hover:text-[var(--foreground)]
+              "
+            >
+              <ChevronRight
+                size={14}
+              />
+            </button>
           </div>
+
+          {/* LOGOUT */}
 
           <motion.button
             type="button"
@@ -723,42 +1191,53 @@ const MobileMenu = ({
             }}
             onClick={handleLogout}
             className="
+              group/logout
               flex
               w-full
               items-center
               gap-3
               rounded-2xl
-              px-3
-              py-2.5
+              border
+              border-transparent
+              px-2
+              py-2
               text-left
               text-sm
-              font-semibold
+              font-bold
               text-[var(--muted)]
-              transition
-              hover:bg-rose-500/10
-              hover:text-rose-500
+              transition-all
+              duration-200
+              hover:border-[var(--border)]
+              hover:bg-[var(--surface)]
+              hover:text-[var(--danger)]
             "
           >
-            <span className="
-              flex
-              h-10
-              w-10
-              items-center
-              justify-center
-              rounded-xl
-              bg-[var(--surface-soft)]
-            ">
+            <span
+              className="
+                flex
+                h-10
+                w-10
+                items-center
+                justify-center
+                rounded-xl
+                border
+                border-[var(--border)]
+                bg-[var(--surface-soft)]
+                transition-colors
+                group-hover/logout:text-[var(--danger)]
+              "
+            >
               <LogOut
                 size={18}
               />
             </span>
 
-            {t(
-              "common.logout"
-            )}
+            <span>
+              {t("common.logout")}
+            </span>
           </motion.button>
         </div>
-      </motion.div>
+      </motion.aside>
     </div>
   );
 };
@@ -773,22 +1252,39 @@ const MenuSection = ({
   renderItems,
 }) => {
   return (
-    <section className="
-      mb-6
-    ">
-      <p className="
-        mb-2
-        px-3
-        text-[9px]
-        font-black
-        uppercase
-        tracking-[0.18em]
-        text-[var(--muted)]
-      ">
-        {title}
-      </p>
+    <section className="mb-7">
+      <div
+        className="
+          mb-2.5
+          flex
+          items-center
+          gap-3
+          px-1
+        "
+      >
+        <p
+          className="
+            shrink-0
+            text-[9px]
+            font-black
+            uppercase
+            tracking-[0.18em]
+            text-[var(--muted-foreground)]
+          "
+        >
+          {title}
+        </p>
 
-      <div className="space-y-1">
+        <div
+          className="
+            h-px
+            flex-1
+            bg-[var(--border)]
+          "
+        />
+      </div>
+
+      <div className="space-y-1.5">
         {renderItems(items)}
       </div>
     </section>

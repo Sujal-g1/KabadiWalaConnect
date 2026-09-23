@@ -251,7 +251,6 @@ const MobileHeader = ({
                   </span>
                 </div>
                 */} 
-                
               </div>
             </button>
           </div>
