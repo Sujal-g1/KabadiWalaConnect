@@ -1,7 +1,7 @@
 import {
+  AlertCircle,
   CheckCircle2,
   Clock3,
-  AlertCircle,
   XCircle,
 } from "lucide-react";
 
@@ -12,7 +12,7 @@ const statusConfig = {
       "Waiting for recycler confirmation.",
     icon: Clock3,
     className:
-      "bg-[var(--warning)]/10 text-[var(--warning)] border-[var(--warning)]/20",
+      "border-[var(--warning)]/20 bg-[linear-gradient(135deg,var(--surface)_0%,var(--warning)_180%)] text-[var(--warning)]",
   },
 
   CONFIRMED: {
@@ -21,7 +21,7 @@ const statusConfig = {
       "The recycler has confirmed the handover.",
     icon: CheckCircle2,
     className:
-      "bg-[var(--success)]/10 text-[var(--success)] border-[var(--success)]/20",
+      "border-[var(--success)]/20 bg-[linear-gradient(135deg,var(--surface)_0%,var(--success)_180%)] text-[var(--success)]",
   },
 
   DISPUTED: {
@@ -30,7 +30,7 @@ const statusConfig = {
       "This handover requires attention.",
     icon: AlertCircle,
     className:
-      "bg-[var(--danger)]/10 text-[var(--danger)] border-[var(--danger)]/20",
+      "border-[var(--danger)]/20 bg-[linear-gradient(135deg,var(--surface)_0%,var(--danger)_180%)] text-[var(--danger)]",
   },
 
   CANCELLED: {
@@ -39,11 +39,13 @@ const statusConfig = {
       "This handover has been cancelled.",
     icon: XCircle,
     className:
-      "bg-[var(--danger)]/10 text-[var(--danger)] border-[var(--danger)]/20",
+      "border-[var(--danger)]/20 bg-[linear-gradient(135deg,var(--surface)_0%,var(--danger)_180%)] text-[var(--danger)]",
   },
 };
 
-const HandoverStatus = ({ status }) => {
+const HandoverStatus = ({
+  status,
+}) => {
   const config =
     statusConfig[status] ||
     statusConfig.PENDING;
@@ -53,20 +55,23 @@ const HandoverStatus = ({ status }) => {
   return (
     <section
       className={`
-        rounded-3xl
+        rounded-[26px]
         border
         p-4
+        shadow-[0_10px_28px_rgba(0,0,0,0.05)]
         ${config.className}
       `}
     >
       <div className="flex items-center gap-3">
         <div
           className="
-            flex h-9 w-9
+            flex
+            h-10
+            w-10
             shrink-0
             items-center
             justify-center
-            rounded-xl
+            rounded-2xl
             bg-current/10
           "
         >
@@ -74,11 +79,18 @@ const HandoverStatus = ({ status }) => {
         </div>
 
         <div className="min-w-0">
-          <p className="text-sm font-semibold">
+          <p className="text-sm font-extrabold">
             {config.label}
           </p>
 
-          <p className="mt-0.5 text-xs opacity-80">
+          <p
+            className="
+              mt-0.5
+              text-[11px]
+              leading-4
+              opacity-75
+            "
+          >
             {config.description}
           </p>
         </div>

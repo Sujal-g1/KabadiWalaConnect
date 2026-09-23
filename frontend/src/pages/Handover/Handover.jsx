@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import {
   ArrowLeft,
+  Check,
   CheckCircle2,
   Copy,
   Loader2,
@@ -8,7 +8,20 @@ import {
   RefreshCw,
   Scale,
   ShieldCheck,
+  Sparkles,
 } from "lucide-react";
+
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+import {
+  motion,
+  AnimatePresence,
+} from "framer-motion";
+
 import {
   useNavigate,
   useParams,
@@ -35,8 +48,11 @@ const Handover = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [lot, setLot] = useState(null);
-  const [handover, setHandover] = useState(null);
+  const [lot, setLot] =
+    useState(null);
+
+  const [handover, setHandover] =
+    useState(null);
 
   const [actualWeight, setActualWeight] =
     useState("");
@@ -62,51 +78,67 @@ const Handover = () => {
   const [submitting, setSubmitting] =
     useState(false);
 
+  const [refreshing, setRefreshing] =
+    useState(false);
+
   const [error, setError] =
     useState("");
 
   const [success, setSuccess] =
     useState(false);
 
-  useEffect(() => {
-    loadData();
-  }, [id]);
+  /* ==========================================================
+     LOAD
+  ========================================================== */
 
-  const loadData = async () => {
+  const loadData = async (
+    isRefresh = false
+  ) => {
     try {
-      setLoading(true);
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+
       setError("");
 
       const lotResponse =
         await getLotById(id);
 
       const currentLot =
-        lotResponse.lot;
+        lotResponse?.lot;
 
       setLot(currentLot);
 
       setLocation(
-        currentLot.location || ""
+        currentLot?.location || ""
       );
 
       setLatitude(
-        currentLot.latitude ?? null
+        currentLot?.latitude ??
+          null
       );
 
       setLongitude(
-        currentLot.longitude ?? null
+        currentLot?.longitude ??
+          null
       );
 
       setFinalValue(
-        currentLot.estimatedValue ?? ""
+        currentLot?.estimatedValue ??
+          ""
       );
 
       try {
         const handoverResponse =
-          await getHandoverByLotId(id);
+          await getHandoverByLotId(
+            id
+          );
 
         setHandover(
-          handoverResponse.handover
+          handoverResponse?.handover ||
+            null
         );
       } catch {
         setHandover(null);
@@ -120,18 +152,32 @@ const Handover = () => {
       );
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
-  const handleAddPhotos = (files) => {
-    const newPhotos = files.map(
-      (file) => ({
+  useEffect(() => {
+    if (id) {
+      loadData();
+    }
+  }, [id]);
+
+  /* ==========================================================
+     PHOTOS
+  ========================================================== */
+
+  const handleAddPhotos = (
+    files
+  ) => {
+    const newPhotos =
+      files.map((file) => ({
         file,
         name: file.name,
         preview:
-          URL.createObjectURL(file),
-      })
-    );
+          URL.createObjectURL(
+            file
+          ),
+      }));
 
     setPhotos((current) => [
       ...current,
@@ -139,9 +185,12 @@ const Handover = () => {
     ]);
   };
 
-  const handleRemovePhoto = (index) => {
+  const handleRemovePhoto = (
+    index
+  ) => {
     setPhotos((current) => {
-      const photo = current[index];
+      const photo =
+        current[index];
 
       if (photo?.preview) {
         URL.revokeObjectURL(
@@ -155,9 +204,50 @@ const Handover = () => {
     });
   };
 
+  /* ==========================================================
+     READINESS
+  ========================================================== */
+
+  const readiness = useMemo(
+    () => ({
+      weight:
+        Boolean(actualWeight) &&
+        Number(actualWeight) > 0,
+
+      value:
+        finalValue !== "" &&
+        Number(finalValue) >= 0,
+
+      location:
+        Boolean(location?.trim()),
+
+      photos:
+        photos.length > 0,
+    }),
+    [
+      actualWeight,
+      finalValue,
+      location,
+      photos.length,
+    ]
+  );
+
+  const completedSteps =
+    Object.values(
+      readiness
+    ).filter(Boolean).length;
+
+  const readinessPercentage =
+    (completedSteps / 4) * 100;
+
+  /* ==========================================================
+     SUBMIT
+  ========================================================== */
+
   const handleSubmit = async () => {
     try {
       setError("");
+      setSuccess(false);
       setSubmitting(true);
 
       if (
@@ -195,9 +285,17 @@ const Handover = () => {
         });
 
       const createdHandover =
-        response.handover;
+        response?.handover;
 
-      for (const photo of photos) {
+      if (!createdHandover?.id) {
+        throw new Error(
+          "Handover was created but no handover ID was returned."
+        );
+      }
+
+      for (
+        const photo of photos
+      ) {
         await uploadHandoverPhoto(
           createdHandover.id,
           photo.file
@@ -205,21 +303,26 @@ const Handover = () => {
       }
 
       const updatedResponse =
-        await getHandoverByLotId(id);
+        await getHandoverByLotId(
+          id
+        );
 
       setHandover(
-        updatedResponse.handover
+        updatedResponse?.handover ||
+          null
       );
 
       setSuccess(true);
 
-      photos.forEach((photo) => {
-        if (photo.preview) {
-          URL.revokeObjectURL(
-            photo.preview
-          );
+      photos.forEach(
+        (photo) => {
+          if (photo.preview) {
+            URL.revokeObjectURL(
+              photo.preview
+            );
+          }
         }
-      });
+      );
 
       setPhotos([]);
 
@@ -240,32 +343,56 @@ const Handover = () => {
     }
   };
 
-  /* ─────────────────────────────
-     Loading
-  ───────────────────────────── */
+  /* ==========================================================
+     LOADING
+  ========================================================== */
 
   if (loading) {
     return (
       <div
         className="
+          relative
           flex
-          min-h-[60vh]
+          min-h-[70vh]
           items-center
           justify-center
-          text-[var(--foreground)]
+          overflow-hidden
+          bg-[var(--background)]
         "
       >
-        <div className="flex flex-col items-center gap-3">
+        <div
+          className="
+            pointer-events-none
+            absolute
+            h-72
+            w-72
+            rounded-full
+            bg-[var(--accent)]
+            opacity-40
+            blur-[100px]
+          "
+        />
+
+        <div
+          className="
+            relative
+            flex
+            flex-col
+            items-center
+            gap-3
+          "
+        >
           <div
             className="
               flex
-              h-12
-              w-12
+              h-14
+              w-14
               items-center
               justify-center
               rounded-2xl
               bg-[var(--accent)]
               text-[var(--primary)]
+              shadow-lg
             "
           >
             <Loader2
@@ -274,7 +401,13 @@ const Handover = () => {
             />
           </div>
 
-          <p className="text-sm text-[var(--muted)]">
+          <p
+            className="
+              text-sm
+              font-medium
+              text-[var(--muted)]
+            "
+          >
             Loading handover...
           </p>
         </div>
@@ -282,24 +415,22 @@ const Handover = () => {
     );
   }
 
-  /* ─────────────────────────────
-     Error
-  ───────────────────────────── */
+  /* ==========================================================
+     ERROR WITHOUT LOT
+  ========================================================== */
 
   if (error && !lot) {
     return (
-      <div className="w-full">
-        <div
-          className="
-            mx-auto
-            w-full
-            max-w-3xl
-            px-4
-            py-6
-            sm:px-6
-            sm:py-8
-          "
-        >
+      <div
+        className="
+          relative
+          min-h-screen
+          bg-[var(--background)]
+          px-4
+          py-6
+        "
+      >
+        <div className="mx-auto max-w-3xl">
           <button
             type="button"
             onClick={() =>
@@ -309,33 +440,31 @@ const Handover = () => {
             }
             className="
               mb-5
-              flex
-              min-h-10
+              inline-flex
               items-center
               gap-2
               rounded-xl
               px-2
+              py-2
               text-sm
-              font-medium
+              font-semibold
               text-[var(--muted)]
-              transition
-              hover:bg-[var(--surface-soft)]
-              hover:text-[var(--foreground)]
             "
           >
-            <ArrowLeft size={18} />
+            <ArrowLeft size={17} />
             Back to Lot
           </button>
 
           <div
             className="
-              rounded-3xl
+              rounded-[26px]
               border
               border-[var(--danger)]/20
-              bg-[var(--danger)]/10
+              bg-[var(--surface)]
               p-5
               text-sm
               text-[var(--danger)]
+              shadow-sm
             "
           >
             {error}
@@ -345,9 +474,9 @@ const Handover = () => {
     );
   }
 
-  /* ─────────────────────────────
-     Existing Handover
-  ───────────────────────────── */
+  /* ==========================================================
+     EXISTING HANDOVER
+  ========================================================== */
 
   if (handover) {
     const handoverDate =
@@ -364,31 +493,55 @@ const Handover = () => {
           )
         : "—";
 
-    const copyReference = async () => {
-      try {
-        await navigator.clipboard.writeText(
-          handover.referenceId
-        );
-      } catch (error) {
-        console.error(
-          "Failed to copy reference:",
-          error
-        );
-      }
-    };
+    const copyReference =
+      async () => {
+        try {
+          await navigator.clipboard.writeText(
+            handover.referenceId
+          );
+        } catch (error) {
+          console.error(
+            "Failed to copy reference:",
+            error
+          );
+        }
+      };
 
     return (
-      <div className="w-full">
+      <div
+        className="
+          relative
+          min-h-full
+          overflow-hidden
+          bg-[var(--background)]
+        "
+      >
         <div
           className="
+            pointer-events-none
+            fixed
+            -right-32
+            top-24
+            h-80
+            w-80
+            rounded-full
+            bg-[var(--accent)]
+            opacity-25
+            blur-[110px]
+          "
+        />
+
+        <main
+          className="
+            relative
             mx-auto
             w-full
-            max-w-3xl
+            max-w-4xl
             px-4
-            py-5
             pb-32
+            pt-5
             sm:px-6
-            sm:py-8
+            sm:pt-8
           "
         >
           <HandoverHeader
@@ -400,47 +553,25 @@ const Handover = () => {
             }
           />
 
-          {success && (
-            <div
-              className="
-                mb-5
-                flex
-                items-center
-                gap-3
-                rounded-2xl
-                border
-                border-[var(--success)]/20
-                bg-[var(--success)]/10
-                p-4
-                text-[var(--success)]
-              "
-            >
-              <CheckCircle2
-                size={21}
-                className="shrink-0"
-              />
-
-              <p className="text-sm font-medium">
-                Handover recorded successfully.
-              </p>
-            </div>
-          )}
-
-          <div className="space-y-4">
-
-            {/* Status */}
+          <div className="mt-5 space-y-4">
             <HandoverStatus
-              status={handover.status}
+              status={
+                handover.status
+              }
             />
 
             {/* Reference */}
+
             <section
               className="
-                rounded-3xl
+                relative
+                overflow-hidden
+                rounded-[28px]
                 border
                 border-[var(--border)]
-                bg-[var(--surface)]
+                bg-[linear-gradient(135deg,var(--surface)_0%,var(--background)_120%)]
                 p-5
+                shadow-[0_14px_38px_rgba(18,63,45,0.07)]
                 sm:p-6
               "
             >
@@ -448,10 +579,10 @@ const Handover = () => {
                 <div>
                   <p
                     className="
-                      text-[11px]
-                      font-medium
+                      text-[9px]
+                      font-bold
                       uppercase
-                      tracking-wide
+                      tracking-[0.15em]
                       text-[var(--muted)]
                     "
                   >
@@ -460,23 +591,33 @@ const Handover = () => {
 
                   <button
                     type="button"
-                    onClick={copyReference}
+                    onClick={
+                      copyReference
+                    }
                     className="
                       mt-1
                       flex
+                      max-w-full
                       items-center
                       gap-2
                       text-sm
-                      font-semibold
+                      font-extrabold
                       transition
                       hover:text-[var(--primary)]
                     "
                   >
-                    {handover.referenceId}
+                    <span className="truncate">
+                      {
+                        handover.referenceId
+                      }
+                    </span>
 
                     <Copy
-                      size={14}
-                      className="text-[var(--muted)]"
+                      size={13}
+                      className="
+                        shrink-0
+                        text-[var(--muted)]
+                      "
                     />
                   </button>
                 </div>
@@ -484,12 +625,12 @@ const Handover = () => {
                 <div
                   className="
                     flex
-                    h-10
-                    w-10
+                    h-11
+                    w-11
                     shrink-0
                     items-center
                     justify-center
-                    rounded-xl
+                    rounded-2xl
                     bg-[var(--accent)]
                     text-[var(--primary)]
                   "
@@ -498,45 +639,90 @@ const Handover = () => {
                 </div>
               </div>
 
+              {/* Summary */}
+
               <div
                 className="
                   mt-5
                   grid
-                  grid-cols-1
-                  divide-y
-                  divide-[var(--border)]
-                  sm:grid-cols-2
-                  sm:divide-x
-                  sm:divide-y-0
+                  grid-cols-2
+                  gap-2.5
                 "
               >
-                <div className="py-3 sm:pr-5 sm:py-2">
-                  <p className="text-xs text-[var(--muted)]">
+                <div
+                  className="
+                    rounded-2xl
+                    border
+                    border-[var(--border)]
+                    bg-[var(--background)]
+                    px-3.5
+                    py-3
+                  "
+                >
+                  <p
+                    className="
+                      text-[9px]
+                      font-semibold
+                      uppercase
+                      tracking-wider
+                      text-[var(--muted)]
+                    "
+                  >
                     Actual Weight
                   </p>
 
                   <div className="mt-1 flex items-center gap-2">
                     <Scale
-                      size={15}
+                      size={14}
                       className="text-[var(--primary)]"
                     />
 
-                    <p className="text-sm font-semibold">
-                      {handover.actualWeight}{" "}
-                      {handover.weightUnit || "kg"}
+                    <p className="text-sm font-extrabold">
+                      {
+                        handover.actualWeight
+                      }{" "}
+                      {
+                        handover.weightUnit ||
+                        "kg"
+                      }
                     </p>
                   </div>
                 </div>
 
-                <div className="py-3 sm:pl-5 sm:py-2">
-                  <p className="text-xs text-[var(--muted)]">
+                <div
+                  className="
+                    rounded-2xl
+                    border
+                    border-[var(--primary)]/15
+                    bg-[var(--accent)]
+                    px-3.5
+                    py-3
+                  "
+                >
+                  <p
+                    className="
+                      text-[9px]
+                      font-semibold
+                      uppercase
+                      tracking-wider
+                      text-[var(--muted)]
+                    "
+                  >
                     Final Value
                   </p>
 
-                  <p className="mt-1 text-lg font-bold text-[var(--primary)]">
+                  <p
+                    className="
+                      mt-1
+                      text-lg
+                      font-extrabold
+                      text-[var(--primary)]
+                    "
+                  >
                     ₹
                     {Number(
-                      handover.finalValue || 0
+                      handover.finalValue ||
+                        0
                     ).toLocaleString(
                       "en-IN"
                     )}
@@ -544,15 +730,36 @@ const Handover = () => {
                 </div>
               </div>
 
-              <div className="mt-3 border-t border-[var(--border)] pt-3">
+              {/* Metadata */}
+
+              <div
+                className="
+                  mt-3
+                  rounded-2xl
+                  border
+                  border-[var(--border)]
+                  bg-[var(--background)]
+                  px-3.5
+                  py-3
+                "
+              >
                 <div className="flex items-center justify-between gap-4">
-                  <span className="flex items-center gap-2 text-xs text-[var(--muted)]">
-                    <MapPin size={14} />
+                  <span
+                    className="
+                      flex
+                      items-center
+                      gap-2
+                      text-xs
+                      text-[var(--muted)]
+                    "
+                  >
+                    <MapPin size={13} />
                     Location
                   </span>
 
-                  <span className="max-w-[60%] truncate text-right text-xs font-medium">
-                    {handover.location || "—"}
+                  <span className="max-w-[60%] truncate text-right text-xs font-bold">
+                    {handover.location ||
+                      "—"}
                   </span>
                 </div>
 
@@ -561,7 +768,7 @@ const Handover = () => {
                     Recorded
                   </span>
 
-                  <span className="text-xs font-medium">
+                  <span className="text-xs font-bold">
                     {handoverDate}
                   </span>
                 </div>
@@ -569,17 +776,19 @@ const Handover = () => {
             </section>
 
             {/* GPS */}
+
             {typeof handover.latitude ===
               "number" &&
               typeof handover.longitude ===
                 "number" && (
                 <section
                   className="
-                    rounded-3xl
+                    rounded-[26px]
                     border
                     border-[var(--border)]
                     bg-[var(--surface)]
                     p-5
+                    shadow-sm
                   "
                 >
                   <div className="flex items-center gap-3">
@@ -599,11 +808,17 @@ const Handover = () => {
                     </div>
 
                     <div>
-                      <p className="text-sm font-semibold">
+                      <p className="text-sm font-extrabold">
                         GPS Evidence
                       </p>
 
-                      <p className="mt-0.5 text-xs text-[var(--muted)]">
+                      <p
+                        className="
+                          mt-0.5
+                          text-[10px]
+                          text-[var(--muted)]
+                        "
+                      >
                         Recorded at handover
                       </p>
                     </div>
@@ -613,70 +828,113 @@ const Handover = () => {
                     className="
                       mt-4
                       rounded-2xl
-                      bg-[var(--surface-soft)]
+                      bg-[linear-gradient(135deg,var(--accent),var(--background))]
                       px-4
                       py-3
                       text-xs
+                      font-semibold
                       text-[var(--muted)]
                     "
                   >
-                    {handover.latitude.toFixed(5)},{" "}
-                    {handover.longitude.toFixed(5)}
+                    {handover.latitude.toFixed(
+                      5
+                    )}
+                    ,{" "}
+                    {handover.longitude.toFixed(
+                      5
+                    )}
                   </div>
                 </section>
               )}
 
             {/* Evidence */}
-            {handover.photos?.length > 0 && (
+
+            {handover.photos?.length >
+              0 && (
               <section
                 className="
-                  rounded-3xl
+                  rounded-[28px]
                   border
                   border-[var(--border)]
                   bg-[var(--surface)]
                   p-5
+                  shadow-[0_12px_35px_rgba(18,63,45,0.06)]
                   sm:p-6
                 "
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-3">
                   <div>
-                    <h2 className="text-sm font-semibold">
+                    <h2 className="text-sm font-extrabold">
                       Evidence Photos
                     </h2>
 
-                    <p className="mt-1 text-xs text-[var(--muted)]">
+                    <p
+                      className="
+                        mt-1
+                        text-[10px]
+                        text-[var(--muted)]
+                      "
+                    >
                       Photos captured during handover
                     </p>
                   </div>
 
-                  <span className="text-xs font-medium text-[var(--muted)]">
-                    {handover.photos.length}{" "}
-                    {handover.photos.length === 1
-                      ? "photo"
-                      : "photos"}
+                  <span
+                    className="
+                      rounded-full
+                      bg-[var(--accent)]
+                      px-2.5
+                      py-1.5
+                      text-[10px]
+                      font-bold
+                      text-[var(--primary)]
+                    "
+                  >
+                    {
+                      handover.photos
+                        .length
+                    }{" "}
+                    photos
                   </span>
                 </div>
 
-                <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <div
+                  className="
+                    mt-4
+                    grid
+                    grid-cols-2
+                    gap-2.5
+                    sm:grid-cols-3
+                  "
+                >
                   {handover.photos.map(
                     (photo) => (
                       <div
                         key={photo.id}
                         className="
+                          group
                           aspect-square
                           overflow-hidden
-                          rounded-2xl
+                          rounded-[20px]
+                          border
+                          border-[var(--border)]
                           bg-[var(--surface-soft)]
+                          shadow-sm
                         "
                       >
                         <img
-                          src={photo.url}
+                          src={
+                            photo.url
+                          }
                           alt="Handover evidence"
                           loading="lazy"
                           className="
                             h-full
                             w-full
                             object-cover
+                            transition
+                            duration-500
+                            group-hover:scale-105
                           "
                         />
                       </div>
@@ -686,61 +944,103 @@ const Handover = () => {
               </section>
             )}
 
+            <button
+              type="button"
+              onClick={() =>
+                navigate(
+                  `/collector/lots/${id}`
+                )
+              }
+              className="
+                flex
+                w-full
+                items-center
+                justify-center
+                gap-2
+                rounded-2xl
+                border
+                border-[var(--border)]
+                bg-[var(--surface)]
+                px-5
+                py-4
+                text-sm
+                font-bold
+                shadow-sm
+                transition
+                hover:border-[var(--primary)]/30
+                active:scale-[0.99]
+              "
+            >
+              <ArrowLeft size={16} />
+              Back to Lot
+            </button>
           </div>
-
-          <button
-            type="button"
-            onClick={() =>
-              navigate(
-                `/collector/lots/${id}`
-              )
-            }
-            className="
-              mt-5
-              flex
-              w-full
-              items-center
-              justify-center
-              gap-2
-              rounded-2xl
-              border
-              border-[var(--border)]
-              bg-[var(--surface)]
-              px-5
-              py-4
-              text-sm
-              font-semibold
-              transition
-              hover:bg-[var(--surface-soft)]
-              active:scale-[0.99]
-            "
-          >
-            <ArrowLeft size={17} />
-            Back to Lot
-          </button>
-        </div>
+        </main>
       </div>
     );
   }
 
-  /* ─────────────────────────────
-     New Handover
-  ───────────────────────────── */
+  /* ==========================================================
+     NEW HANDOVER
+  ========================================================== */
 
   return (
-    <div className="w-full">
+    <div
+      className="
+        relative
+        min-h-full
+        overflow-hidden
+        bg-[var(--background)]
+      "
+    >
+      {/* Ambient background */}
+
       <div
         className="
+          pointer-events-none
+          fixed
+          -right-32
+          top-24
+          h-80
+          w-80
+          rounded-full
+          bg-[var(--accent)]
+          opacity-25
+          blur-[110px]
+        "
+      />
+
+      <div
+        className="
+          pointer-events-none
+          fixed
+          -left-40
+          bottom-0
+          h-80
+          w-80
+          rounded-full
+          bg-[var(--accent)]
+          opacity-20
+          blur-[110px]
+        "
+      />
+
+      <main
+        className="
+          relative
           mx-auto
           w-full
-          max-w-3xl
+          max-w-6xl
           px-4
-          py-5
-          pb-32
+          pb-36
+          pt-5
           sm:px-6
-          sm:py-8
+          sm:pt-8
+          lg:px-8
         "
       >
+        {/* HEADER */}
+
         <HandoverHeader
           lot={lot}
           onBack={() =>
@@ -750,83 +1050,147 @@ const Handover = () => {
           }
         />
 
-        {/* Quick summary */}
+        {/* ====================================================
+            READINESS
+        ==================================================== */}
+
         <section
           className="
-            mb-5
-            rounded-3xl
+            mt-5
+            overflow-hidden
+            rounded-[26px]
             border
             border-[var(--border)]
             bg-[var(--surface)]
-            p-4
+            shadow-sm
           "
         >
-          <div className="grid grid-cols-2 gap-3">
+          <div className="p-4 sm:p-5">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p
+                  className="
+                    text-[10px]
+                    font-bold
+                    uppercase
+                    tracking-[0.15em]
+                    text-[var(--primary)]
+                  "
+                >
+                  Handover readiness
+                </p>
 
-            <div
-              className="
-                rounded-2xl
-                bg-[var(--surface-soft)]
-                p-3
-              "
-            >
-              <p className="text-[11px] text-[var(--muted)]">
-                Material
-              </p>
+                <h2
+                  className="
+                    mt-1
+                    text-sm
+                    font-extrabold
+                  "
+                >
+                  Complete the transfer record
+                </h2>
+              </div>
 
-              <p className="mt-1 truncate text-sm font-semibold">
-                {lot?.material || "—"}
-              </p>
+              <span
+                className="
+                  text-sm
+                  font-extrabold
+                  text-[var(--primary)]
+                "
+              >
+                {completedSteps}/4
+              </span>
             </div>
 
             <div
               className="
-                rounded-2xl
-                bg-[var(--surface-soft)]
-                p-3
+                mt-4
+                h-2
+                overflow-hidden
+                rounded-full
+                bg-[var(--border)]
               "
             >
-              <p className="text-[11px] text-[var(--muted)]">
-                Approx. Weight
-              </p>
-
-              <p className="mt-1 text-sm font-semibold">
-                {lot?.approximateWeight || "—"}{" "}
-                {lot?.weightUnit || "kg"}
-              </p>
+              <motion.div
+                animate={{
+                  width: `${readinessPercentage}%`,
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 120,
+                  damping: 20,
+                }}
+                className="
+                  h-full
+                  rounded-full
+                  bg-gradient-to-r
+                  from-[var(--primary)]
+                  to-[var(--teal)]
+                "
+              />
             </div>
 
+            <div
+              className="
+                mt-3
+                grid
+                grid-cols-2
+                gap-2
+                sm:grid-cols-4
+              "
+            >
+              <ReadinessItem
+                label="Weight"
+                done={
+                  readiness.weight
+                }
+              />
+
+              <ReadinessItem
+                label="Value"
+                done={
+                  readiness.value
+                }
+              />
+
+              <ReadinessItem
+                label="Location"
+                done={
+                  readiness.location
+                }
+              />
+
+              <ReadinessItem
+                label="Evidence"
+                done={
+                  readiness.photos
+                }
+              />
+            </div>
           </div>
         </section>
 
-        <div className="space-y-4">
+        {/* ====================================================
+            ERROR / SUCCESS
+        ==================================================== */}
 
-          <HandoverWeight
-            value={actualWeight}
-            onChange={setActualWeight}
-          />
-
-          <HandoverValue
-            value={finalValue}
-            onChange={setFinalValue}
-          />
-
-          <HandoverLocation
-            location={location}
-            latitude={latitude}
-            longitude={longitude}
-            onLocationChange={setLocation}
-          />
-
-          <HandoverPhotoSection
-            photos={photos}
-            onAddPhotos={handleAddPhotos}
-            onRemovePhoto={handleRemovePhoto}
-          />
-
+        <AnimatePresence>
           {error && (
-            <div
+            <motion.div
+              initial={{
+                opacity: 0,
+                y: -6,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              exit={{
+                opacity: 0,
+                y: -6,
+              }}
               className="
+                mt-4
                 rounded-2xl
                 border
                 border-[var(--danger)]/20
@@ -834,16 +1198,26 @@ const Handover = () => {
                 px-4
                 py-3
                 text-sm
+                font-medium
                 text-[var(--danger)]
               "
             >
               {error}
-            </div>
+            </motion.div>
           )}
 
           {success && (
-            <div
+            <motion.div
+              initial={{
+                opacity: 0,
+                scale: 0.98,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+              }}
               className="
+                mt-4
                 flex
                 items-center
                 gap-3
@@ -854,89 +1228,444 @@ const Handover = () => {
                 px-4
                 py-3
                 text-sm
-                font-medium
+                font-semibold
                 text-[var(--success)]
               "
             >
               <CheckCircle2
                 size={19}
-                className="shrink-0"
               />
 
               Handover recorded successfully.
-            </div>
+            </motion.div>
           )}
+        </AnimatePresence>
 
-          {/* Submit */}
-          <div
-            className="
-              sticky
-              bottom-20
-              z-10
-              pt-2
-              sm:static
-              sm:pt-1
-            "
-          >
-            <button
-              type="button"
-              disabled={submitting}
-              onClick={handleSubmit}
-              className="
-                flex
-                w-full
-                items-center
-                justify-center
-                gap-2
-                rounded-2xl
-                bg-[var(--primary)]
-                px-5
-                py-4
-                text-sm
-                font-semibold
-                text-[var(--primary-foreground)]
-                shadow-xl
-                shadow-black/10
-                transition
-                hover:opacity-90
-                active:scale-[0.99]
-                disabled:cursor-not-allowed
-                disabled:opacity-60
-              "
-            >
-              {submitting ? (
-                <>
-                  <Loader2
-                    size={19}
-                    className="animate-spin"
-                  />
+        {/* ====================================================
+            FORM LAYOUT
+        ==================================================== */}
 
-                  Recording Handover...
-                </>
-              ) : (
-                <>
-                  <CheckCircle2 size={19} />
-                  Record Handover
-                </>
-              )}
-            </button>
+        <div
+          className="
+            mt-5
+            grid
+            gap-5
+            lg:grid-cols-[minmax(0,1.1fr)_minmax(330px,0.9fr)]
+            lg:items-start
+          "
+        >
+          {/* LEFT */}
 
-            <p
-              className="
-                mt-2
-                text-center
-                text-[11px]
-                leading-4
-                text-[var(--muted)]
-              "
-            >
-              Your handover details and evidence
-              will be securely recorded.
-            </p>
+          <div className="space-y-5">
+            <HandoverWeight
+              value={
+                actualWeight
+              }
+              onChange={
+                setActualWeight
+              }
+            />
+
+            <HandoverValue
+              value={finalValue}
+              onChange={
+                setFinalValue
+              }
+            />
+
+            <HandoverLocation
+              location={location}
+              latitude={latitude}
+              longitude={longitude}
+              onLocationChange={
+                setLocation
+              }
+            />
+
+            <HandoverPhotoSection
+              photos={photos}
+              onAddPhotos={
+                handleAddPhotos
+              }
+              onRemovePhoto={
+                handleRemovePhoto
+              }
+            />
           </div>
 
+          {/* RIGHT — DESKTOP SUMMARY */}
+
+          <aside
+            className="
+              lg:sticky
+              lg:top-24
+            "
+          >
+            <div
+              className="
+                relative
+                overflow-hidden
+                rounded-[30px]
+                border
+                border-white/10
+                bg-[linear-gradient(135deg,#06150F_0%,#0A281A_38%,#10563A_72%,#126A46_100%)]
+                p-5
+                text-white
+                shadow-[0_20px_55px_rgba(18,63,45,0.22)]
+                sm:p-6
+              "
+            >
+              <div
+                className="
+                  pointer-events-none
+                  absolute
+                  -right-16
+                  -top-16
+                  h-44
+                  w-44
+                  rounded-full
+                  bg-[#52D49A]/15
+                  blur-3xl
+                "
+              />
+
+              <div className="relative">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck
+                    size={15}
+                    className="text-emerald-200"
+                  />
+
+                  <span
+                    className="
+                      text-[10px]
+                      font-bold
+                      uppercase
+                      tracking-[0.15em]
+                      text-white/50
+                    "
+                  >
+                    Transfer record
+                  </span>
+                </div>
+
+                <h2
+                  className="
+                    mt-2
+                    text-xl
+                    font-extrabold
+                  "
+                >
+                  Ready to record
+                </h2>
+
+                <p
+                  className="
+                    mt-2
+                    text-xs
+                    leading-5
+                    text-white/55
+                  "
+                >
+                  Once submitted, the handover record
+                  and evidence will be associated with
+                  this lot.
+                </p>
+
+                {/* Summary */}
+
+                <div className="mt-6 space-y-2">
+                  <SummaryRow
+                    label="Material"
+                    value={
+                      lot?.material ||
+                      "—"
+                    }
+                  />
+
+                  <SummaryRow
+                    label="Approx. weight"
+                    value={`${lot?.approximateWeight || "—"} ${
+                      lot?.weightUnit ||
+                      "kg"
+                    }`}
+                  />
+
+                  <SummaryRow
+                    label="Collection location"
+                    value={
+                      lot?.location ||
+                      "—"
+                    }
+                  />
+
+                  <SummaryRow
+                    label="Evidence photos"
+                    value={`${photos.length} ${
+                      photos.length ===
+                      1
+                        ? "photo"
+                        : "photos"
+                    }`}
+                  />
+                </div>
+
+                {/* CTA */}
+
+                <motion.button
+                  type="button"
+                  disabled={submitting}
+                  onClick={
+                    handleSubmit
+                  }
+                  whileTap={{
+                    scale: 0.98,
+                  }}
+                  className="
+                    mt-6
+                    flex
+                    min-h-14
+                    w-full
+                    items-center
+                    justify-center
+                    gap-2
+                    rounded-2xl
+                    bg-white
+                    px-5
+                    py-4
+                    text-sm
+                    font-extrabold
+                    text-[var(--primary)]
+                    shadow-xl
+                    transition
+                    hover:bg-white/95
+                    disabled:cursor-not-allowed
+                    disabled:opacity-60
+                  "
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2
+                        size={18}
+                        className="animate-spin"
+                      />
+
+                      Recording Handover...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2
+                        size={18}
+                      />
+
+                      Record Handover
+                    </>
+                  )}
+                </motion.button>
+
+                <p
+                  className="
+                    mt-3
+                    text-center
+                    text-[10px]
+                    leading-4
+                    text-white/40
+                  "
+                >
+                  The final amount and actual weight
+                  will be stored as the handover record.
+                </p>
+              </div>
+            </div>
+          </aside>
         </div>
+
+        {/* MOBILE CTA */}
+
+        <div
+          className="
+            sticky
+            bottom-20
+            z-20
+            mt-5
+            rounded-2xl
+            border
+            border-[var(--border)]
+            bg-[var(--background)]/85
+            p-2
+            shadow-2xl
+            backdrop-blur-2xl
+            lg:hidden
+          "
+        >
+          <motion.button
+            type="button"
+            disabled={submitting}
+            onClick={
+              handleSubmit
+            }
+            whileTap={{
+              scale: 0.985,
+            }}
+            className="
+              flex
+              min-h-13
+              w-full
+              items-center
+              justify-center
+              gap-2
+              rounded-xl
+              bg-[var(--primary)]
+              px-5
+              py-3.5
+              text-sm
+              font-extrabold
+              text-[var(--primary-foreground)]
+              shadow-lg
+              shadow-black/15
+              disabled:opacity-60
+            "
+          >
+            {submitting ? (
+              <>
+                <Loader2
+                  size={18}
+                  className="animate-spin"
+                />
+
+                Recording Handover...
+              </>
+            ) : (
+              <>
+                <CheckCircle2 size={18} />
+
+                Record Handover
+              </>
+            )}
+          </motion.button>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+/* ============================================================
+   READINESS ITEM
+============================================================ */
+
+const ReadinessItem = ({
+  label,
+  done,
+}) => {
+  return (
+    <div
+      className={`
+        flex
+        items-center
+        gap-2
+        rounded-xl
+        border
+        px-2.5
+        py-2
+
+        ${
+          done
+            ? `
+              border-[var(--primary)]/15
+              bg-[var(--accent)]
+            `
+            : `
+              border-[var(--border)]
+              bg-[var(--background)]
+            `
+        }
+      `}
+    >
+      <div
+        className={`
+          flex
+          h-5
+          w-5
+          shrink-0
+          items-center
+          justify-center
+          rounded-full
+
+          ${
+            done
+              ? "bg-[var(--primary)] text-white"
+              : "bg-[var(--border)] text-[var(--muted)]"
+          }
+        `}
+      >
+        {done ? (
+          <Check
+            size={10}
+            strokeWidth={3}
+          />
+        ) : (
+          <span className="h-1.5 w-1.5 rounded-full bg-current" />
+        )}
       </div>
+
+      <span
+        className="
+          truncate
+          text-[10px]
+          font-semibold
+          text-[var(--muted)]
+        "
+      >
+        {label}
+      </span>
+    </div>
+  );
+};
+
+/* ============================================================
+   SUMMARY ROW
+============================================================ */
+
+const SummaryRow = ({
+  label,
+  value,
+}) => {
+  return (
+    <div
+      className="
+        flex
+        items-center
+        justify-between
+        gap-3
+        rounded-xl
+        border
+        border-white/10
+        bg-white/5
+        px-3
+        py-3
+      "
+    >
+      <span
+        className="
+          text-[10px]
+          text-white/45
+        "
+      >
+        {label}
+      </span>
+
+      <span
+        className="
+          max-w-[55%]
+          truncate
+          text-right
+          text-[11px]
+          font-bold
+          text-white/85
+        "
+      >
+        {value}
+      </span>
     </div>
   );
 };
