@@ -1,5 +1,15 @@
-import { useEffect, useState } from "react";
-import { ArrowLeft, Check, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+
+import {
+  ArrowLeft,
+  Check,
+  ChevronRight,
+  Loader2,
+  Sparkles,
+} from "lucide-react";
+
+import { motion, AnimatePresence } from "framer-motion";
+
 import { useNavigate } from "react-router-dom";
 
 import LotPhotoSection from "./components/LotPhotoSection";
@@ -10,6 +20,7 @@ import LotDescription from "./components/LotDescription";
 import ValuationPreview from "./components/ValuationPreview";
 
 import useCurrentLocation from "../../hooks/useCurrentLocation";
+
 import {
   calculateValuation,
 } from "../../services/prices/priceApi";
@@ -28,6 +39,10 @@ const CreateLot = () => {
   const navigate = useNavigate();
 
   const location = useCurrentLocation();
+
+  /* ==========================================================
+     STATE
+  ========================================================== */
 
   const [material, setMaterial] = useState("");
   const [subcategory, setSubcategory] =
@@ -63,11 +78,9 @@ const CreateLot = () => {
     location?.city ||
     "";
 
-  /*
-   * --------------------------------------------------
-   * Reset valuation whenever important lot data changes
-   * --------------------------------------------------
-   */
+  /* ==========================================================
+     RESET VALUATION
+  ========================================================== */
 
   useEffect(() => {
     setValuation(null);
@@ -78,27 +91,25 @@ const CreateLot = () => {
     pricingLocation,
   ]);
 
-  /*
-   * --------------------------------------------------
-   * Cleanup photo preview URLs
-   * --------------------------------------------------
-   */
+  /* ==========================================================
+     CLEANUP PHOTO PREVIEWS
+  ========================================================== */
 
   useEffect(() => {
     return () => {
       photos.forEach((photo) => {
         if (photo.preview) {
-          URL.revokeObjectURL(photo.preview);
+          URL.revokeObjectURL(
+            photo.preview
+          );
         }
       });
     };
   }, []);
 
-  /*
-   * --------------------------------------------------
-   * Validation
-   * --------------------------------------------------
-   */
+  /* ==========================================================
+     VALIDATION
+  ========================================================== */
 
   const weightNumber = Number(weight);
 
@@ -119,7 +130,10 @@ const CreateLot = () => {
       return "Please select a material.";
     }
 
-    if (!weight || !Number.isFinite(weightNumber)) {
+    if (
+      !weight ||
+      !Number.isFinite(weightNumber)
+    ) {
       return "Please enter a valid weight.";
     }
 
@@ -138,11 +152,62 @@ const CreateLot = () => {
     return null;
   };
 
-  /*
-   * --------------------------------------------------
-   * Calculate valuation
-   * --------------------------------------------------
-   */
+  /* ==========================================================
+     PROGRESS
+  ========================================================== */
+
+  const progressSteps = useMemo(
+    () => [
+      {
+        key: "photos",
+        label: "Photos",
+        completed: photos.length > 0,
+      },
+      {
+        key: "material",
+        label: "Material",
+        completed: Boolean(material),
+      },
+      {
+        key: "weight",
+        label: "Weight",
+        completed:
+          weightNumber > 0 &&
+          Number.isFinite(weightNumber),
+      },
+      {
+        key: "location",
+        label: "Location",
+        completed: Boolean(pricingLocation),
+      },
+      {
+        key: "value",
+        label: "Value",
+        completed: Boolean(valuation),
+      },
+    ],
+    [
+      photos.length,
+      material,
+      weightNumber,
+      pricingLocation,
+      valuation,
+    ]
+  );
+
+  const completedSteps =
+    progressSteps.filter(
+      (step) => step.completed
+    ).length;
+
+  const progressPercentage =
+    (completedSteps /
+      progressSteps.length) *
+    100;
+
+  /* ==========================================================
+     CALCULATE VALUATION
+  ========================================================== */
 
   const handleCalculate = async () => {
     setError("");
@@ -195,11 +260,9 @@ const CreateLot = () => {
     }
   };
 
-  /*
-   * --------------------------------------------------
-   * Create + upload + finalize
-   * --------------------------------------------------
-   */
+  /* ==========================================================
+     CREATE + UPLOAD + FINALIZE
+  ========================================================== */
 
   const handleCreateLot = async () => {
     setError("");
@@ -215,59 +278,59 @@ const CreateLot = () => {
     try {
       setCreating(true);
 
-      /*
-       * STEP 1
-       * Create database lot
-       */
+      /* ======================================================
+         STEP 1 — CREATE LOT
+      ====================================================== */
 
-      const result = await createLot({
-        material,
-        subcategory:
-          subcategory || null,
+      const result =
+        await createLot({
+          material,
+          subcategory:
+            subcategory || null,
 
-        approximateWeight:
-          weightNumber,
+          approximateWeight:
+            weightNumber,
 
-        weightUnit: "kg",
+          weightUnit: "kg",
 
-        latitude:
-          typeof location?.latitude ===
-          "number"
-            ? location.latitude
-            : null,
+          latitude:
+            typeof location?.latitude ===
+            "number"
+              ? location.latitude
+              : null,
 
-        longitude:
-          typeof location?.longitude ===
-          "number"
-            ? location.longitude
-            : null,
+          longitude:
+            typeof location?.longitude ===
+            "number"
+              ? location.longitude
+              : null,
 
-        location:
-          pricingLocation,
+          location:
+            pricingLocation,
 
-        description:
-          description.trim() || null,
+          description:
+            description.trim() || null,
 
-        condition:
-          condition || null,
+          condition:
+            condition || null,
 
-        estimatedRate:
-          valuation?.rate ??
-          valuation?.estimatedRate ??
-          null,
+          estimatedRate:
+            valuation?.rate ??
+            valuation?.estimatedRate ??
+            null,
 
-        minEstimatedValue:
-          valuation?.minEstimatedValue ??
-          null,
+          minEstimatedValue:
+            valuation?.minEstimatedValue ??
+            null,
 
-        maxEstimatedValue:
-          valuation?.maxEstimatedValue ??
-          null,
+          maxEstimatedValue:
+            valuation?.maxEstimatedValue ??
+            null,
 
-        estimatedValue:
-          valuation?.estimatedValue ??
-          null,
-      });
+          estimatedValue:
+            valuation?.estimatedValue ??
+            null,
+        });
 
       const lot = result?.lot;
 
@@ -277,10 +340,9 @@ const CreateLot = () => {
         );
       }
 
-      /*
-       * STEP 2
-       * Upload photos
-       */
+      /* ======================================================
+         STEP 2 — UPLOAD PHOTOS
+      ====================================================== */
 
       for (
         let index = 0;
@@ -299,20 +361,15 @@ const CreateLot = () => {
         );
       }
 
-      /*
-       * STEP 3
-       * Finalize lot
-       *
-       * Backend changes:
-       * CREATED → AVAILABLE
-       */
+      /* ======================================================
+         STEP 3 — FINALIZE
+      ====================================================== */
 
       await finalizeLot(lot.id);
 
-      /*
-       * STEP 4
-       * Navigate to lot details
-       */
+      /* ======================================================
+         STEP 4 — DETAILS
+      ====================================================== */
 
       navigate(
         `/collector/lots/${lot.id}`,
@@ -335,11 +392,9 @@ const CreateLot = () => {
     }
   };
 
-  /*
-   * --------------------------------------------------
-   * Add photos
-   * --------------------------------------------------
-   */
+  /* ==========================================================
+     ADD PHOTOS
+  ========================================================== */
 
   const handleAddPhotos = async (
     files
@@ -418,11 +473,9 @@ const CreateLot = () => {
     ]);
   };
 
-  /*
-   * --------------------------------------------------
-   * Remove photo
-   * --------------------------------------------------
-   */
+  /* ==========================================================
+     REMOVE PHOTO
+  ========================================================== */
 
   const handleRemovePhoto = (
     photoId
@@ -447,44 +500,56 @@ const CreateLot = () => {
     });
   };
 
-  /*
-   * --------------------------------------------------
-   * UI
-   * --------------------------------------------------
-   */
+  /* ==========================================================
+     UI
+  ========================================================== */
+return (
+  <div
+    className="
+      min-h-screen
+      bg-[var(--background)]
+      text-[var(--foreground)]
+    "
+  >
+    {/* ======================================================
+        HEADER
+    ====================================================== */}
 
-  return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
-
-      {/* Header */}
-      <header
+    <header
+      className="
+        sticky
+        top-0
+        z-40
+        border-b
+        border-[var(--border)]
+        bg-[var(--background)]/88
+        backdrop-blur-2xl
+      "
+    >
+      <div
         className="
-          sticky
-          top-0
-          z-20
-          border-b
-          border-[var(--border)]
-          bg-[var(--background)]/95
-          backdrop-blur
+          mx-auto
+          max-w-2xl
+          px-4
         "
       >
+        {/* HEADER ROW */}
+
         <div
           className="
-            mx-auto
             flex
-            h-16
-            max-w-2xl
+            h-[68px]
             items-center
             gap-3
-            px-4
           "
         >
-          <button
+          <motion.button
             type="button"
             disabled={creating}
-            onClick={() =>
-              navigate(-1)
-            }
+            onClick={() => navigate(-1)}
+            whileTap={{
+              scale: 0.9,
+            }}
             className="
               flex
               h-10
@@ -496,58 +561,330 @@ const CreateLot = () => {
               border
               border-[var(--border)]
               bg-[var(--surface)]
+              text-[var(--foreground)]
               transition
+              hover:border-[var(--primary)]/30
               active:scale-95
               disabled:cursor-not-allowed
               disabled:opacity-50
             "
           >
-            <ArrowLeft size={20} />
-          </button>
+            <ArrowLeft
+              size={19}
+              strokeWidth={2.2}
+            />
+          </motion.button>
 
-          <div>
-            <h1 className="font-semibold">
-              Add E-Waste
-            </h1>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <h1
+                className="
+                  truncate
+                  text-base
+                  font-extrabold
+                  tracking-tight
+                "
+              >
+                Create E-Waste Lot
+              </h1>
 
-            <p className="text-xs text-[var(--muted)]">
-              Create a new lot
+              <Sparkles
+                size={14}
+                className="
+                  shrink-0
+                  text-[var(--primary)]
+                "
+              />
+            </div>
+
+            <p
+              className="
+                mt-0.5
+                text-xs
+                text-[var(--muted)]
+              "
+            >
+              Add details and get an estimated value
             </p>
           </div>
-        </div>
-      </header>
 
-      {/* Content */}
-      <main
+          <div
+            className="
+              shrink-0
+              rounded-full
+              border
+              border-[var(--border)]
+              bg-[var(--surface)]
+              px-2.5
+              py-1.5
+              text-[10px]
+              font-bold
+              text-[var(--muted)]
+            "
+          >
+            {completedSteps}/{progressSteps.length}
+          </div>
+        </div>
+
+        {/* PROGRESS BAR */}
+
+        <div className="pb-3">
+          <div
+            className="
+              relative
+              h-1.5
+              overflow-hidden
+              rounded-full
+              bg-[var(--border)]
+            "
+          >
+            <motion.div
+              animate={{
+                width: `${progressPercentage}%`,
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 120,
+                damping: 20,
+              }}
+              className="
+                absolute
+                inset-y-0
+                left-0
+                rounded-full
+                bg-gradient-to-r
+                from-[var(--primary)]
+                to-[var(--teal)]
+              "
+            />
+          </div>
+
+          <div
+            className="
+              mt-2
+              flex
+              items-center
+              justify-between
+            "
+          >
+            {progressSteps.map(
+              (step, index) => (
+                <div
+                  key={step.key}
+                  className="
+                    flex
+                    items-center
+                    gap-1
+                  "
+                >
+                  <motion.span
+                    animate={{
+                      scale: step.completed
+                        ? 1
+                        : 0.85,
+                    }}
+                    className={`
+                      flex
+                      h-4
+                      w-4
+                      items-center
+                      justify-center
+                      rounded-full
+                      text-[8px]
+                      font-bold
+
+                      ${
+                        step.completed
+                          ? "bg-[var(--primary)] text-white"
+                          : "bg-[var(--border)] text-[var(--muted)]"
+                      }
+                    `}
+                  >
+                    {step.completed ? (
+                      <Check
+                        size={9}
+                        strokeWidth={3}
+                      />
+                    ) : (
+                      index + 1
+                    )}
+                  </motion.span>
+
+                  <span
+                    className={`
+                      hidden
+                      text-[9px]
+                      font-semibold
+                      sm:block
+                      ${
+                        step.completed
+                          ? "text-[var(--primary)]"
+                          : "text-[var(--muted)]"
+                      }
+                    `}
+                  >
+                    {step.label}
+                  </span>
+                </div>
+              )
+            )}
+          </div>
+        </div>
+      </div>
+    </header>
+
+    {/* ======================================================
+        MAIN
+    ====================================================== */}
+
+    <main
+      className="
+        mx-auto
+        max-w-2xl
+        px-4
+        pb-36
+        pt-6
+      "
+    >
+      {/* ====================================================
+          INTRO
+      ==================================================== */}
+
+      <motion.div
+        initial={{
+          opacity: 0,
+          y: 12,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
         className="
-          mx-auto
-          max-w-2xl
-          space-y-7
-          px-4
-          py-6
-          pb-32
+          relative
+          overflow-hidden
+          rounded-[28px]
+          border
+          border-[var(--border)]
+          bg-[var(--surface)]
+          px-5
+          py-5
+          shadow-sm
         "
       >
+        <div
+          className="
+            pointer-events-none
+            absolute
+            -right-14
+            -top-14
+            h-36
+            w-36
+            rounded-full
+            bg-[var(--accent)]
+            opacity-60
+            blur-3xl
+          "
+        />
 
-        {/* Error */}
-        {error && (
+        <div className="relative">
           <div
+            className="
+              flex
+              items-center
+              gap-2
+              text-[10px]
+              font-bold
+              uppercase
+              tracking-[0.16em]
+              text-[var(--primary)]
+            "
+          >
+            <span
+              className="
+                h-1.5
+                w-1.5
+                rounded-full
+                bg-[var(--primary)]
+              "
+            />
+
+            New collection
+          </div>
+
+          <h2
+            className="
+              mt-2
+              text-xl
+              font-extrabold
+              tracking-tight
+            "
+          >
+            Create your e-waste lot
+          </h2>
+
+          <p
+            className="
+              mt-2
+              max-w-lg
+              text-sm
+              leading-6
+              text-[var(--muted)]
+            "
+          >
+            Add a photo, identify the material,
+            enter the weight and check the local
+            estimated value.
+          </p>
+        </div>
+      </motion.div>
+
+      {/* ====================================================
+          ERROR
+      ==================================================== */}
+
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: -8,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            exit={{
+              opacity: 0,
+              y: -8,
+            }}
             role="alert"
             className="
+              mt-5
               rounded-2xl
               border
-              border-[var(--danger)]/30
+              border-[var(--danger)]/25
               bg-[var(--danger)]/10
-              p-4
+              px-4
+              py-3.5
               text-sm
+              font-medium
+              leading-5
               text-[var(--danger)]
             "
           >
             {error}
-          </div>
+          </motion.div>
         )}
+      </AnimatePresence>
 
-        {/* Photos */}
+      {/* ====================================================
+          FORM FLOW
+      ==================================================== */}
+
+      <div className="mt-10">
+
+        {/* PHOTO */}
+
         <LotPhotoSection
           photos={photos}
           onAddPhotos={
@@ -558,12 +895,19 @@ const CreateLot = () => {
           }
         />
 
-        {/* Material */}
+        <div
+          className="
+            my-10
+            h-px
+            bg-[var(--border)]
+          "
+        />
+
+        {/* MATERIAL */}
+
         <MaterialSelector
           material={material}
-          subcategory={
-            subcategory
-          }
+          subcategory={subcategory}
           onMaterialChange={
             setMaterial
           }
@@ -572,13 +916,31 @@ const CreateLot = () => {
           }
         />
 
-        {/* Weight */}
+        <div
+          className="
+            my-10
+            h-px
+            bg-[var(--border)]
+          "
+        />
+
+        {/* WEIGHT */}
+
         <WeightInput
           weight={weight}
           onChange={setWeight}
         />
 
-        {/* Location */}
+        <div
+          className="
+            my-10
+            h-px
+            bg-[var(--border)]
+          "
+        />
+
+        {/* LOCATION */}
+
         <LocationSection
           location={location}
           selectedLocation={
@@ -589,7 +951,16 @@ const CreateLot = () => {
           }
         />
 
-        {/* Description */}
+        <div
+          className="
+            my-10
+            h-px
+            bg-[var(--border)]
+          "
+        />
+
+        {/* MORE DETAILS */}
+
         <LotDescription
           description={description}
           condition={condition}
@@ -601,10 +972,63 @@ const CreateLot = () => {
           }
         />
 
-        {/* Valuation */}
-        <div className="space-y-3">
+        <div
+          className="
+            my-10
+            h-px
+            bg-[var(--border)]
+          "
+        />
 
-          <button
+        {/* ==================================================
+            VALUATION
+        ================================================== */}
+
+        <section>
+          <div className="mb-5">
+            <div
+              className="
+                flex
+                items-center
+                gap-2
+                text-[10px]
+                font-bold
+                uppercase
+                tracking-[0.15em]
+                text-[var(--primary)]
+              "
+            >
+              <Sparkles size={13} />
+
+              Valuation
+            </div>
+
+            <h2
+              className="
+                mt-1
+                text-lg
+                font-extrabold
+                tracking-tight
+              "
+            >
+              Check estimated value
+            </h2>
+
+            <p
+              className="
+                mt-1
+                text-sm
+                leading-5
+                text-[var(--muted)]
+              "
+            >
+              We use the material, weight and
+              location to estimate the current
+              lot value.
+            </p>
+          </div>
+
+          <motion.button
             type="button"
             disabled={
               !canCalculate ||
@@ -614,96 +1038,207 @@ const CreateLot = () => {
             onClick={
               handleCalculate
             }
+            whileTap={{
+              scale: 0.985,
+            }}
             className="
+              group
+              relative
               flex
               min-h-14
               w-full
               items-center
               justify-center
               gap-2
+              overflow-hidden
               rounded-2xl
               bg-[var(--primary)]
               px-5
               py-4
-              font-semibold
+              font-bold
               text-[var(--primary-foreground)]
+              shadow-lg
+              shadow-black/10
               transition
-              active:scale-[0.99]
               disabled:cursor-not-allowed
-              disabled:opacity-50
+              disabled:opacity-45
+              disabled:shadow-none
             "
           >
-            {valuationLoading ? (
-              <>
-                <Loader2
-                  size={19}
-                  className="animate-spin"
-                />
+            <span className="relative flex items-center gap-2">
+              {valuationLoading ? (
+                <>
+                  <Loader2
+                    size={18}
+                    className="animate-spin"
+                  />
 
-                Calculating...
-              </>
-            ) : (
-              "Calculate Estimated Value"
-            )}
-          </button>
+                  Calculating...
+                </>
+              ) : (
+                <>
+                  Calculate Estimated Value
 
-          <ValuationPreview
-            valuation={valuation}
-            loading={
-              valuationLoading
-            }
-          />
-        </div>
+                  <ChevronRight
+                    size={18}
+                    className="
+                      transition-transform
+                      group-hover:translate-x-0.5
+                    "
+                  />
+                </>
+              )}
+            </span>
+          </motion.button>
 
-        {/* Create Lot */}
-        {valuation && (
-          <button
-            type="button"
-            disabled={creating}
-            onClick={
-              handleCreateLot
-            }
-            className="
-              flex
-              min-h-14
-              w-full
-              items-center
-              justify-center
-              gap-2
-              rounded-2xl
-              bg-[var(--primary)]
-              px-5
-              py-4
-              font-semibold
-              text-[var(--primary-foreground)]
-              transition
-              active:scale-[0.99]
-              disabled:cursor-not-allowed
-              disabled:opacity-60
-            "
-          >
-            {creating ? (
-              <>
-                <Loader2
-                  size={19}
-                  className="animate-spin"
-                />
+          <div className="mt-4">
+            <ValuationPreview
+              valuation={valuation}
+              loading={
+                valuationLoading
+              }
+            />
+          </div>
+        </section>
 
-                Creating Lot...
-              </>
-            ) : (
-              <>
-                <Check size={20} />
+        {/* ==================================================
+            CREATE LOT
+        ================================================== */}
 
-                Create Lot
-              </>
-            )}
-          </button>
-        )}
+        <AnimatePresence>
+          {valuation && (
+            <motion.section
+              initial={{
+                opacity: 0,
+                y: 14,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              className="
+                mt-10
+                rounded-[28px]
+                bg-gradient-to-br
+                from-[var(--primary)]
+                via-[var(--forest)]
+                to-[#071D14]
+                p-5
+                text-white
+                shadow-xl
+              "
+            >
+              <div className="flex items-start gap-3">
+                <div
+                  className="
+                    flex
+                    h-11
+                    w-11
+                    shrink-0
+                    items-center
+                    justify-center
+                    rounded-2xl
+                    bg-white/10
+                  "
+                >
+                  <Check
+                    size={20}
+                    strokeWidth={2.5}
+                  />
+                </div>
 
-      </main>
-    </div>
-  );
+                <div>
+                  <p
+                    className="
+                      text-[10px]
+                      font-bold
+                      uppercase
+                      tracking-[0.15em]
+                      text-white/60
+                    "
+                  >
+                    Ready to submit
+                  </p>
+
+                  <h2
+                    className="
+                      mt-1
+                      text-lg
+                      font-extrabold
+                    "
+                  >
+                    Your lot is ready
+                  </h2>
+
+                  <p
+                    className="
+                      mt-1
+                      text-xs
+                      leading-5
+                      text-white/65
+                    "
+                  >
+                    Submit it to continue with
+                    recycler matching and pickup.
+                  </p>
+                </div>
+              </div>
+
+              <motion.button
+                type="button"
+                disabled={creating}
+                onClick={
+                  handleCreateLot
+                }
+                whileTap={{
+                  scale: 0.985,
+                }}
+                className="
+                  mt-5
+                  flex
+                  min-h-14
+                  w-full
+                  items-center
+                  justify-center
+                  gap-2
+                  rounded-2xl
+                  bg-white
+                  px-5
+                  py-4
+                  font-bold
+                  text-[var(--primary)]
+                  shadow-lg
+                  disabled:cursor-not-allowed
+                  disabled:opacity-60
+                "
+              >
+                {creating ? (
+                  <>
+                    <Loader2
+                      size={19}
+                      className="animate-spin"
+                    />
+
+                    Creating Lot...
+                  </>
+                ) : (
+                  <>
+                    <Check
+                      size={19}
+                      strokeWidth={2.7}
+                    />
+
+                    Create Lot
+                  </>
+                )}
+              </motion.button>
+            </motion.section>
+          )}
+        </AnimatePresence>
+      </div>
+    </main>
+  </div>
+);
 };
 
 export default CreateLot;

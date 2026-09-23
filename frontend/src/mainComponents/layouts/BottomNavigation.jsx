@@ -264,8 +264,7 @@ const BottomNavigation = ({
               "
             >
               {/* Rotating outline */}
-
-              <motion.span
+              {/* <motion.span
                 animate={{
                   rotate: [0, 360],
                 }}
@@ -283,7 +282,7 @@ const BottomNavigation = ({
                   border-white/20
                   border-dashed
                 "
-              />
+              /> */}
 
               <Plus
                 size={27}
