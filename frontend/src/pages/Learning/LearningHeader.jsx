@@ -157,8 +157,7 @@ const LearningHeader = ({
      LANGUAGE DATA
   ============================================================ */
 
-  const languageOptions =
-    SUPPORTED_LANGUAGES.map(
+  const languageOptions = SUPPORTED_LANGUAGES.map(
       (item) => ({
         value: item.code,
         label: item.nativeLabel,
@@ -202,8 +201,7 @@ const LearningHeader = ({
     },
   ];
 
-  const selectedTheme =
-    themeOptions.find(
+  const selectedTheme = themeOptions.find(
       (item) =>
         item.value === theme
     ) ||
@@ -218,7 +216,7 @@ const LearningHeader = ({
       className="
         sticky
         top-0
-        z-40
+        z-[100]
         bg-[var(--background)]/88
         backdrop-blur-2xl
       "
@@ -237,18 +235,18 @@ const LearningHeader = ({
             HEADER CARD
         ===================================================== */}
 
-        <div
-          className="
-            relative
-            overflow-hidden
-            rounded-b-[24px]
-            border-x
-            border-b
-            border-[var(--border)]
-            bg-[var(--surface)]/92
-            shadow-[0_10px_35px_rgba(18,63,45,0.07)]
-          "
-        >
+       <div
+      className="
+        relative
+        overflow-visible
+        rounded-b-[24px]
+        border-x
+        border-b
+        border-[var(--border)]
+        bg-[var(--surface)]/92
+        shadow-[0_10px_35px_rgba(18,63,45,0.07)]
+      "
+    >
           {/* ==================================================
               SPARK BORDER
           ================================================== */}
@@ -657,7 +655,6 @@ const LearningHeader = ({
               {/* =================================================
                   ECO-MITRA
               ================================================= */}
-
               <motion.button
                 type="button"
                 onClick={() =>
@@ -894,7 +891,7 @@ const LearningHeader = ({
                         absolute
                         right-0
                         top-[calc(100%+8px)]
-                        z-50
+                        z-[999]
                         w-40
                         overflow-hidden
                         rounded-2xl
@@ -1182,7 +1179,7 @@ const LearningHeader = ({
                         absolute
                         right-0
                         top-[calc(100%+8px)]
-                        z-50
+                        z-[999]
                         w-44
                         max-h-[min(420px,70vh)]
                         overflow-y-auto
@@ -1353,7 +1350,6 @@ const LearningHeader = ({
           <div
             className="
               relative
-              z-30
               border-t
               border-[var(--border)]
               px-3
