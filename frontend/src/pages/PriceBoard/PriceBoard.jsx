@@ -5,8 +5,9 @@ import {
   Volume2,
   TrendingDown,
   TrendingUp,
-  Minus,
   Database,
+  ChevronRight,
+  Sparkles,
 } from "lucide-react";
 
 import {
@@ -15,7 +16,11 @@ import {
   useState,
 } from "react";
 
-import { motion } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+} from "framer-motion";
+
 import { useNavigate } from "react-router-dom";
 
 import useAuthStore from "../../store/authStore";
@@ -38,6 +43,10 @@ const PriceBoard = () => {
   );
 
   const { t } = useTranslation();
+
+  /* ==========================================================
+     STATE
+  ========================================================== */
 
   const [prices, setPrices] =
     useState([]);
@@ -70,9 +79,10 @@ const PriceBoard = () => {
     user?.operatingLocation ||
     "Meerut";
 
-  /*
-    Load current prices.
-  */
+  /* ==========================================================
+     LOAD PRICES
+  ========================================================== */
+
   const loadPrices = async (
     refresh = false
   ) => {
@@ -98,9 +108,6 @@ const PriceBoard = () => {
 
       setPrices(priceData);
 
-      /*
-        Preserve selected card if possible.
-      */
       if (priceData.length) {
         setSelectedPrice(
           (current) => {
@@ -142,9 +149,10 @@ const PriceBoard = () => {
     }
   };
 
-  /*
-    Load prices when location/filter changes.
-  */
+  /* ==========================================================
+     LOAD WHEN FILTER / LOCATION CHANGES
+  ========================================================== */
+
   useEffect(() => {
     loadPrices();
   }, [
@@ -152,10 +160,10 @@ const PriceBoard = () => {
     filterMaterial,
   ]);
 
-  /*
-    Load history for selected
-    material + subcategory.
-  */
+  /* ==========================================================
+     LOAD HISTORY
+  ========================================================== */
+
   useEffect(() => {
     if (!selectedPrice) {
       setHistory([]);
@@ -198,9 +206,10 @@ const PriceBoard = () => {
     location,
   ]);
 
-  /*
-    Search filtering happens locally.
-  */
+  /* ==========================================================
+     LOCAL SEARCH
+  ========================================================== */
+
   const visiblePrices =
     useMemo(() => {
       const query =
@@ -223,9 +232,10 @@ const PriceBoard = () => {
       );
     }, [prices, search]);
 
-  /*
-    Market summary.
-  */
+  /* ==========================================================
+     SUMMARY
+  ========================================================== */
+
   const summary =
     useMemo(() => {
       if (!prices.length) {
@@ -248,26 +258,35 @@ const PriceBoard = () => {
         ) / prices.length;
 
       return {
-        materials: new Set(
-          prices.map(
-            (item) =>
-              item.material
-          )
-        ).size,
+        materials:
+          new Set(
+            prices.map(
+              (item) =>
+                item.material
+            )
+          ).size,
 
         average,
 
-        rising: prices.filter(
-          (item) =>
-            item.trend === "rising"
-        ).length,
+        rising:
+          prices.filter(
+            (item) =>
+              item.trend ===
+              "rising"
+          ).length,
 
-        falling: prices.filter(
-          (item) =>
-            item.trend === "falling"
-        ).length,
+        falling:
+          prices.filter(
+            (item) =>
+              item.trend ===
+              "falling"
+          ).length,
       };
     }, [prices]);
+
+  /* ==========================================================
+     SPEAK PRICE
+  ========================================================== */
 
   const speakPrice = (
     price
@@ -308,6 +327,21 @@ const PriceBoard = () => {
     );
   };
 
+  /* ==========================================================
+     SELECTED PRICE
+  ========================================================== */
+
+  const selectedIndex =
+    selectedPrice
+      ? visiblePrices.findIndex(
+          (price) =>
+            price.material ===
+              selectedPrice.material &&
+            price.subcategory ===
+              selectedPrice.subcategory
+        )
+      : -1;
+
   return (
     <div
       className="
@@ -322,63 +356,95 @@ const PriceBoard = () => {
           w-full
           max-w-6xl
           px-4
-          pb-10
-          pt-5
+          pb-32
+          pt-4
           sm:px-6
+          sm:pt-6
           lg:px-8
         "
       >
-        {/* Header */}
-        <header
-          className="
-            flex
-            items-center
-            justify-between
-            gap-4
-          "
-        >
-          <div className="flex items-center gap-3">
-            <button
+        {/* ==================================================
+            HEADER
+        ================================================== */}
+
+        <header className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <motion.button
               type="button"
               onClick={() =>
                 navigate(
                   "/collector"
                 )
               }
+              whileTap={{
+                scale: 0.9,
+              }}
               className="
-                flex h-11 w-11
+                flex
+                h-10
+                w-10
                 shrink-0
                 items-center
                 justify-center
-                rounded-full
-                border border-[var(--border)]
+                rounded-xl
+                border
+                border-[var(--border)]
                 bg-[var(--surface)]
+                shadow-sm
                 transition
-                active:scale-95
+                hover:border-[var(--primary)]/30
               "
             >
               <ArrowLeft
-                size={19}
+                size={18}
               />
-            </button>
+            </motion.button>
 
-            <div>
-              <h1 className="text-xl font-semibold sm:text-2xl">
-                {t(
-                  "priceBoard.title"
-                )}
-              </h1>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h1
+                  className="
+                    truncate
+                    text-xl
+                    font-extrabold
+                    tracking-tight
+                    sm:text-2xl
+                  "
+                >
+                  {t(
+                    "priceBoard.title"
+                  )}
+                </h1>
 
-              <div className="mt-1 flex items-center gap-1.5 text-xs text-[var(--muted)]">
-                <MapPin
-                  size={13}
+                <Sparkles
+                  size={14}
+                  className="
+                    hidden
+                    shrink-0
+                    text-[var(--primary)]
+                    sm:block
+                  "
                 />
+              </div>
 
-                <span>
+              <div
+                className="
+                  mt-1
+                  flex
+                  items-center
+                  gap-1.5
+                  text-[11px]
+                  text-[var(--muted)]
+                "
+              >
+                <MapPin size={12} />
+
+                <span className="truncate">
                   {t(
                     "priceBoard.localMarket"
-                  )}{" "}
-                  · {location}
+                  )}
+                  {" · "}
+                  {location}
                 </span>
               </div>
             </div>
@@ -390,22 +456,28 @@ const PriceBoard = () => {
               loadPrices(true)
             }
             whileTap={{
-              scale: 0.94,
+              scale: 0.92,
             }}
             className="
-              flex h-11 w-11
+              flex
+              h-10
+              w-10
+              shrink-0
               items-center
               justify-center
               rounded-xl
-              border border-[var(--border)]
+              border
+              border-[var(--border)]
               bg-[var(--surface)]
               text-[var(--muted)]
+              shadow-sm
               transition
               hover:text-[var(--primary)]
             "
+            aria-label="Refresh prices"
           >
             <RefreshCw
-              size={17}
+              size={16}
               className={
                 refreshing
                   ? "animate-spin"
@@ -415,39 +487,108 @@ const PriceBoard = () => {
           </motion.button>
         </header>
 
-        {/* Market overview */}
+        {/* ==================================================
+            MARKET HERO
+        ================================================== */}
+
         {!loading &&
           !error &&
           prices.length > 0 && (
-            <section
+            <motion.section
+              initial={{
+                opacity: 0,
+                y: 10,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
               className="
                 mt-6
                 overflow-hidden
-                rounded-[26px]
-                border border-[var(--border)]
+                rounded-[28px]
+                border
+                border-[var(--border)]
                 bg-[var(--surface)]
+                shadow-sm
               "
             >
-              <div className="p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-[var(--muted)]">
-                      Local market
-                    </p>
+              <div
+                className="
+                  relative
+                  overflow-hidden
+                  p-5
+                  sm:p-6
+                "
+              >
+                <div
+                  className="
+                    pointer-events-none
+                    absolute
+                    -right-16
+                    -top-16
+                    h-40
+                    w-40
+                    rounded-full
+                    bg-[var(--accent)]
+                    opacity-60
+                    blur-3xl
+                  "
+                />
 
-                    <h2 className="mt-1 text-lg font-semibold">
+                <div className="relative flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <div
+                      className="
+                        flex
+                        items-center
+                        gap-2
+                        text-[10px]
+                        font-bold
+                        uppercase
+                        tracking-[0.15em]
+                        text-[var(--primary)]
+                      "
+                    >
+                      <Database size={13} />
+
+                      Local market
+                    </div>
+
+                    <h2
+                      className="
+                        mt-2
+                        text-lg
+                        font-extrabold
+                        tracking-tight
+                        sm:text-xl
+                      "
+                    >
                       Today's reference prices
                     </h2>
 
-                    <p className="mt-1 text-xs text-[var(--muted)]">
-                      Updated from available
-                      market records
+                    <p
+                      className="
+                        mt-1
+                        max-w-md
+                        text-xs
+                        leading-5
+                        text-[var(--muted)]
+                      "
+                    >
+                      Current market records for{" "}
+                      <span className="font-semibold text-[var(--foreground)]">
+                        {location}
+                      </span>
                     </p>
                   </div>
 
                   <div
                     className="
-                      flex h-11 w-11
+                      flex
+                      h-11
+                      w-11
+                      shrink-0
                       items-center
                       justify-center
                       rounded-2xl
@@ -455,67 +596,67 @@ const PriceBoard = () => {
                       text-[var(--primary)]
                     "
                   >
-                    <Database
-                      size={19}
-                    />
+                    <Database size={18} />
                   </div>
                 </div>
+
+                {/* SUMMARY */}
+
+                <div
+                  className="
+                    relative
+                    mt-6
+                    grid
+                    grid-cols-2
+                    gap-2
+                    sm:grid-cols-4
+                  "
+                >
+                  <SummaryItem
+                    label="Materials"
+                    value={
+                      summary.materials
+                    }
+                  />
+
+                  <SummaryItem
+                    label="Average"
+                    value={`₹${Math.round(
+                      summary.average
+                    )}`}
+                  />
+
+                  <SummaryItem
+                    label="Rising"
+                    value={
+                      summary.rising
+                    }
+                    icon={
+                      <TrendingUp size={13} />
+                    }
+                    positive
+                  />
+
+                  <SummaryItem
+                    label="Falling"
+                    value={
+                      summary.falling
+                    }
+                    icon={
+                      <TrendingDown size={13} />
+                    }
+                    negative
+                  />
+                </div>
               </div>
-
-              <div
-                className="
-                  grid
-                  grid-cols-2
-                  border-t
-                  border-[var(--border)]
-                  sm:grid-cols-4
-                "
-              >
-                <SummaryItem
-                  label="Materials"
-                  value={
-                    summary.materials
-                  }
-                />
-
-                <SummaryItem
-                  label="Avg. price"
-                  value={`₹${Math.round(
-                    summary.average
-                  )}`}
-                />
-
-                <SummaryItem
-                  label="Rising"
-                  value={
-                    summary.rising
-                  }
-                  icon={
-                    <TrendingUp
-                      size={14}
-                    />
-                  }
-                  positive
-                />
-
-                <SummaryItem
-                  label="Falling"
-                  value={
-                    summary.falling
-                  }
-                  icon={
-                    <TrendingDown
-                      size={14}
-                    />
-                  }
-                  negative
-                />
-              </div>
-            </section>
+            </motion.section>
           )}
 
-        {/* Filters */}
-        <div className="mt-6">
+        {/* ==================================================
+            FILTERS
+        ================================================== */}
+
+        <section className="mt-7">
           <PriceFilters
             search={search}
             setSearch={setSearch}
@@ -526,56 +667,81 @@ const PriceBoard = () => {
               setFilterMaterial
             }
           />
-        </div>
+        </section>
 
-        {/* Error */}
-        {!loading && error && (
-          <div
-            className="
-              mt-6
-              rounded-[26px]
-              border border-danger/20
-              bg-[var(--surface)]
-              p-6
-            "
-          >
-            <p className="font-medium">
-              {t(
-                "priceBoard.failed"
-              )}
-            </p>
+        {/* ==================================================
+            ERROR
+        ================================================== */}
 
-            <p className="mt-2 text-sm text-[var(--muted)]">
-              {error}
-            </p>
-
-            <button
-              type="button"
-              onClick={() =>
-                loadPrices()
-              }
+        <AnimatePresence>
+          {!loading && error && (
+            <motion.div
+              initial={{
+                opacity: 0,
+                y: 8,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
               className="
-                mt-5
-                rounded-2xl
-                bg-[var(--primary)]
-                px-4 py-3
-                text-sm
-                font-medium
-                text-[var(--primary-foreground)]
+                mt-6
+                rounded-[24px]
+                border
+                border-[var(--danger)]/20
+                bg-[var(--surface)]
+                p-5
               "
             >
-              {t(
-                "priceBoard.retry"
-              )}
-            </button>
-          </div>
-        )}
+              <p className="font-semibold">
+                {t(
+                  "priceBoard.failed"
+                )}
+              </p>
 
-        {/* Loading */}
+              <p
+                className="
+                  mt-2
+                  text-sm
+                  leading-5
+                  text-[var(--muted)]
+                "
+              >
+                {error}
+              </p>
+
+              <button
+                type="button"
+                onClick={() =>
+                  loadPrices()
+                }
+                className="
+                  mt-4
+                  rounded-xl
+                  bg-[var(--primary)]
+                  px-4
+                  py-2.5
+                  text-sm
+                  font-semibold
+                  text-[var(--primary-foreground)]
+                "
+              >
+                {t(
+                  "priceBoard.retry"
+                )}
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ==================================================
+            LOADING
+        ================================================== */}
+
         {loading && (
           <div
             className="
-              mt-6
+              mt-7
               grid
               grid-cols-1
               gap-3
@@ -583,41 +749,61 @@ const PriceBoard = () => {
               lg:grid-cols-3
             "
           >
-            {[1, 2, 3, 4, 5, 6].map(
-              (item) => (
-                <div
-                  key={item}
-                  className="
-                    h-56
-                    animate-pulse
-                    rounded-[26px]
-                    bg-[var(--surface-soft)]
-                  "
-                />
-              )
-            )}
+            {[
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+            ].map((item) => (
+              <div
+                key={item}
+                className="
+                  h-60
+                  animate-pulse
+                  rounded-[24px]
+                  bg-[var(--surface-soft)]
+                "
+              />
+            ))}
           </div>
         )}
 
-        {/* Empty */}
+        {/* ==================================================
+            EMPTY
+        ================================================== */}
+
         {!loading &&
           !error &&
           visiblePrices.length ===
             0 && (
-            <div
+            <motion.div
+              initial={{
+                opacity: 0,
+                y: 8,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
               className="
-                mt-6
+                mt-7
                 rounded-[26px]
-                border border-[var(--border)]
+                border
+                border-[var(--border)]
                 bg-[var(--surface)]
-                px-6 py-12
+                px-6
+                py-12
                 text-center
               "
             >
               <div
                 className="
                   mx-auto
-                  flex h-14 w-14
+                  flex
+                  h-14
+                  w-14
                   items-center
                   justify-center
                   rounded-2xl
@@ -629,39 +815,91 @@ const PriceBoard = () => {
                 ₹
               </div>
 
-              <h3 className="mt-4 font-semibold">
+              <h3 className="mt-4 font-bold">
                 No price available
               </h3>
 
-              <p className="mx-auto mt-2 max-w-sm text-sm text-[var(--muted)]">
-                No matching market
-                records were found
+              <p
+                className="
+                  mx-auto
+                  mt-2
+                  max-w-sm
+                  text-sm
+                  leading-5
+                  text-[var(--muted)]
+                "
+              >
+                No matching market records were found
                 for {location}.
               </p>
-            </div>
+            </motion.div>
           )}
 
-        {/* Price cards */}
+        {/* ==================================================
+            CURRENT PRICES
+        ================================================== */}
+
         {!loading &&
           !error &&
           visiblePrices.length >
             0 && (
-            <section className="mt-7">
-              <div className="mb-3 flex items-end justify-between">
+            <section className="mt-8">
+              <div
+                className="
+                  mb-4
+                  flex
+                  items-end
+                  justify-between
+                  gap-3
+                "
+              >
                 <div>
-                  <h2 className="font-semibold">
-                    Current prices
-                  </h2>
+                  <div className="flex items-center gap-2">
+                    <h2
+                      className="
+                        text-base
+                        font-extrabold
+                        tracking-tight
+                      "
+                    >
+                      Current prices
+                    </h2>
 
-                  <p className="mt-1 text-xs text-[var(--muted)]">
-                    Tap a price to view
-                    its history
+                    <span
+                      className="
+                        rounded-full
+                        bg-[var(--accent)]
+                        px-2
+                        py-1
+                        text-[9px]
+                        font-bold
+                        text-[var(--primary)]
+                      "
+                    >
+                      LIVE DATA
+                    </span>
+                  </div>
+
+                  <p
+                    className="
+                      mt-1
+                      text-xs
+                      text-[var(--muted)]
+                    "
+                  >
+                    Tap a material to view its price history.
                   </p>
                 </div>
 
-                <span className="text-xs text-[var(--muted)]">
-                  {visiblePrices.length}{" "}
-                  results
+                <span
+                  className="
+                    shrink-0
+                    text-[11px]
+                    font-semibold
+                    text-[var(--muted)]
+                  "
+                >
+                  {visiblePrices.length} results
                 </span>
               </div>
 
@@ -675,7 +913,7 @@ const PriceBoard = () => {
                 "
               >
                 {visiblePrices.map(
-                  (price) => {
+                  (price, index) => {
                     const selected =
                       selectedPrice?.id ===
                         price.id ||
@@ -689,7 +927,7 @@ const PriceBoard = () => {
                       );
 
                     return (
-                      <button
+                      <motion.button
                         key={
                           price.id ||
                           `${price.material}-${price.subcategory}`
@@ -700,7 +938,26 @@ const PriceBoard = () => {
                             price
                           )
                         }
-                        className="text-left"
+                        initial={{
+                          opacity: 0,
+                          y: 10,
+                        }}
+                        animate={{
+                          opacity: 1,
+                          y: 0,
+                        }}
+                        transition={{
+                          delay:
+                            Math.min(
+                              index *
+                                0.04,
+                              0.25
+                            ),
+                        }}
+                        whileTap={{
+                          scale: 0.99,
+                        }}
+                        className="w-full text-left"
                       >
                         <PriceCard
                           price={price}
@@ -711,7 +968,7 @@ const PriceBoard = () => {
                             speakPrice
                           }
                         />
-                      </button>
+                      </motion.button>
                     );
                   }
                 )}
@@ -719,15 +976,63 @@ const PriceBoard = () => {
             </section>
           )}
 
-        {/* Selected material */}
+        {/* ==================================================
+            SELECTED PRICE / HISTORY
+        ================================================== */}
+
         {!loading &&
           !error &&
           selectedPrice && (
-            <section className="mt-7">
+            <section className="mt-8">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div>
+                  <p
+                    className="
+                      text-[10px]
+                      font-bold
+                      uppercase
+                      tracking-[0.15em]
+                      text-[var(--primary)]
+                    "
+                  >
+                    Price trend
+                  </p>
+
+                  <h2
+                    className="
+                      mt-1
+                      text-base
+                      font-extrabold
+                    "
+                  >
+                    {selectedPrice.material}
+                  </h2>
+                </div>
+
+                {selectedIndex >=
+                  0 && (
+                  <div
+                    className="
+                      flex
+                      items-center
+                      gap-1
+                      text-xs
+                      font-semibold
+                      text-[var(--muted)]
+                    "
+                  >
+                    View details
+                    <ChevronRight
+                      size={14}
+                    />
+                  </div>
+                )}
+              </div>
+
               {historyLoading ? (
                 <div
                   className="
-                    h-[520px]
+                    h-[460px]
                     animate-pulse
                     rounded-[26px]
                     bg-[var(--surface-soft)]
@@ -747,25 +1052,32 @@ const PriceBoard = () => {
             </section>
           )}
 
-        {/* Voice hint */}
+        {/* ==================================================
+            VOICE SUPPORT
+        ================================================== */}
+
         {!loading &&
           !error &&
           prices.length > 0 && (
             <div
               className="
-                mt-5
+                mt-6
                 flex
-                items-center
+                items-start
                 gap-3
                 rounded-2xl
-                border border-[var(--border)]
+                border
+                border-[var(--border)]
                 bg-[var(--surface)]
-                px-4 py-3
+                px-4
+                py-3.5
               "
             >
               <div
                 className="
-                  flex h-9 w-9
+                  flex
+                  h-9
+                  w-9
                   shrink-0
                   items-center
                   justify-center
@@ -774,33 +1086,63 @@ const PriceBoard = () => {
                   text-[var(--primary)]
                 "
               >
-                <Volume2
-                  size={16}
-                />
+                <Volume2 size={16} />
               </div>
 
-              <p className="text-xs leading-5 text-[var(--muted)]">
-                Tap the speaker icon on
-                any price card to hear
-                the current reference
-                price.
-              </p>
+              <div>
+                <p
+                  className="
+                    text-xs
+                    font-bold
+                    text-[var(--foreground)]
+                  "
+                >
+                  Voice price support
+                </p>
+
+                <p
+                  className="
+                    mt-0.5
+                    text-[11px]
+                    leading-5
+                    text-[var(--muted)]
+                  "
+                >
+                  Use the speaker control on a price card
+                  to hear the current reference price.
+                </p>
+              </div>
             </div>
           )}
 
-        {/* Disclaimer */}
-        <p className="mt-5 text-center text-[10px] leading-4 text-[var(--muted)]">
-          Reference prices are based
-          on available market records.
-          Actual recycler offers may
-          vary depending on material
-          quality, quantity, location,
-          and condition.
+        {/* ==================================================
+            DISCLAIMER
+        ================================================== */}
+
+        <p
+          className="
+            mx-auto
+            mt-6
+            max-w-2xl
+            text-center
+            text-[10px]
+            leading-4
+            text-[var(--muted)]
+          "
+        >
+          Reference prices are based on available market
+          records. Actual recycler offers may vary depending
+          on material quality, quantity, location and
+          condition.
         </p>
       </main>
     </div>
   );
 };
+
+/* ============================================================
+   SUMMARY ITEM
+============================================================ */
 
 const SummaryItem = ({
   label,
@@ -812,27 +1154,42 @@ const SummaryItem = ({
   return (
     <div
       className="
-        border-r
+        rounded-2xl
+        border
         border-[var(--border)]
-        p-4
-        last:border-r-0
+        bg-[var(--background)]
+        px-3
+        py-3
+        sm:px-4
       "
     >
-      <p className="text-[10px] uppercase tracking-wide text-[var(--muted)]">
+      <p
+        className="
+          text-[9px]
+          font-semibold
+          uppercase
+          tracking-wider
+          text-[var(--muted)]
+        "
+      >
         {label}
       </p>
 
       <div
         className={`
           mt-1
-          flex items-center gap-1
-          text-sm font-semibold
+          flex
+          items-center
+          gap-1
+          text-sm
+          font-extrabold
+
           ${
             positive
-              ? "text-success"
+              ? "text-[var(--primary)]"
               : negative
-              ? "text-danger"
-              : ""
+                ? "text-[var(--danger)]"
+                : "text-[var(--foreground)]"
           }
         `}
       >

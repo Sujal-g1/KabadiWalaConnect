@@ -1,4 +1,5 @@
 import {
+  useId,
   useMemo,
   useState,
 } from "react";
@@ -18,7 +19,10 @@ import {
   ArrowUpRight,
   Minus,
   TrendingUp,
+  Activity,
 } from "lucide-react";
+
+import { motion } from "framer-motion";
 
 import useTranslation from "../../../i18n/useTranslation";
 
@@ -27,127 +31,179 @@ const PriceHistory = ({
   material,
   subcategory,
 }) => {
-  const { t } = useTranslation();
+  const { t } =
+    useTranslation();
 
   const [range, setRange] =
     useState(30);
 
-  const filteredHistory = useMemo(() => {
-    if (!history.length) {
-      return [];
-    }
+  const gradientId =
+    `priceGradient-${useId()}`;
 
-    const sorted = [...history].sort(
-      (a, b) =>
-        new Date(a.recordedAt) -
-        new Date(b.recordedAt)
-    );
+  /* ==========================================================
+     FILTER HISTORY
+  ========================================================== */
 
-    return sorted.slice(-range);
-  }, [history, range]);
+  const filteredHistory =
+    useMemo(() => {
+      if (!history.length) {
+        return [];
+      }
 
-  const chartData = useMemo(() => {
-    return filteredHistory.map(
-      (item) => ({
-        date: new Date(
-          item.recordedAt
-        ).toLocaleDateString(
-          "en-IN",
-          {
-            day: "2-digit",
-            month: "short",
-          }
-        ),
+      const sorted =
+        [...history].sort(
+          (a, b) =>
+            new Date(
+              a.recordedAt
+            ) -
+            new Date(
+              b.recordedAt
+            )
+        );
 
-        fullDate: new Date(
-          item.recordedAt
-        ).toLocaleDateString(
-          "en-IN",
-          {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          }
-        ),
-
-        price: Number(item.price),
-      })
-    );
-  }, [filteredHistory]);
-
-  const statistics = useMemo(() => {
-    if (!filteredHistory.length) {
-      return null;
-    }
-
-    const values =
-      filteredHistory.map((item) =>
-        Number(item.price)
+      return sorted.slice(
+        -range
       );
+    }, [
+      history,
+      range,
+    ]);
 
-    const current =
-      values[values.length - 1];
+  /* ==========================================================
+     CHART DATA
+  ========================================================== */
 
-    const previous =
-      values.length > 1
-        ? values[values.length - 2]
-        : current;
+  const chartData =
+    useMemo(() => {
+      return filteredHistory.map(
+        (item) => ({
+          date: new Date(
+            item.recordedAt
+          ).toLocaleDateString(
+            "en-IN",
+            {
+              day: "2-digit",
+              month: "short",
+            }
+          ),
 
-    const highest = Math.max(
-      ...values
-    );
+          fullDate: new Date(
+            item.recordedAt
+          ).toLocaleDateString(
+            "en-IN",
+            {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            }
+          ),
 
-    const lowest = Math.min(
-      ...values
-    );
+          price: Number(
+            item.price
+          ),
+        })
+      );
+    }, [
+      filteredHistory,
+    ]);
 
-    const average =
-      values.reduce(
-        (sum, value) =>
-          sum + value,
-        0
-      ) / values.length;
+  /* ==========================================================
+     STATISTICS
+  ========================================================== */
 
-    const change =
-      previous !== 0
-        ? ((current - previous) /
-            previous) *
-          100
-        : 0;
+  const statistics =
+    useMemo(() => {
+      if (
+        !filteredHistory.length
+      ) {
+        return null;
+      }
 
-    const periodChange =
-      values[0] !== 0
-        ? ((current - values[0]) /
-            values[0]) *
-          100
-        : 0;
+      const values =
+        filteredHistory.map(
+          (item) =>
+            Number(item.price)
+        );
 
-    return {
-      current,
-      previous,
-      highest,
-      lowest,
-      average,
-      change,
-      periodChange,
-    };
-  }, [filteredHistory]);
+      const current =
+        values[
+          values.length - 1
+        ];
+
+      const previous =
+        values.length > 1
+          ? values[
+              values.length - 2
+            ]
+          : current;
+
+      const highest =
+        Math.max(...values);
+
+      const lowest =
+        Math.min(...values);
+
+      const average =
+        values.reduce(
+          (sum, value) =>
+            sum + value,
+          0
+        ) / values.length;
+
+      const change =
+        previous !== 0
+          ? ((current -
+              previous) /
+              previous) *
+            100
+          : 0;
+
+      const periodChange =
+        values[0] !== 0
+          ? ((current -
+              values[0]) /
+              values[0]) *
+            100
+          : 0;
+
+      return {
+        current,
+        previous,
+        highest,
+        lowest,
+        average,
+        change,
+        periodChange,
+      };
+    }, [
+      filteredHistory,
+    ]);
+
+  /* ==========================================================
+     EMPTY
+  ========================================================== */
 
   if (!history.length) {
     return (
       <section
         className="
-          rounded-[26px]
-          border border-[var(--border)]
+          rounded-[24px]
+          border
+          border-[var(--border)]
           bg-[var(--surface)]
           p-5
+          shadow-sm
         "
       >
         <div className="flex items-center gap-3">
           <div
             className="
-              flex h-10 w-10
-              items-center justify-center
+              flex
+              h-10
+              w-10
+              shrink-0
+              items-center
+              justify-center
               rounded-xl
               bg-[var(--accent)]
               text-[var(--primary)]
@@ -157,14 +213,20 @@ const PriceHistory = ({
           </div>
 
           <div>
-            <h2 className="font-semibold">
+            <h2 className="font-bold">
               {t(
                 "priceBoard.priceHistory"
               )}
             </h2>
 
-            <p className="mt-1 text-xs text-[var(--muted)]">
-              No historical data available
+            <p
+              className="
+                mt-1
+                text-xs
+                text-[var(--muted)]
+              "
+            >
+              No historical data available.
             </p>
           </div>
         </div>
@@ -172,56 +234,91 @@ const PriceHistory = ({
     );
   }
 
+  /* ==========================================================
+     MAIN
+  ========================================================== */
+
   return (
     <section
       className="
         overflow-hidden
         rounded-[26px]
-        border border-[var(--border)]
+        border
+        border-[var(--border)]
         bg-[var(--surface)]
+        shadow-sm
       "
     >
-      {/* Header */}
-      <div className="p-5 pb-0">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <div
-                className="
-                  flex h-10 w-10
-                  shrink-0
-                  items-center justify-center
-                  rounded-xl
-                  bg-[var(--accent)]
-                  text-[var(--primary)]
-                "
-              >
-                <TrendingUp size={18} />
-              </div>
+      {/* ====================================================
+          HEADER
+      ==================================================== */}
 
-              <div className="min-w-0">
-                <h2 className="font-semibold">
+      <div
+        className="
+          p-4
+          sm:p-5
+        "
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <div
+              className="
+                flex
+                h-10
+                w-10
+                shrink-0
+                items-center
+                justify-center
+                rounded-xl
+                bg-[var(--accent)]
+                text-[var(--primary)]
+              "
+            >
+              <Activity size={17} />
+            </div>
+
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <h2
+                  className="
+                    truncate
+                    text-sm
+                    font-bold
+                    text-[var(--foreground)]
+                  "
+                >
                   {t(
                     "priceBoard.priceHistory"
                   )}
                 </h2>
-
-                <p className="mt-1 truncate text-xs text-[var(--muted)]">
-                  {material}
-                  {subcategory
-                    ? ` · ${subcategory}`
-                    : ""}
-                </p>
               </div>
+
+              <p
+                className="
+                  mt-0.5
+                  truncate
+                  text-[11px]
+                  text-[var(--muted)]
+                "
+              >
+                {material}
+                {subcategory
+                  ? ` · ${subcategory}`
+                  : ""}
+              </p>
             </div>
           </div>
 
-          {/* Range */}
+          {/* RANGE */}
+
           <div
             className="
-              flex shrink-0
+              flex
+              shrink-0
               rounded-xl
-              bg-[var(--surface-soft)]
+              border
+              border-[var(--border)]
+              bg-[var(--background)]
               p-1
             "
           >
@@ -235,14 +332,23 @@ const PriceHistory = ({
                   }
                   className={`
                     rounded-lg
-                    px-2.5 py-1.5
-                    text-xs
-                    font-medium
+                    px-2
+                    py-1.5
+                    text-[10px]
+                    font-bold
                     transition
+
                     ${
-                      range === days
-                        ? "bg-[var(--surface)] text-[var(--foreground)] shadow-sm"
-                        : "text-[var(--muted)]"
+                      range ===
+                      days
+                        ? `
+                          bg-[var(--primary)]
+                          text-[var(--primary-foreground)]
+                          shadow-sm
+                        `
+                        : `
+                          text-[var(--muted)]
+                        `
                     }
                   `}
                 >
@@ -254,20 +360,37 @@ const PriceHistory = ({
         </div>
       </div>
 
-      {/* Statistics */}
+      {/* ====================================================
+          STATISTICS
+      ==================================================== */}
+
       {statistics && (
-        <div className="mt-5 grid grid-cols-2 border-y border-[var(--border)] sm:grid-cols-4">
+        <div
+          className="
+            grid
+            grid-cols-2
+            gap-2
+            px-4
+            sm:grid-cols-4
+            sm:px-5
+          "
+        >
           <Stat
             label="Current"
             value={`₹${Math.round(
               statistics.current
+            ).toLocaleString(
+              "en-IN"
             )}`}
+            highlight
           />
 
           <Stat
             label="Average"
             value={`₹${Math.round(
               statistics.average
+            ).toLocaleString(
+              "en-IN"
             )}`}
           />
 
@@ -275,6 +398,8 @@ const PriceHistory = ({
             label="Highest"
             value={`₹${Math.round(
               statistics.highest
+            ).toLocaleString(
+              "en-IN"
             )}`}
           />
 
@@ -282,79 +407,107 @@ const PriceHistory = ({
             label="Lowest"
             value={`₹${Math.round(
               statistics.lowest
+            ).toLocaleString(
+              "en-IN"
             )}`}
           />
         </div>
       )}
 
-      {/* Change */}
+      {/* ====================================================
+          CHANGE
+      ==================================================== */}
+
       {statistics && (
-        <div className="px-5 pt-5">
+        <div className="px-4 pt-4 sm:px-5">
           <div
-            className={`
-              flex items-center justify-between
+            className="
+              flex
+              items-center
+              justify-between
+              gap-3
               rounded-2xl
-              px-4 py-3
-              ${
-                statistics.periodChange >
-                0
-                  ? "bg-success/10"
-                  : statistics.periodChange <
-                    0
-                  ? "bg-danger/10"
-                  : "bg-[var(--surface-soft)]"
-              }
-            `}
+              border
+              border-[var(--border)]
+              bg-[var(--background)]
+              px-3.5
+              py-3
+            "
           >
-            <div>
-              <p className="text-xs text-[var(--muted)]">
+            <div className="min-w-0">
+              <p
+                className="
+                  text-[10px]
+                  font-semibold
+                  uppercase
+                  tracking-wider
+                  text-[var(--muted)]
+                "
+              >
                 Change over {range} days
               </p>
 
-              <p className="mt-1 text-sm font-medium">
+              <p
+                className="
+                  mt-1
+                  truncate
+                  text-xs
+                  font-semibold
+                "
+              >
                 ₹
                 {Math.round(
                   statistics.lowest
-                )}{" "}
-                — ₹
+                ).toLocaleString(
+                  "en-IN"
+                )}
+                {" – "}
+                ₹
                 {Math.round(
                   statistics.highest
+                ).toLocaleString(
+                  "en-IN"
                 )}
               </p>
             </div>
 
             <div
               className={`
-                flex items-center gap-1
-                text-sm font-semibold
+                flex
+                shrink-0
+                items-center
+                gap-1
+                text-sm
+                font-extrabold
+
                 ${
                   statistics.periodChange >
                   0
-                    ? "text-success"
+                    ? "text-[var(--primary)]"
                     : statistics.periodChange <
-                      0
-                    ? "text-danger"
-                    : "text-[var(--muted)]"
+                        0
+                      ? "text-[var(--danger)]"
+                      : "text-[var(--muted)]"
                 }
               `}
             >
               {statistics.periodChange >
                 0 && (
                 <ArrowUpRight
-                  size={17}
+                  size={16}
                 />
               )}
 
               {statistics.periodChange <
                 0 && (
                 <ArrowDownRight
-                  size={17}
+                  size={16}
                 />
               )}
 
               {statistics.periodChange ===
                 0 && (
-                <Minus size={17} />
+                <Minus size={16} />
               )}
 
               {statistics.periodChange >
@@ -370,8 +523,20 @@ const PriceHistory = ({
         </div>
       )}
 
-      {/* Chart */}
-      <div className="mt-5 h-64 w-full px-2 sm:h-72 sm:px-4">
+      {/* ====================================================
+          CHART
+      ==================================================== */}
+
+      <div
+        className="
+          mt-3
+          h-[240px]
+          w-full
+          px-1
+          sm:h-[290px]
+          sm:px-3
+        "
+      >
         <ResponsiveContainer
           width="100%"
           height="100%"
@@ -379,15 +544,15 @@ const PriceHistory = ({
           <AreaChart
             data={chartData}
             margin={{
-              top: 10,
-              right: 10,
-              left: -15,
-              bottom: 0,
+              top: 16,
+              right: 8,
+              left: -20,
+              bottom: 4,
             }}
           >
             <defs>
               <linearGradient
-                id="priceGradient"
+                id={gradientId}
                 x1="0"
                 y1="0"
                 x2="0"
@@ -396,20 +561,20 @@ const PriceHistory = ({
                 <stop
                   offset="0%"
                   stopColor="var(--primary)"
-                  stopOpacity={0.25}
+                  stopOpacity={0.22}
                 />
 
                 <stop
                   offset="100%"
                   stopColor="var(--primary)"
-                  stopOpacity={0.02}
+                  stopOpacity={0.01}
                 />
               </linearGradient>
             </defs>
 
             <CartesianGrid
               stroke="var(--border)"
-              strokeDasharray="4 4"
+              strokeDasharray="4 5"
               vertical={false}
             />
 
@@ -417,24 +582,26 @@ const PriceHistory = ({
               dataKey="date"
               tick={{
                 fill: "var(--muted)",
-                fontSize: 10,
+                fontSize: 9,
               }}
               axisLine={false}
               tickLine={false}
-              minTickGap={30}
+              minTickGap={28}
             />
 
             <YAxis
               tick={{
                 fill: "var(--muted)",
-                fontSize: 10,
+                fontSize: 9,
               }}
               axisLine={false}
               tickLine={false}
-              width={45}
+              width={44}
               domain={["auto", "auto"]}
               tickFormatter={(value) =>
-                `₹${Math.round(value)}`
+                `₹${Math.round(
+                  value
+                )}`
               }
             />
 
@@ -453,14 +620,19 @@ const PriceHistory = ({
                 color:
                   "var(--foreground)",
                 boxShadow:
-                  "0 10px 30px rgba(0,0,0,0.08)",
+                  "0 12px 30px rgba(0,0,0,0.08)",
+                padding:
+                  "10px 12px",
               }}
               labelStyle={{
                 color:
                   "var(--muted)",
                 marginBottom: 4,
+                fontSize: 10,
               }}
-              formatter={(value) => [
+              formatter={(
+                value
+              ) => [
                 `₹${Math.round(
                   value
                 )} / kg`,
@@ -472,25 +644,38 @@ const PriceHistory = ({
               type="monotone"
               dataKey="price"
               stroke="var(--primary)"
-              fill="url(#priceGradient)"
+              fill={`url(#${gradientId})`}
               strokeWidth={2.5}
               dot={false}
               activeDot={{
                 r: 5,
                 fill: "var(--primary)",
+                stroke:
+                  "var(--surface)",
+                strokeWidth: 2,
               }}
             />
           </AreaChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Footer */}
+      {/* ====================================================
+          FOOTER
+      ==================================================== */}
+
       <div
         className="
-          flex items-center justify-between
-          border-t border-[var(--border)]
-          px-5 py-4
-          text-xs text-[var(--muted)]
+          flex
+          items-center
+          justify-between
+          gap-3
+          border-t
+          border-[var(--border)]
+          px-4
+          py-3.5
+          text-[10px]
+          text-[var(--muted)]
+          sm:px-5
         "
       >
         <span>
@@ -505,24 +690,60 @@ const PriceHistory = ({
   );
 };
 
+/* ============================================================
+   STAT
+============================================================ */
+
 const Stat = ({
   label,
   value,
+  highlight = false,
 }) => {
   return (
     <div
-      className="
-        border-r
-        border-[var(--border)]
-        p-4
-        last:border-r-0
-      "
+      className={`
+        rounded-2xl
+        border
+        px-3
+        py-3
+
+        ${
+          highlight
+            ? `
+              border-[var(--primary)]/20
+              bg-[var(--accent)]
+            `
+            : `
+              border-[var(--border)]
+              bg-[var(--background)]
+            `
+        }
+      `}
     >
-      <p className="text-[10px] uppercase tracking-wide text-[var(--muted)]">
+      <p
+        className="
+          text-[9px]
+          font-semibold
+          uppercase
+          tracking-wider
+          text-[var(--muted)]
+        "
+      >
         {label}
       </p>
 
-      <p className="mt-1 text-sm font-semibold">
+      <p
+        className={`
+          mt-1
+          text-sm
+          font-extrabold
+          ${
+            highlight
+              ? "text-[var(--primary)]"
+              : "text-[var(--foreground)]"
+          }
+        `}
+      >
         {value}
       </p>
     </div>
