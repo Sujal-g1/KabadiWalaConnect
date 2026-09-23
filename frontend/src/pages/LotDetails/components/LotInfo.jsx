@@ -6,125 +6,245 @@ import {
   Scale,
 } from "lucide-react";
 
+import { motion } from "framer-motion";
+
 const LotInfo = ({ lot }) => {
-  const createdDate = lot.createdAt
-    ? new Date(
-        lot.createdAt
-      ).toLocaleDateString("en-IN", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      })
-    : "—";
+  const createdDate =
+    lot.createdAt
+      ? new Date(
+          lot.createdAt
+        ).toLocaleDateString(
+          "en-IN",
+          {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }
+        )
+      : "—";
 
   return (
-    <section
+    <motion.section
+      initial={{
+        opacity: 0,
+        y: 10,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
       className="
-        rounded-3xl
+        relative
+        overflow-hidden
+        rounded-[28px]
         border
         border-[var(--border)]
-        bg-[var(--surface)]
+        bg-[linear-gradient(135deg,var(--surface)_0%,var(--surface)_72%,var(--accent)_150%)]
         p-5
+        shadow-[0_14px_38px_rgba(18,63,45,0.07)]
         sm:p-6
       "
     >
-      <div className="flex items-center gap-2">
+      {/* TOP ACCENT */}
+
+      <div
+        className="
+          absolute
+          left-0
+          right-0
+          top-0
+          h-1
+          bg-gradient-to-r
+          from-[var(--primary)]
+          via-[var(--teal)]
+          to-[var(--jade)]
+        "
+      />
+
+      {/* HEADER */}
+
+      <div className="flex items-center gap-3">
         <div
           className="
             flex
-            h-9
-            w-9
+            h-10
+            w-10
             items-center
             justify-center
-            rounded-xl
+            rounded-2xl
             bg-[var(--accent)]
             text-[var(--primary)]
+            shadow-sm
           "
         >
-          <FileText size={17} />
+          <FileText
+            size={17}
+          />
         </div>
 
         <div>
-          <h2 className="text-sm font-semibold">
-            Lot Information
+          <h2 className="text-sm font-extrabold">
+            Lot information
           </h2>
 
-          <p className="text-xs text-[var(--muted)]">
+          <p
+            className="
+              mt-0.5
+              text-[11px]
+              text-[var(--muted)]
+            "
+          >
             Collection details
           </p>
         </div>
       </div>
 
-      <div className="mt-5 divide-y divide-[var(--border)]">
+      {/* INFORMATION GRID */}
 
-        <InfoRow
+      <div
+        className="
+          mt-5
+          grid
+          grid-cols-2
+          gap-2.5
+        "
+      >
+        <InfoTile
           icon={Scale}
           label="Approx. weight"
           value={`${lot.approximateWeight} ${
-            lot.weightUnit || "kg"
+            lot.weightUnit ||
+            "kg"
           }`}
         />
 
-        <InfoRow
+        <InfoTile
           icon={CircleAlert}
           label="Condition"
-          value={lot.condition || "Not specified"}
+          value={
+            lot.condition ||
+            "Not specified"
+          }
         />
 
-        <InfoRow
+        <InfoTile
           icon={MapPin}
           label="Location"
-          value={lot.location || "Not specified"}
+          value={
+            lot.location ||
+            "Not specified"
+          }
         />
 
-        <InfoRow
+        <InfoTile
           icon={CalendarDays}
           label="Created"
           value={createdDate}
         />
-
       </div>
 
-      {lot.description && (
-        <div className="mt-5 border-t border-[var(--border)] pt-5">
+      {/* DESCRIPTION */}
 
-          <p className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
+      {lot.description && (
+        <div
+          className="
+            mt-3
+            rounded-2xl
+            border
+            border-[var(--border)]
+            bg-[var(--background)]
+            p-3.5
+          "
+        >
+          <p
+            className="
+              text-[9px]
+              font-bold
+              uppercase
+              tracking-wider
+              text-[var(--muted)]
+            "
+          >
             Description
           </p>
 
-          <p className="mt-2 text-sm leading-6">
+          <p
+            className="
+              mt-2
+              text-sm
+              leading-6
+              text-[var(--foreground)]
+            "
+          >
             {lot.description}
           </p>
-
         </div>
       )}
-    </section>
+    </motion.section>
   );
 };
 
-const InfoRow = ({
+const InfoTile = ({
   icon: Icon,
   label,
   value,
 }) => {
   return (
-    <div className="flex items-center justify-between gap-5 py-4">
+    <div
+      className="
+        min-w-0
+        rounded-2xl
+        border
+        border-[var(--border)]
+        bg-[var(--background)]
+        px-3
+        py-3
+        shadow-sm
+      "
+    >
+      <div className="flex items-start gap-2.5">
+        <div
+          className="
+            flex
+            h-8
+            w-8
+            shrink-0
+            items-center
+            justify-center
+            rounded-xl
+            bg-[var(--surface-soft)]
+            text-[var(--muted)]
+          "
+        >
+          <Icon size={14} />
+        </div>
 
-      <div className="flex min-w-0 items-center gap-3">
-        <Icon
-          size={17}
-          className="shrink-0 text-[var(--muted)]"
-        />
+        <div className="min-w-0">
+          <p
+            className="
+              text-[9px]
+              font-semibold
+              uppercase
+              tracking-wider
+              text-[var(--muted)]
+            "
+          >
+            {label}
+          </p>
 
-        <span className="text-sm text-[var(--muted)]">
-          {label}
-        </span>
+          <p
+            className="
+              mt-1
+              truncate
+              text-xs
+              font-bold
+              text-[var(--foreground)]
+            "
+          >
+            {value}
+          </p>
+        </div>
       </div>
-
-      <span className="max-w-[55%] text-right text-sm font-semibold">
-        {value}
-      </span>
-
     </div>
   );
 };
