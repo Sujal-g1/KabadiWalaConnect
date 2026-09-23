@@ -1,0 +1,184 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  COLLECTOR
+  RECYCLER
+  ADMIN
+}
+
+enum HandoverStatus {
+  PENDING
+  CONFIRMED
+  DISPUTED
+  CANCELLED
+}
+
+enum LotStatus {
+  CREATED
+  AVAILABLE
+  OFFER_RECEIVED
+  PICKUP_SCHEDULED
+  PICKED_UP
+  HANDED_OVER
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // Firebase identity
+  firebaseUid String @unique
+
+  // Authentication/contact
+  phoneNumber String? @unique
+  email       String? @unique
+
+  // Personal information
+  firstName String
+  lastName  String
+
+  // Account
+  role UserRole
+
+  // Profile
+  preferredLanguage String
+  operatingLocation String
+
+  lots              EWasteLot[]
+  recyclerHandovers Handover[]  @relation("RecyclerHandovers")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PriceHistory {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  material    String
+  subcategory String?
+
+  location String
+
+  price    Float
+  minPrice Float?
+  maxPrice Float?
+
+  unit String @default("kg")
+
+  source       String?
+  recyclerName String?
+
+  recordedAt DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EWasteLot {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  referenceId String @unique
+
+  collectorId String @db.ObjectId
+  collector   User   @relation(fields: [collectorId], references: [id])
+
+  material    String
+  subcategory String?
+
+  description String?
+  condition   String?
+
+  approximateWeight Float
+  weightUnit        String @default("kg")
+
+  latitude  Float?
+  longitude Float?
+  location  String
+
+  estimatedRate     Float?
+  minEstimatedValue Float?
+  maxEstimatedValue Float?
+  estimatedValue    Float?
+
+  status LotStatus @default(CREATED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  photos   LotPhoto[]
+  handover Handover?
+
+  @@index([collectorId])
+  @@index([status])
+  @@index([material])
+  @@index([location])
+  @@index([createdAt])
+}
+
+model LotPhoto {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  lotId String    @db.ObjectId
+  lot   EWasteLot @relation(fields: [lotId], references: [id])
+
+  url        String
+  storageKey String?
+
+  createdAt DateTime @default(now())
+
+  @@index([lotId])
+}
+
+model Handover {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  referenceId String @unique
+
+  lotId String    @unique @db.ObjectId
+  lot   EWasteLot @relation(fields: [lotId], references: [id])
+
+  actualWeight Float
+  weightUnit   String @default("kg")
+
+  latitude  Float?
+  longitude Float?
+  location  String?
+
+  handedOverAt DateTime @default(now())
+
+  finalValue Float?
+
+  recyclerId String? @db.ObjectId
+  recycler   User?   @relation("RecyclerHandovers", fields: [recyclerId], references: [id])
+
+  recyclerConfirmedAt DateTime?
+
+  status HandoverStatus @default(PENDING)
+
+  photos HandoverPhoto[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HandoverPhoto {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  handoverId String   @db.ObjectId
+  handover   Handover @relation(fields: [handoverId], references: [id])
+
+  url        String
+  storageKey String?
+
+  createdAt DateTime @default(now())
+
+  @@index([handoverId])
+}
