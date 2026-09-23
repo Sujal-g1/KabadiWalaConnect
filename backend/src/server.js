@@ -15,9 +15,8 @@ const app = Fastify({ logger: true,});
 
 // CORS
 // await app.register(cors, { origin: true,});
-import cors from "@fastify/cors";
 
-await Fastify.register(cors, {
+await app.register(cors, {
   origin: [
     "http://localhost:5173",
     "https://kabadiwalaconnect-theta.vercel.app",

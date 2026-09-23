@@ -8,10 +8,11 @@ const getPrices = async (request, reply) => {
       material,
     } = request.query;
 
-    const prices = await priceService.getPrices({
-      location,
-      material,
-    });
+    const prices =
+      await priceService.getPrices({
+        location,
+        material,
+      });
 
     return reply.code(200).send({
       success: true,
@@ -27,10 +28,14 @@ const getPrices = async (request, reply) => {
   }
 };
 
-const getPriceHistory = async (request, reply) => {
+const getPriceHistory = async (
+  request,
+  reply
+) => {
   try {
     const {
       material,
+      subcategory,
       location,
       limit,
     } = request.query;
@@ -38,6 +43,7 @@ const getPriceHistory = async (request, reply) => {
     const prices =
       await priceService.getPriceHistory({
         material,
+        subcategory,
         location,
         limit,
       });
@@ -95,5 +101,5 @@ const calculateValuation = async (
 export default {
   getPrices,
   getPriceHistory,
-  calculateValuation
+  calculateValuation,
 };

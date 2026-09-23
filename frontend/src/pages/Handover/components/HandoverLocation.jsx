@@ -16,7 +16,7 @@ const HandoverLocation = ({
   return (
     <section
       className="
-        rounded-2xl
+        rounded-3xl
         border border-[var(--border)]
         bg-[var(--surface)]
         p-5
@@ -32,7 +32,7 @@ const HandoverLocation = ({
             text-[var(--primary)]
           "
         >
-          <MapPin size={20} />
+          <MapPin size={19} />
         </div>
 
         <div>
@@ -40,49 +40,77 @@ const HandoverLocation = ({
             Handover Location
           </h2>
 
-          <p className="mt-1 text-xs text-[var(--muted)]">
+          <p className="mt-1 text-xs leading-5 text-[var(--muted)]">
             Location recorded for traceability.
           </p>
         </div>
       </div>
 
-      <input
-        type="text"
-        value={location}
-        onChange={(event) =>
-          onLocationChange(
-            event.target.value
-          )
-        }
-        placeholder="Meerut"
-        className="
-          mt-4 w-full rounded-xl
-          border border-[var(--border)]
-          bg-[var(--surface-soft)]
-          px-4 py-3
-          text-[var(--foreground)]
-          outline-none
-          transition
-          focus:border-[var(--primary)]
-        "
-      />
+      <div className="relative mt-5">
+        <MapPin
+          size={17}
+          className="
+            pointer-events-none
+            absolute
+            left-4
+            top-1/2
+            -translate-y-1/2
+            text-[var(--muted)]
+          "
+        />
+
+        <input
+          type="text"
+          value={location}
+          onChange={(event) =>
+            onLocationChange(event.target.value)
+          }
+          placeholder="Enter location"
+          className="
+            h-13
+            w-full
+            rounded-2xl
+            border border-[var(--border)]
+            bg-[var(--surface-soft)]
+            pl-11
+            pr-4
+            text-sm
+            text-[var(--foreground)]
+            outline-none
+            transition
+            placeholder:text-[var(--muted)]
+            focus:border-[var(--primary)]
+            focus:ring-2
+            focus:ring-[var(--primary)]/10
+          "
+        />
+      </div>
 
       {hasCoordinates && (
         <div
           className="
-            mt-3 flex items-center gap-2
-            rounded-xl
+            mt-3
+            flex items-center gap-2
+            rounded-2xl
             bg-[var(--surface-soft)]
-            px-3 py-2.5
+            px-3.5
+            py-3
             text-xs
             text-[var(--muted)]
           "
         >
-          <Navigation size={14} />
+          <Navigation
+            size={14}
+            className="shrink-0 text-[var(--primary)]"
+          />
 
-          <span>
+          <span className="truncate">
             GPS: {latitude.toFixed(5)},{" "}
             {longitude.toFixed(5)}
+          </span>
+
+          <span className="ml-auto shrink-0 font-medium text-[var(--success)]">
+            Recorded
           </span>
         </div>
       )}

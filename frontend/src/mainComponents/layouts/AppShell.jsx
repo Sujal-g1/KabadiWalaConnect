@@ -5,6 +5,7 @@ import Sidebar from "./Sidebar";
 import MobileHeader from "./MobileHeader";
 import BottomNavigation from "./BottomNavigation";
 import PageContainer from "./PageContainer";
+import logo from "../../assets/images/logo.webp";
 
 const AppShell = ({ children }) => {
   const [sidebarCollapsed, setSidebarCollapsed] =
@@ -71,15 +72,23 @@ const MobileMenu = ({ onClose }) => {
         "
       >
         <div className="mb-8 flex items-center justify-between">
-          <div>
+         <div className="flex items-center gap-2">
+          <img
+            src={logo}
+            alt="Kabadiwala Connect"
+            className="h-10 w-10 shrink-0 object-contain"
+          />
+
+          <div className="flex flex-col leading-tight">
             <p className="text-lg font-bold text-[var(--foreground)]">
-              KabadiWala
+              Kabadiwala
             </p>
 
-            <p className="text-xs text-[var(--muted)]">
+            <p className="text-lg font-bold text-[var(--muted)]">
               Connect
             </p>
           </div>
+        </div>
 
           <button
             onClick={onClose}

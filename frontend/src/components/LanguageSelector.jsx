@@ -1,5 +1,5 @@
 import useLanguageStore from "../store/languageStore";
-import { languages } from "../i18n/languages";
+import { SUPPORTED_LANGUAGES } from "../i18n/languages";
 
 const LanguageSelector = () => {
   const language = useLanguageStore(
@@ -11,25 +11,35 @@ const LanguageSelector = () => {
   );
 
   return (
-    <select
-      value={language}
-      onChange={(e) =>
-        setLanguage(e.target.value)
-      }
-      className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
-    >
-      {Object.values(languages).map(
-        (item) => (
-          <option
+    <div className="flex flex-wrap gap-2">
+      {SUPPORTED_LANGUAGES.map((item) => {
+        const active = language === item.code;
+
+        return (
+          <button
             key={item.code}
-            value={item.code}
-            className="bg-[#0a1813] text-white"
+            type="button"
+            onClick={() => setLanguage(item.code)}
+            className={`
+              flex items-center gap-2
+              rounded-xl
+              border
+              px-3 py-2
+              text-sm
+              font-medium
+              transition-all duration-200
+              ${
+                active
+                  ? "border-[var(--primary)] bg-[var(--accent)] text-[var(--primary)] shadow-sm"
+                  : "border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:border-[var(--primary)]/50 hover:bg-[var(--surface-soft)] hover:text-[var(--primary)]"
+              }
+            `}
           >
-            {item.nativeName}
-          </option>
-        )
-      )}
-    </select>
+            <span>{item.nativeLabel}</span>
+          </button>
+        );
+      })}
+    </div>
   );
 };
 

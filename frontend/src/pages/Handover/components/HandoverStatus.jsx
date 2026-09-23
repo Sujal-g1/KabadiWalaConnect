@@ -43,9 +43,7 @@ const statusConfig = {
   },
 };
 
-const HandoverStatus = ({
-  status,
-}) => {
+const HandoverStatus = ({ status }) => {
   const config =
     statusConfig[status] ||
     statusConfig.PENDING;
@@ -55,16 +53,27 @@ const HandoverStatus = ({
   return (
     <section
       className={`
-        rounded-2xl
+        rounded-3xl
         border
         p-4
         ${config.className}
       `}
     >
       <div className="flex items-center gap-3">
-        <Icon size={22} />
+        <div
+          className="
+            flex h-9 w-9
+            shrink-0
+            items-center
+            justify-center
+            rounded-xl
+            bg-current/10
+          "
+        >
+          <Icon size={19} />
+        </div>
 
-        <div>
+        <div className="min-w-0">
           <p className="text-sm font-semibold">
             {config.label}
           </p>

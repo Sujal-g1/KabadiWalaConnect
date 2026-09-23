@@ -110,7 +110,7 @@ const useCurrentLocation = () => {
   }, []);
 
   return {
-    ...location,
+    location,
     refreshLocation: getLocation,
   };
 };
