@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { motion } from "framer-motion";
+import WeatherForecastStrip from "./WeatherForecastStrip";
 
 /* ==========================================================
    STATUS ICONS
@@ -438,102 +439,141 @@ const WeatherNotice = ({
           </div>
         </div>
 
-        {/* ==================================================
-            RAIN / WIND
-        ================================================== */}
+        {/* RAIN / WIND   WEATHER RISK */}
+      <div className="relative mt-4">
+        <div
+          className={`
+            flex
+            items-center
+            gap-3
+            rounded-2xl
+            border
+            px-3
+            py-2.5
+            backdrop-blur-sm
+            ${
+              summary.stormRisk?.detected
+                ? "border-[#B34A45]/20 bg-[#FDEAE7]/70"
+                : summary.rainChance >= 60
+                  ? "border-[#E6A43B]/25 bg-[#FFF3D9]/70"
+                  : "border-black/5 bg-white/40"
+            }
+          `}
+        >
+          {/* ICON */}
 
-        {hasRainChance && (
           <div
-        className="
-          relative
-          mt-4
-          flex
-          items-center
-          gap-3
-          rounded-2xl
-          border
-          border-black/5
-          bg-white/45
-          px-3
-          py-2.5
-          text-[#123F2D]
-          backdrop-blur-sm
-        "
-      >
-            {/* RAIN ICON */}
-
-            <div
-              className="
-                flex
-                h-8
-                w-8
-                shrink-0
-                items-center
-                justify-center
-                rounded-xl
-                bg-white/60
-                text-[#278F8B]
-              "
-            >
-              <CloudRain size={15} />
-            </div>
-
-            {/* RAIN INFO */}
-
-            <div
-              className="
-                min-w-0
-                flex-1
-              "
-            >
-              <p
-                className={`
-                  text-[9px]
-                  font-bold
-                  uppercase
-                  tracking-[0.12em]
-                  ${colors.muted}
-                `}
-              >
-                {summary.ui?.rainChance ||
-                  "Rain chance"}
-              </p>
-
-              <p
-                className={`
-                  mt-0.5
-                  text-xs
-                  font-bold
-                  ${colors.text}
-                `}
-              >
-                {summary.rainChance}% ·{" "}
-                {summary.ui?.nextHours ||
-                  "Next few hours"}
-              </p>
-            </div>
-
-            {/* WIND */}
-
-            {summary.windSpeed >=
-              40 && (
-              <div
-                className={`
-                  flex
-                  items-center
-                  gap-1
-                  text-[10px]
-                  font-semibold
-                  ${colors.muted}
-                `}
-              >
-                <Wind size={12} />
-
-                {summary.windSpeed} km/h
-              </div>
-            )}
+            className={`
+              flex
+              h-8
+              w-8
+              shrink-0
+              items-center
+              justify-center
+              rounded-xl
+              ${
+                summary.stormRisk?.detected
+                  ? "bg-[#7D2622] text-white"
+                  : summary.rainChance >= 60
+                    ? "bg-[#8A5B10] text-white"
+                    : "bg-white/60 text-[#278F8B]"
+              }
+            `}
+          >
+            {summary.stormRisk?.detected
+              ? "⛈️"
+              : "🌧️"}
           </div>
-        )}
+
+          {/* TEXT */}
+
+          <div className="min-w-0 flex-1">
+            <p
+              className={`
+                text-[9px]
+                font-black
+                uppercase
+                tracking-[0.12em]
+                ${
+                  summary.stormRisk?.detected
+                    ? "text-[#7D2622]"
+                    : summary.rainChance >= 60
+                      ? "text-[#6A450B]"
+                      : "text-[#315D49]"
+                }
+              `}
+            >
+              {summary.stormRisk?.detected
+                ? "Storm risk"
+                : "Rain chance · next 6 hours"}
+            </p>
+
+            <p
+              className={`
+                mt-0.5
+                text-xs
+                font-black
+                ${
+                  summary.stormRisk?.detected
+                    ? "text-[#6F2925]"
+                    : summary.rainChance >= 60
+                      ? "text-[#5F430F]"
+                      : "text-[#123F2D]"
+                }
+              `}
+            >
+              {summary.stormRisk?.detected
+                ? "Storm expected"
+                : `${summary.rainChance}% chance of rain`}
+            </p>
+          </div>
+
+          {/* PERCENTAGE */}
+
+          <div className="shrink-0 text-right">
+            <p
+              className={`
+                text-lg
+                font-black
+                ${
+                  summary.stormRisk?.detected
+                    ? "text-[#7D2622]"
+                    : summary.rainChance >= 60
+                      ? "text-[#6A450B]"
+                      : "text-[#123F2D]"
+                }
+              `}
+            >
+              {summary.rainChance}%
+            </p>
+          </div>
+        </div>
+      </div>
+
+    {/* NEXT 6 HOURS */}
+      {summary.nextSixHours?.length > 0 && (
+        <div
+          className="
+            relative
+            mt-3
+            overflow-hidden
+            rounded-2xl
+            border
+            border-black/5
+            bg-white/35
+            px-1
+            py-2
+            backdrop-blur-sm
+          "
+        >
+          <WeatherForecastStrip
+            hours={
+              summary.nextSixHours
+            }
+          />
+        </div>
+      )}
+
       </motion.div>
 
       {/* ======================================================

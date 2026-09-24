@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import { motion } from "framer-motion";
+import WeatherForecastStrip from "./WeatherForecastStrip";
 
 /* ==========================================================
    STATUS ICONS
@@ -456,94 +457,92 @@ const WeatherNoticeMobile = ({
           </div>
         </div>
 
-        {/* ==================================================
-            RAIN / WIND
-        ================================================== */}
+      {/* Rain / Storm Risk */}
+        <div
+        className={`mt-3 flex items-center gap-2.5 rounded-xl border px-3 py-2.5 ${
+            summary.stormRisk?.detected
+            ? "border-[#B34A45]/20 bg-[#FDEAE7]/80"
+            : summary.rainChance >= 60
+                ? "border-[#E6A43B]/25 bg-[#FFF3D9]/80"
+                : "border-black/5 bg-white/40"
+        }`}
+        >
+        <div
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+            summary.stormRisk?.detected
+                ? "bg-[#B34A45]/10"
+                : summary.rainChance >= 60
+                ? "bg-[#E6A43B]/10"
+                : "bg-white/60"
+            }`}
+        >
+            <span className="text-sm">
+            {summary.stormRisk?.detected ? "⛈️" : "🌧️"}
+            </span>
+        </div>
 
-        {hasRainChance && (
-          <div
-            className="
-              relative
-              mt-3
-              flex
-              items-center
-              gap-2.5
-              rounded-xl
-              border
-              border-black/5
-              bg-white/45
-              px-3
-              py-2.5
-              backdrop-blur-sm
-            "
-          >
-            <div
-              className="
-                flex
-                h-8
-                w-8
-                shrink-0
-                items-center
-                justify-center
-                rounded-xl
-                bg-white/60
-                text-[#278F8B]
-              "
+        <div className="min-w-0 flex-1">
+            <p
+            className={`text-[9px] font-black uppercase tracking-[0.12em] ${
+                summary.stormRisk?.detected
+                ? "!text-[#7D2622]"
+                : summary.rainChance >= 60
+                    ? "!text-[#76581C]"
+                    : "!text-[#315D49]"
+            }`}
             >
-              <CloudRain size={14} />
-            </div>
+            {summary.stormRisk?.detected
+                ? "Storm risk"
+                : "Rain chance · next 6 hours"}
+            </p>
 
-            <div
-              className="
-                min-w-0
-                flex-1
-              "
+            <p
+            className={`mt-0.5 truncate text-[11px] font-bold ${
+                summary.stormRisk?.detected
+                ? "!text-[#6F2925]"
+                : summary.rainChance >= 60
+                    ? "!text-[#5F430F]"
+                    : "!text-[#123F2D]"
+            }`}
             >
-              <p
-                className={`
-                  text-[8px]
-                  font-black
-                  uppercase
-                  tracking-[0.12em]
-                  ${colors.muted}
-                `}
-              >
-                {summary.ui?.rainChance ||
-                  "Rain chance"}
-              </p>
+            {summary.stormRisk?.detected
+                ? "Storm expected"
+                : summary.rainChance >= 60
+                ? "Rain may affect collection"
+                : "Low rain risk"}
+            </p>
+        </div>
 
-              <p
-                className={`
-                  mt-0.5
-                  text-[10px]
-                  font-bold
-                  ${colors.text}
-                `}
-              >
-                {summary.rainChance}% ·{" "}
-                {summary.ui?.nextHours ||
-                  "Next few hours"}
-              </p>
-            </div>
+        <div className="shrink-0 text-right">
+            <p
+            className={`text-base font-black ${
+                summary.stormRisk?.detected
+                ? "!text-[#7D2622]"
+                : summary.rainChance >= 60
+                    ? "!text-[#5F430F]"
+                    : "!text-[#123F2D]"
+            }`}
+            >
+            {summary.rainChance}%
+            </p>
 
-            {summary.windSpeed >= 40 && (
-              <div
-                className={`
-                  flex
-                  shrink-0
-                  items-center
-                  gap-1
-                  text-[9px]
-                  font-bold
-                  ${colors.muted}
-                `}
-              >
-                <Wind size={11} />
-                {summary.windSpeed}
-              </div>
-            )}
-          </div>
+            <p className="text-[8px] font-bold !text-[#315D49]">
+            rain
+            </p>
+        </div>
+        </div>
+
+        {/* Next 6 Hours */}
+        {summary.nextSixHours?.length > 0 && (
+        <div className="mt-2.5 overflow-hidden rounded-xl border border-black/5 bg-white/35 px-0.5 py-1.5 backdrop-blur-sm">
+            <WeatherForecastStrip
+            hours={summary.nextSixHours}
+            compact
+            />
+        </div>
         )}
+
+      
       </motion.div>
 
       {/* ======================================================

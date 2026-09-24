@@ -283,6 +283,7 @@ const MobileHeader = ({
 
                 {/*   */}
               </div>
+
             </button>
           </div>
 
@@ -290,65 +291,94 @@ const MobileHeader = ({
               RIGHT
           ================================================== */}
 
-          <div
-            className="
-              shrink-0
-            "
-        >
-            <motion.button
-              type="button"
-              whileTap={{
-                scale: 0.9,
-              }}
-              onClick={() =>
-                setShowWeather(
-                  (current) =>
-                    !current
-                )
-              }
-              aria-label="Weather notifications"
-              aria-expanded={
-                showWeather
-              }
-              className="
-                relative
-                flex
-                h-10
-                w-10
-                items-center
-                justify-center
-                rounded-xl
-                text-[var(--muted)]
-                transition
-                hover:bg-[var(--surface-soft)]
-                hover:text-[var(--foreground)]
-              "
-            >
-              <Bell
-                size={18}
-                strokeWidth={2}
-              />
+          <div className="shrink-0">
+  <motion.button
+    type="button"
+    whileTap={{
+      scale: 0.9,
+    }}
+    animate={{
+      scale: showWeather ? 1.04 : 1,
+    }}
+    transition={{
+      type: "spring",
+      stiffness: 400,
+      damping: 20,
+    }}
+    onClick={() =>
+      setShowWeather(
+        (current) => !current
+      )
+    }
+    aria-label="Weather notifications"
+    aria-expanded={showWeather}
+    className={`
+      relative
+      flex
+      h-10
+      w-10
+      items-center
+      justify-center
+      rounded-xl
+      transition-all
+      duration-200
 
-              {/* ALERT DOT */}
+      ${
+        showWeather
+          ? `
+            bg-gradient-to-br
+            from-indigo-500
+            to-violet-500
+            text-white
+            shadow-md
+            shadow-indigo-500/20
+          `
+          : `
+            text-[var(--muted)]
+            hover:bg-[var(--surface-soft)]
+            hover:text-[var(--foreground)]
+          `
+      }
+    `}
+  >
+    <motion.span
+      animate={{
+        rotate: showWeather
+          ? [0, -8, 8, -5, 5, 0]
+          : 0,
+      }}
+      transition={{
+        duration: 0.45,
+        ease: "easeOut",
+      }}
+    >
+      <Bell
+        size={18}
+        strokeWidth={2}
+      />
+    </motion.span>
 
-              {alerts.length >
-                0 && (
-                <span
-                  className="
-                    absolute
-                    right-2
-                    top-2
-                    h-1.5
-                    w-1.5
-                    rounded-full
-                    bg-[#E6A43B]
-                    ring-2
-                    ring-[var(--surface)]
-                  "
-                />
-              )}
-            </motion.button>
-          </div>
+    {/* ALERT DOT */}
+
+    {!showWeather &&
+      alerts.length > 0 && (
+        <span
+          className="
+            absolute
+            right-2
+            top-2
+            h-1.5
+            w-1.5
+            rounded-full
+            bg-[#E6A43B]
+            ring-2
+            ring-[var(--surface)]
+          "
+        />
+      )}
+  </motion.button>
+</div>
+
         </div>
 
         {/* ====================================================
@@ -460,6 +490,7 @@ const MobileHeader = ({
             </>
           )}
         </AnimatePresence>
+
       </motion.div>
     </header>
   );

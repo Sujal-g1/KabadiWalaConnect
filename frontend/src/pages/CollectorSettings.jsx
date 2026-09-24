@@ -38,7 +38,7 @@ const CollectorSettings = () => {
   };
 
   const displayName =
-    user?.firstName ||
+   `${user?.firstName || ""} ${user?.lastName || ""}`.trim() ||
     user?.name ||
     "Collector";
 

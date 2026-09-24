@@ -2,10 +2,10 @@ import {
   getWeatherCopy,
 } from "./weatherTranslations.js";
 
-const WEATHER_URL =
-  "https://api.open-meteo.com/v1/forecast";
+const WEATHER_URL = "https://api.open-meteo.com/v1/forecast";
 
-const WEATHER_TEST_MODE = false;
+export const WEATHER_TEST_MODE = false;
+
 
 const WEATHER_META = {
   0: { key: "clear", icon: "☀️" },
@@ -198,36 +198,58 @@ const getCurrentHourlyIndex = (
   return bestIndex;
 };
 
-export function getRainForecast(
-  weather
-) {
+export function getRainForecast(weather) {
   const hourly =
     weather?.hourly || {};
 
-  const times = hourly.time || [];
+  const times =
+    hourly.time || [];
+
   const probabilities =
-    hourly.precipitation_probability || [];
+    hourly.precipitation_probability ||
+    [];
+
+  const weatherCodes =
+    hourly.weather_code || [];
 
   const startIndex =
     getCurrentHourlyIndex(weather);
 
   const nextHours = times
-    .slice(startIndex, startIndex + 6)
-    .map((time, offset) => ({
-      time,
-      probability:
-        Number(
-          probabilities[startIndex + offset]
-        ) || 0,
-    }));
+    .slice(
+      startIndex,
+      startIndex + 6
+    )
+    .map(
+      (time, offset) => {
+        const index =
+          startIndex + offset;
 
-  const maxNext6Hours = nextHours.length
-    ? Math.max(
-        ...nextHours.map(
-          (item) => item.probability
+        return {
+          time,
+
+          probability:
+            Number(
+              probabilities[index]
+            ) || 0,
+
+          weatherCode:
+            Number(
+              weatherCodes[index]
+            ),
+        };
+      }
+    );
+
+  const maxNext6Hours =
+    nextHours.length
+      ? Math.max(
+          ...nextHours.map(
+            (item) =>
+              item.probability
+          )
         )
-      )
-    : 0;
+      : 0;
 
   const maxToday =
     Number(
@@ -237,17 +259,40 @@ export function getRainForecast(
 
   const rainWindow =
     nextHours.find(
-      (item) => item.probability >= 50
+      (item) =>
+        item.probability >= 50
+    );
+
+  /* ========================================================
+     STORM DETECTION
+
+     WMO:
+     95 = thunderstorm
+     96 = thunderstorm + hail
+     99 = thunderstorm + heavy hail
+  ======================================================== */
+
+  const stormWindow =
+    nextHours.find(
+      (item) =>
+        item.weatherCode >= 95 &&
+        item.weatherCode <= 99
     );
 
   return {
-    maxNext6Hours: Math.round(
-      maxNext6Hours
-    ),
-    maxToday: Math.round(
-      maxToday
-    ),
-    rainWindow: rainWindow || null,
+    maxNext6Hours:
+      Math.round(
+        maxNext6Hours
+      ),
+
+    maxToday:
+      Math.round(maxToday),
+
+    rainWindow:
+      rainWindow || null,
+
+    stormWindow:
+      stormWindow || null,
   };
 }
 
@@ -337,6 +382,15 @@ const getAdvice = ({
     };
   }
 
+  if (rain.stormWindow) {
+  return {
+    type: "avoid",
+    key: "stormSoon",
+    message:
+      copy.adviceThunderstorm,
+  };
+}
+
   if (rain.maxNext6Hours >= 60) {
     return {
       type: "caution",
@@ -407,8 +461,9 @@ export function createWeatherSummary(
       language
     );
 
-  const rain =
-    getRainForecast(weather);
+  const rain = getRainForecast(weather);
+  
+  const nextSixHours = getNextSixHours( weather, language );
 
   const advice =
     getAdvice({
@@ -419,44 +474,40 @@ export function createWeatherSummary(
         description.key,
     });
 
-  const copy = getWeatherCopy(
-    language
-  );
+    const copy = getWeatherCopy( language );
 
   return {
     icon: description.icon,
     weatherKey: description.key,
     label: description.label,
 
-    temperature:
-      round(current.temperature_2m),
+    temperature: round(current.temperature_2m),
+    feelsLike: round(current.apparent_temperature),
+    humidity: round(current.relative_humidity_2m),
+    windSpeed: round(current.wind_speed_10m),
+    rainChance: rain.maxNext6Hours,
+    todayRainChance: rain.maxToday,
+    rainWindow: rain.rainWindow?.time || null,
 
-    feelsLike:
-      round(current.apparent_temperature),
+    stormRisk:  rain.stormWindow ? {
+        detected: true,
+        time:
+          rain.stormWindow.time,
+        weatherCode:
+          rain.stormWindow.weatherCode,
+      }
+    : {
+        detected: false,
 
-    humidity:
-      round(current.relative_humidity_2m),
+        time: null,
 
-    windSpeed:
-      round(current.wind_speed_10m),
+        weatherCode: null,
+      },
 
-    rainChance:
-      rain.maxNext6Hours,
-
-    todayRainChance:
-      rain.maxToday,
-
-    rainWindow:
-      rain.rainWindow?.time || null,
-
-    outdoorStatus:
-      advice.type,
-
-    advice:
-      advice.message,
-
-    notificationTitle:
-      copy.weatherUpdate,
+nextSixHours,
+    outdoorStatus:advice.type,
+    advice: advice.message,
+    notificationTitle: copy.weatherUpdate,
 
     notificationBody:
       advice.type === "good"
@@ -560,6 +611,163 @@ export function createWeatherAlerts(
   ];
 }
 
-export {
-  WEATHER_TEST_MODE,
+export const getNextSixHours = (
+  weather,
+  language = "en"
+) => {
+  if (
+    !weather?.hourly?.time ||
+    !weather?.hourly?.temperature_2m
+  ) {
+    return [];
+  }
+
+  const times =
+    weather.hourly.time;
+
+  const temperatures =
+    weather.hourly.temperature_2m;
+
+  const apparentTemperatures =
+    weather.hourly.apparent_temperature ||
+    [];
+
+  const precipitationProbabilities =
+    weather.hourly
+      .precipitation_probability ||
+    [];
+
+  const weatherCodes =
+    weather.hourly.weather_code ||
+    [];
+
+  const rain =
+    weather.hourly.rain ||
+    [];
+
+  const showers =
+    weather.hourly.showers ||
+    [];
+
+  const windSpeeds =
+    weather.hourly.wind_speed_10m ||
+    [];
+
+  /*
+   * Open-Meteo's hourly time array is already
+   * returned in the requested local timezone.
+   *
+   * Find the current forecast hour.
+   */
+
+  const currentTime =
+    weather.current?.time;
+
+  let currentIndex =
+    times.findIndex(
+      (time) =>
+        time === currentTime
+    );
+
+  /*
+   * Small fallback if the current API time
+   * doesn't exactly match the hourly timestamp.
+   */
+
+  if (currentIndex === -1) {
+    const now =
+      new Date(
+        currentTime ||
+          Date.now()
+      ).getTime();
+
+    let closestIndex = 0;
+    let smallestDifference =
+      Infinity;
+
+    times.forEach(
+      (time, index) => {
+        const difference =
+          Math.abs(
+            new Date(time).getTime() -
+              now
+          );
+
+        if (
+          difference <
+          smallestDifference
+        ) {
+          smallestDifference =
+            difference;
+
+          closestIndex =
+            index;
+        }
+      }
+    );
+
+    currentIndex =
+      closestIndex;
+  }
+
+  return times
+    .slice(
+      currentIndex,
+      currentIndex + 6
+    )
+    .map(
+      ( time, offset ) => {
+        const index = currentIndex + offset;
+        const weatherCode = weatherCodes[index];
+
+        const description = getWeatherDescription( weatherCode, language);
+
+       return {
+  time,
+
+  temperature:
+    Math.round(
+      temperatures[index] ?? 0
+    ),
+
+  feelsLike:
+    Math.round(
+      apparentTemperatures[index] ??
+        temperatures[index] ??
+        0
+    ),
+
+  rainChance:
+    precipitationProbabilities[
+      index
+    ] ?? 0,
+
+  weatherCode,
+
+  icon:
+    description.icon,
+
+  label:
+    description.label,
+
+  weatherKey:
+    description.key,
+
+  rain:
+    rain[index] ?? 0,
+
+  showers:
+    showers[index] ?? 0,
+
+  windSpeed:
+    Math.round(
+      windSpeeds[index] ?? 0
+    ),
+
+  isNow:
+    offset === 0,
 };
+      }
+    );
+};
+
