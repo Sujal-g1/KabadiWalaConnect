@@ -1,74 +1,29 @@
-import prisma from "../../config/prisma.js";
+import {
+  getCurrentPrices,
+  getDynamicPriceHistory,
+} from "./price.engine.js";
 
 const getPrices = async ({
-  location,
+  location = "Meerut",
   material,
-}) => {
-  const where = {};
-
-  if (location) {
-    where.location = {
-      equals: location,
-      mode: "insensitive",
-    };
-  }
-
-  if (material) {
-    where.material = {
-      equals: material,
-      mode: "insensitive",
-    };
-  }
-
-  const prices =
-    await prisma.priceHistory.findMany({
-      where,
-
-      orderBy: {
-        recordedAt: "desc",
-      },
-    });
-
-  return prices;
+} = {}) => {
+  return getCurrentPrices({
+    location,
+    material,
+  });
 };
 
 const getPriceHistory = async ({
   material,
   subcategory,
-  location,
+  location = "Meerut",
   limit = 30,
-}) => {
-  const where = {};
-
-  if (material) {
-    where.material = {
-      equals: material,
-      mode: "insensitive",
-    };
-  }
-
-  if (subcategory) {
-    where.subcategory = {
-      equals: subcategory,
-      mode: "insensitive",
-    };
-  }
-
-  if (location) {
-    where.location = {
-      equals: location,
-      mode: "insensitive",
-    };
-  }
-
-  return prisma.priceHistory.findMany({
-    where,
-
-    orderBy: {
-      recordedAt: "desc",
-    },
-
-    take: Number(limit),
+} = {}) => {
+  return getDynamicPriceHistory({
+    material,
+    subcategory,
+    location,
+    limit,
   });
 };
 

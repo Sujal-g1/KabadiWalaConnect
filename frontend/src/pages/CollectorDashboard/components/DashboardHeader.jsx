@@ -9,13 +9,27 @@ import { useNavigate } from "react-router-dom";
 
 import useAuthStore from "../../../store/authStore";
 import useRegionStore from "../../../store/regionStore";
-
+import useWeatherAlerts from "../../../hooks/useWeatherAlerts";
+import WeatherNotice from "../../../components/weather/WeatherNotice.jsx";
 import EWasteAIButton from "../../../components/EWasteAIButton.jsx";
+import { useState } from "react";
 
 const DashboardHeader = () => {
   const navigate = useNavigate();
 
   const { user } = useAuthStore();
+
+   const [showNotifications, setShowNotifications] = useState(false);
+
+   const {
+  alerts: weatherAlerts,
+  weather,
+  summary: weatherSummary,
+  loading: weatherLoading,
+  checkWeather,
+  requestNotificationPermission,
+  notificationPermission,
+} = useWeatherAlerts();
 
   /* ==========================================================
      GLOBAL DETECTED LOCATION
@@ -105,10 +119,10 @@ const DashboardHeader = () => {
 
       <div className="min-w-0">
         {/* LOCATION */}
-
         <div
           className="
             mb-2.5
+            mr-2
             inline-flex
             max-w-full
             items-center
@@ -136,8 +150,50 @@ const DashboardHeader = () => {
           </span>
         </div>
 
-        {/* GREETING */}
+        {/* WEATHER SNAPSHOT */}
+        {weatherSummary && !weatherLoading && (
+          <button
+            type="button"
+            onClick={() => setShowNotifications(true)}
+            className="
+              mb-3
+              inline-flex
+              max-w-full
+              items-center
+              gap-2
+              rounded-full
+              border
+              border-[#35A873]/20
+              bg-[linear-gradient(135deg,#E3F2E9_0%,#B8DFC8_100%)]
+              px-3
+              py-1.5
+              text-[10px]
+              font-bold
+              text-[#123F2D]
+              shadow-[0_6px_18px_rgba(18,63,45,0.07)]
+              transition-all
+              duration-200
+              hover:-translate-y-0.5
+              active:scale-[0.98]
+            "
+          >
+            <span className="text-sm leading-none">
+              {weatherSummary.icon}
+            </span>
 
+            <span className="truncate">
+              {weatherSummary.temperature}°C · {weatherSummary.label}
+            </span>
+
+            {weatherSummary.rainChance >= 30 && (
+              <span className="shrink-0 rounded-full bg-white/55 px-1.5 py-0.5 text-[9px]">
+                {weatherSummary.rainChance}% rain
+              </span>
+            )}
+          </button>
+        )}
+
+        {/* GREETING */}
         <h1
           className="
             text-2xl
@@ -192,28 +248,9 @@ const DashboardHeader = () => {
           whileTap={{
             scale: 0.97,
           }}
-          className="
-            group/mitra
-            relative
-            flex
-            h-10
-            items-center
-            gap-2
-            overflow-hidden
-            rounded-xl
-            border
-            border-[var(--border)]
-            bg-[var(--surface)]
-            px-3
-            text-sm
-            font-semibold
-            text-[var(--foreground)]
-            shadow-[0_6px_18px_rgba(18,63,45,0.06)]
-            transition-all
-            duration-300
-            hover:border-[var(--foreground)]/20
-            hover:shadow-[0_10px_25px_rgba(18,63,45,0.10)]
-          "
+          className="flex h-10 items-center gap-2 rounded-xl border border-[var(--border)] 
+          bg-[var(--surface)] px-3 text-sm font-semibold text-[var(--foreground)] 
+          shadow-sm transition hover:border-[var(--primary)] hover:bg-[var(--accent)] transition-all  duration-300"
         >
           {/* SPARK */}
 
@@ -294,9 +331,6 @@ const DashboardHeader = () => {
           </div>
         </motion.button>
 
-        {/* ==================================================
-            E-WASTE AI
-        ================================================== */}
 
         <EWasteAIButton />
 
@@ -306,12 +340,9 @@ const DashboardHeader = () => {
 
         <motion.button
           type="button"
-          whileHover={{
-            y: -2,
-          }}
-          whileTap={{
-            scale: 0.96,
-          }}
+          onClick={() => setShowNotifications(!showNotifications)}
+          whileHover={{ y: -2 }}
+          whileTap={{ scale: 0.96 }}
           className="
             group/bell
             relative
@@ -337,93 +368,117 @@ const DashboardHeader = () => {
           <Bell
             size={18}
             strokeWidth={2}
-            className="
-              transition-transform
-              duration-300
-              group-hover/bell:-rotate-6
-            "
+            className="transition-transform duration-300 group-hover/bell:-rotate-6"
           />
 
-          {/* NOTIFICATION DOT */}
-
-          <span
-            className="
-              absolute
-              right-2
-              top-2
-              h-1.5
-              w-1.5
-              rounded-full
-              bg-[var(--danger)]
-              shadow-[0_0_8px_rgba(207,82,100,0.35)]
-            "
-          />
+          {weatherAlerts.length > 0 && (
+            <span
+              className={`absolute right-2 top-2 h-1.5 w-1.5 rounded-full ${
+                weatherAlerts[0]?.severity === "high"
+                  ? "bg-[#B34A45]"
+                  : weatherAlerts[0]?.severity === "medium"
+                    ? "bg-[#E6A43B]"
+                    : "bg-[#35A873]"
+              }`}
+            />
+          )}
         </motion.button>
+
+        {showNotifications && (
+          <div
+            className="fixed right-4 top-20 z-50 w-[min(23rem,calc(100vw-2rem))] max-h-[calc(100vh-6rem)] overflow-y-auto rounded-[28px] border border-[var(--border)] bg-[var(--surface)] p-4 shadow-[0_24px_60px_rgba(18,63,45,0.18)] sm:right-8"
+          >
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#18794E]">
+                  Weather
+                </p>
+                <h3 className="mt-1 text-base font-bold text-[var(--foreground)]">
+                  Notifications
+                </h3>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowNotifications(false)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--muted)] transition hover:bg-[var(--surface-soft)] hover:text-[var(--foreground)]"
+                aria-label="Close notifications"
+              >
+                ×
+              </button>
+            </div>
+
+            <WeatherNotice
+              summary={weatherSummary}
+              alerts={weatherAlerts}
+              loading={weatherLoading}
+              notificationPermission={notificationPermission}
+              onEnableNotifications={requestNotificationPermission}
+              onRefresh={checkWeather}
+            />
+          </div>
+        )}
 
         {/* ==================================================
             PROFILE
         ================================================== */}
 
-        <motion.button
-          type="button"
-          onClick={() =>
-            navigate("/collector/settings")
-          }
-          whileHover={{
-            y: -2,
-          }}
-          whileTap={{
-            scale: 0.96,
-          }}
-          className="
-            group/profile
-            relative
-            flex
-            h-10
-            w-10
-            items-center
-            justify-center
-            overflow-hidden
-            rounded-xl
-            border
-            border-[var(--border)]
-            bg-[var(--surface)]
-            text-xs
-            font-black
-            text-[var(--foreground)]
-            shadow-[0_6px_18px_rgba(18,63,45,0.06)]
-            transition-all
-            duration-300
-            hover:border-[var(--foreground)]/15
-            hover:shadow-[0_10px_24px_rgba(18,63,45,0.10)]
-          "
-        >
-          {/* PROFILE SPARK */}
+      <motion.button
+  type="button"
+  onClick={() =>
+    navigate("/collector/settings")
+  }
+  whileHover={{
+    y: -2,
+  }}
+  whileTap={{
+    scale: 0.96,
+  }}
+  className="
+    group/profile
+    relative
+    flex
+    h-10
+    w-10
+    items-center
+    justify-center
+    overflow-hidden
+    rounded-xl
 
-          <span
-            className="
-              pointer-events-none
-              absolute
-              inset-0
-              rounded-xl
-              ring-1
-              ring-inset
-              ring-white/50
-            "
-          />
+    bg-gradient-to-br
+    from-indigo-500
+    to-violet-500
 
-          <span
-            className="
-              relative
-              z-10
-              transition-transform
-              duration-300
-              group-hover/profile:scale-105
-            "
-          >
-            {initials}
-          </span>
-        </motion.button>
+    text-xs
+    font-black
+    text-white
+
+    shadow-md
+    shadow-indigo-500/20
+
+    transition-all
+    duration-300
+
+    hover:shadow-lg
+    hover:shadow-indigo-500/30
+  "
+>
+
+  <span
+    className="
+      relative
+      z-10
+      transition-transform
+      duration-300
+      group-hover/profile:scale-105
+    "
+  >
+    {initials}
+  </span>
+    </motion.button>
+      
+      
+
       </div>
 
       {/* ======================================================

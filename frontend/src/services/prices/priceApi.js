@@ -20,11 +20,9 @@ const getPrices = async ({
   location,
   material,
 } = {}) => {
-  const token =
-    await getAuthToken();
+  const token = await getAuthToken();
 
-  const params =
-    new URLSearchParams();
+  const params = new URLSearchParams();
 
   if (location) {
     params.set(
@@ -40,23 +38,19 @@ const getPrices = async ({
     );
   }
 
-  const query =
-    params.toString();
+  const query = params.toString();
 
-  const response =
-    await fetch(
-      `${API_URL}/api/prices${
-        query
-          ? `?${query}`
-          : ""
-      }`,
-      {
-        headers: {
-          Authorization:
-            `Bearer ${token}`,
-        },
-      }
-    );
+  const response = await fetch(
+    `${API_URL}/api/prices${
+      query ? `?${query}` : ""
+    }`,
+    {
+      headers: {
+        Authorization:
+          `Bearer ${token}`,
+      },
+    }
+  );
 
   const data =
     await response.json();

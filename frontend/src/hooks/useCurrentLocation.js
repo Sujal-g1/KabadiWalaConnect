@@ -25,10 +25,10 @@ const useCurrentLocation = () => {
       async (position) => {
         const { latitude, longitude } = position.coords;
 
-        console.log("Location found:", {
-          latitude,
-          longitude,
-        });
+        // console.log("Location found:", {
+        //   latitude,
+        //   longitude,
+        // });
 
         try {
           const response = await fetch(

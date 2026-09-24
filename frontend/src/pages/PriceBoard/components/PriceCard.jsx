@@ -1,442 +1,166 @@
 import {
   ArrowDownRight,
   ArrowUpRight,
-  ArrowRight,
   Clock3,
   Volume2,
-  Check,
 } from "lucide-react";
-
-import { motion } from "framer-motion";
-
-import useTranslation from "../../../i18n/useTranslation";
-
-const trendIcons = {
-  rising: ArrowUpRight,
-  falling: ArrowDownRight,
-  stable: ArrowRight,
-};
-
-const materialIcons = {
-  CRT: "🖥️",
-  LCD: "📺",
-  PCB: "🔌",
-  Cables: "🔗",
-  Battery: "🔋",
-  Motor: "⚙️",
-  "Mixed Plastic": "♻️",
-  Copper: "🟠",
-  Aluminium: "⚪",
-  Iron: "🔩",
-};
-
-const trendStyles = {
-  rising: {
-    icon: "text-[var(--primary)]",
-    bg: "bg-[var(--accent)]",
-    label: "Rising",
-  },
-
-  falling: {
-    icon: "text-[var(--danger)]",
-    bg: "bg-[var(--danger)]/10",
-    label: "Falling",
-  },
-
-  stable: {
-    icon: "text-[var(--muted)]",
-    bg: "bg-[var(--surface-soft)]",
-    label: "Stable",
-  },
-};
 
 const PriceCard = ({
   price,
   selected = false,
   onSpeak,
 }) => {
-  const { t } = useTranslation();
+  const trend = price?.trend || "stable";
+  const isToday = price?.isToday ?? true;
 
-  const TrendIcon =
-    trendIcons[price.trend] ||
-    ArrowRight;
+  const trendPositive =
+    trend === "rising";
 
-  const icon =
-    materialIcons[price.material] ||
-    "♻️";
-
-  const trend =
-    trendStyles[price.trend] ||
-    trendStyles.stable;
-
-  const recordedDate =
-    price.recordedAt
-      ? new Date(
-          price.recordedAt
-        ).toLocaleDateString(
-          "en-IN",
-          {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          }
-        )
-      : "—";
+  const trendNegative =
+    trend === "falling";
 
   return (
-    <motion.article
-      animate={{
-        y: selected ? -2 : 0,
-      }}
-      transition={{
-        type: "spring",
-        stiffness: 350,
-        damping: 25,
-      }}
+    <article
       className={`
+        group
         relative
         overflow-hidden
         rounded-[24px]
         border
         p-4
         transition-all
-        duration-200
-
+        duration-300
         ${
           selected
-            ? `
-              border-[var(--primary)]/45
-              bg-[var(--surface)]
-              shadow-[0_12px_30px_rgba(18,63,45,0.09)]
-            `
-            : `
-              border-[var(--border)]
-              bg-[var(--surface)]
-              shadow-sm
-              hover:-translate-y-0.5
-              hover:shadow-md
-            `
+            ? "border-[#35A873]/45 bg-[linear-gradient(135deg,#F3FBF6_0%,#E3F2E9_100%)] shadow-[0_16px_38px_rgba(18,63,45,0.13)]"
+            : "border-[var(--border)] bg-[linear-gradient(135deg,var(--surface)_0%,var(--surface)_80%,var(--accent)_150%)] shadow-[0_10px_28px_rgba(18,63,45,0.06)] hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(18,63,45,0.10)]"
         }
       `}
     >
-      {/* =====================================================
-          SELECTED EDGE
-      ===================================================== */}
-
       {selected && (
-        <div
-          className="
-            absolute
-            inset-y-4
-            left-0
-            w-1
-            rounded-r-full
-            bg-[var(--primary)]
-          "
-        />
+        <div className="absolute left-0 top-0 h-full w-1 bg-[linear-gradient(180deg,#123F2D,#35A873,#278F8B)]" />
       )}
 
-      {/* =====================================================
-          TOP
-      ===================================================== */}
-
-      <div className="flex items-start gap-3">
-        {/* MATERIAL ICON */}
-
-        <div
-          className="
-            flex
-            h-11
-            w-11
-            shrink-0
-            items-center
-            justify-center
-            rounded-2xl
-            bg-[var(--surface-soft)]
-            text-xl
-          "
-        >
-          {icon}
-        </div>
-
-        {/* TITLE */}
-
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <p
-              className="
-                truncate
-                text-sm
-                font-bold
-                text-[var(--foreground)]
-              "
-            >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="truncate text-sm font-extrabold text-[var(--foreground)]">
               {price.material}
-            </p>
+            </h3>
 
-            {selected && (
-              <span
-                className="
-                  flex
-                  h-5
-                  w-5
-                  shrink-0
-                  items-center
-                  justify-center
-                  rounded-full
-                  bg-[var(--primary)]
-                  text-white
-                "
-              >
-                <Check
-                  size={11}
-                  strokeWidth={3}
-                />
+            {isToday && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#123F2D] px-2 py-1 text-[8px] font-bold uppercase tracking-[0.08em] text-[#DDF7E8]">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#65D39A]" />
+                Today
               </span>
             )}
           </div>
 
-          {price.subcategory && (
-            <p
-              className="
-                mt-0.5
-                truncate
-                text-[11px]
-                text-[var(--muted)]
-              "
-            >
-              {price.subcategory}
-            </p>
-          )}
+          <p className="mt-1 truncate text-[11px] text-[var(--muted)]">
+            {price.subcategory}
+          </p>
         </div>
 
-        {/* TREND */}
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onSpeak?.(price);
+          }}
+          className="
+            flex h-9 w-9 shrink-0 items-center justify-center
+            rounded-xl
+            border border-[var(--border)]
+            bg-[var(--surface)]
+            text-[var(--muted)]
+            shadow-[0_5px_14px_rgba(18,63,45,0.05)]
+            transition
+            hover:text-[#18794E]
+            active:scale-95
+          "
+          aria-label={`Speak ${price.subcategory} price`}
+        >
+          <Volume2 size={15} />
+        </button>
+      </div>
+
+      <div className="mt-6 flex items-end justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
+            Current rate
+          </p>
+
+          <div className="mt-1 flex items-end gap-1.5">
+            <span className="text-2xl font-black tracking-tight text-[var(--foreground)]">
+              ₹{Math.round(price.price)}
+            </span>
+
+            <span className="pb-1 text-[10px] font-semibold text-[var(--muted)]">
+              /kg
+            </span>
+          </div>
+        </div>
 
         <div
           className={`
-            flex
-            shrink-0
-            items-center
-            gap-1
-            rounded-full
-            px-2
-            py-1.5
-            text-[9px]
-            font-bold
-            ${trend.bg}
-            ${trend.icon}
+            flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-bold
+            ${
+              trendPositive
+                ? "bg-[#E3F2E9] text-[#18794E]"
+                : trendNegative
+                  ? "bg-[#FBEAE8] text-[#B34A45]"
+                  : "bg-[var(--surface-soft)] text-[var(--muted)]"
+            }
           `}
         >
-          <TrendIcon
-            size={12}
-            strokeWidth={2.4}
-          />
+          {trendPositive ? (
+            <ArrowUpRight size={13} />
+          ) : trendNegative ? (
+            <ArrowDownRight size={13} />
+          ) : null}
 
-          <span className="hidden sm:inline">
-            {trend.label}
-          </span>
+          {Math.abs(
+            Number(price.changePercent || 0)
+          ).toFixed(1)}
+          %
         </div>
       </div>
 
-      {/* =====================================================
-          PRICE
-      ===================================================== */}
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5">
+          <p className="text-[9px] uppercase tracking-[0.1em] text-[var(--muted)]">
+            Range
+          </p>
 
-      <div className="mt-5">
-        <div className="flex items-end gap-2">
-          <span
-            className="
-              text-[2rem]
-              font-extrabold
-              tracking-tight
-              text-[var(--foreground)]
-            "
-          >
-            ₹
-            {Math.round(
-              Number(price.price || 0)
-            ).toLocaleString("en-IN")}
-          </span>
-
-          <span
-            className="
-              mb-1
-              text-xs
-              font-medium
-              text-[var(--muted)]
-            "
-          >
-            / {price.unit || "kg"}
-          </span>
+          <p className="mt-1 text-xs font-bold text-[var(--foreground)]">
+            ₹{Math.round(price.minPrice)}–
+            {Math.round(price.maxPrice)}
+          </p>
         </div>
 
-        <p
-          className="
-            mt-0.5
-            text-[10px]
-            uppercase
-            tracking-wider
-            text-[var(--muted)]
-          "
-        >
-          {t(
-            "priceBoard.prevailingPrice"
-          )}
-        </p>
-      </div>
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2.5">
+          <p className="text-[9px] uppercase tracking-[0.1em] text-[var(--muted)]">
+            Updated
+          </p>
 
-      {/* =====================================================
-          RANGE
-      ===================================================== */}
+          <p className="mt-1 flex items-center gap-1 text-xs font-bold text-[#18794E]">
+            <Clock3 size={11} />
 
-      {price.minPrice != null &&
-        price.maxPrice != null && (
-          <div
-            className="
-              mt-4
-              rounded-2xl
-              border
-              border-[var(--border)]
-              bg-[var(--background)]
-              px-3
-              py-2.5
-            "
-          >
-            <div className="flex items-center justify-between">
-              <p
-                className="
-                  text-[10px]
-                  font-semibold
-                  uppercase
-                  tracking-wider
-                  text-[var(--muted)]
-                "
-              >
-                {t(
-                  "priceBoard.marketRange"
+            {isToday
+              ? "Today"
+              : new Date(
+                  price.recordedAt
+                ).toLocaleDateString(
+                  "en-IN",
+                  {
+                    day: "2-digit",
+                    month: "short",
+                  }
                 )}
-              </p>
-
-              <span
-                className="
-                  text-[10px]
-                  font-semibold
-                  text-[var(--primary)]
-                "
-              >
-                / {price.unit || "kg"}
-              </span>
-            </div>
-
-            <p
-              className="
-                mt-1
-                text-sm
-                font-bold
-                text-[var(--foreground)]
-              "
-            >
-              ₹
-              {Math.round(
-                Number(
-                  price.minPrice
-                )
-              ).toLocaleString(
-                "en-IN"
-              )}
-              {" – "}
-              ₹
-              {Math.round(
-                Number(
-                  price.maxPrice
-                )
-              ).toLocaleString(
-                "en-IN"
-              )}
-            </p>
-          </div>
-        )}
-
-      {/* =====================================================
-          FOOTER
-      ===================================================== */}
-
-      <div
-        className="
-          mt-4
-          flex
-          items-center
-          justify-between
-          gap-3
-        "
-      >
-        <div
-          className="
-            flex
-            min-w-0
-            items-center
-            gap-1.5
-            text-[10px]
-            text-[var(--muted)]
-          "
-        >
-          <Clock3
-            size={12}
-            className="shrink-0"
-          />
-
-          <span className="truncate">
-            {recordedDate}
-          </span>
+          </p>
         </div>
-
-        {/* SPEAK CONTROL */}
-
-        {onSpeak && (
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-              onSpeak(price);
-            }}
-            onKeyDown={(event) => {
-              if (
-                event.key ===
-                  "Enter" ||
-                event.key === " "
-              ) {
-                event.preventDefault();
-                event.stopPropagation();
-                onSpeak(price);
-              }
-            }}
-            aria-label={`Hear price for ${price.material}`}
-            className="
-              flex
-              h-9
-              w-9
-              shrink-0
-              cursor-pointer
-              items-center
-              justify-center
-              rounded-xl
-              border
-              border-[var(--border)]
-              bg-[var(--background)]
-              text-[var(--muted)]
-              transition
-              hover:border-[var(--primary)]/40
-              hover:text-[var(--primary)]
-              active:scale-95
-            "
-          >
-            <Volume2 size={15} />
-          </div>
-        )}
       </div>
-    </motion.article>
+    </article>
   );
 };
 

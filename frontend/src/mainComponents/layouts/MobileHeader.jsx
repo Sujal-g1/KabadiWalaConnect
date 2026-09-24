@@ -1,13 +1,16 @@
 import {
   Bell,
   Menu,
-  MapPin,
-  ChevronRight,
 } from "lucide-react";
 
 import {
   motion,
+  AnimatePresence,
 } from "framer-motion";
+
+import {
+  useState,
+} from "react";
 
 import {
   useNavigate,
@@ -18,17 +21,54 @@ import logo from "../../assets/images/logo.webp";
 import useAuthStore from "../../store/authStore";
 import useRegionStore from "../../store/regionStore";
 import useTranslation from "../../i18n/useTranslation";
+import useWeatherAlerts from "../../hooks/useWeatherAlerts";
+
+import WeatherNoticeMobile from "../../../src/components/Weather/WeatherNoticeMobile";
 
 const MobileHeader = ({
   onMenuClick,
 }) => {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
-  const { user } =
-    useAuthStore();
+  const {
+    user,
+  } = useAuthStore();
 
-  const { t } =
-    useTranslation();
+  const {
+    t,
+  } = useTranslation();
+
+  /* ==========================================================
+     WEATHER
+  ========================================================== */
+
+  const {
+    alerts,
+    summary,
+
+    loading,
+    notificationPermission,
+
+    checkWeather,
+    requestNotificationPermission,
+
+    soundEnabled,
+    enableAlertSound,
+  } = useWeatherAlerts();
+
+  /* ==========================================================
+     UI
+  ========================================================== */
+
+  const [
+    showWeather,
+    setShowWeather,
+  ] = useState(false);
+
+  /* ==========================================================
+     LOCATION
+  ========================================================== */
 
   const city =
     useRegionStore(
@@ -45,17 +85,8 @@ const MobileHeader = ({
       (state) => state.status
     );
 
-  const firstName =
-    user?.firstName ||
-    "Collector";
-
-  const initials =
-    `${user?.firstName?.charAt(0) || ""}${user?.lastName?.charAt(0) || ""}`
-      .trim()
-      .toUpperCase() || "U";
-
   /* ==========================================================
-     LOCATION
+     LOCATION LABEL
   ========================================================== */
 
   const locationLabel =
@@ -73,8 +104,11 @@ const MobileHeader = ({
   return (
     <header
       className="
-        sticky top-0 z-40
-        px-3 pt-3
+        sticky
+        top-0
+        z-40
+        px-3
+        pt-3
         lg:hidden
       "
     >
@@ -92,7 +126,7 @@ const MobileHeader = ({
         }}
         className="
           relative
-          overflow-hidden
+          overflow-visible
           rounded-2xl
           border
           border-[var(--border)]
@@ -105,7 +139,7 @@ const MobileHeader = ({
         "
       >
         {/* ====================================================
-            SUBTLE TOP LIGHT
+            TOP LIGHT
         ==================================================== */}
 
         <div
@@ -117,27 +151,35 @@ const MobileHeader = ({
             h-px
             bg-gradient-to-r
             from-transparent
-            via-indigo-400/60
+            via-[var(--primary)]/40
             to-transparent
           "
         />
 
-        <div className="
-          flex
-          items-center
-          justify-between
-          gap-3
-        ">
+        {/* ====================================================
+            HEADER ROW
+        ==================================================== */}
+
+        <div
+          className="
+            flex
+            items-center
+            justify-between
+            gap-3
+          "
+        >
           {/* ==================================================
               LEFT
           ================================================== */}
 
-          <div className="
-            flex
-            min-w-0
-            items-center
-            gap-2.5
-          ">
+          <div
+            className="
+              flex
+              min-w-0
+              items-center
+              gap-2.5
+            "
+          >
             {/* MENU */}
 
             <motion.button
@@ -145,7 +187,9 @@ const MobileHeader = ({
               whileTap={{
                 scale: 0.9,
               }}
-              onClick={onMenuClick}
+              onClick={
+                onMenuClick
+              }
               aria-label="Open menu"
               className="
                 flex
@@ -174,7 +218,9 @@ const MobileHeader = ({
             <button
               type="button"
               onClick={() =>
-                navigate("/collector")
+                navigate(
+                  "/collector"
+                )
               }
               className="
                 flex
@@ -184,6 +230,8 @@ const MobileHeader = ({
                 text-left
               "
             >
+              {/* LOGO */}
+
               <motion.div
                 whileTap={{
                   scale: 0.95,
@@ -215,63 +263,54 @@ const MobileHeader = ({
                 />
               </motion.div>
 
-              <div className="
-                min-w-0
-              ">
-                <p className="
-                  truncate
-                  text-[14px]
-                  font-black
-                  tracking-tight
-                  text-[var(--foreground)]
-                ">
+              {/* TEXT */}
+
+              <div
+                className="
+                  min-w-0
+                "
+              >
+                <p
+                  className="
+                    truncate
+                    text-[14px]
+                    font-black
+                    tracking-tight
+                    text-[var(--foreground)]
+                  "
+                >
                   Kabadiwala Connect
                 </p>
 
-              { /*  <div className="
-                  mt-0.5
-                  flex
-                  max-w-[180px]
-                  items-center
-                  gap-1
-                  text-[9px]
-                  font-semibold
-                  text-[var(--muted)]
-                ">
-                  <MapPin
-                    size={10}
-                    className="
-                      shrink-0
-                      text-indigo-400
-                    "
-                  />
-
-                  <span className="truncate">
-                    {locationLabel}
-                  </span>
-                </div>
-                */} 
+                {/*   */}
               </div>
             </button>
           </div>
 
           {/* ==================================================
-              RIGHT 
+              RIGHT
           ================================================== */}
 
-          <div className="
-            flex
-            shrink-0
-            items-center
-            gap-1.5
-          ">
-            {/* NOTIFICATION */}
-
+          <div
+            className="
+              shrink-0
+            "
+          >
             <motion.button
               type="button"
               whileTap={{
                 scale: 0.9,
               }}
+              onClick={() =>
+                setShowWeather(
+                  (current) =>
+                    !current
+                )
+              }
+              aria-label="Weather notifications"
+              aria-expanded={
+                showWeather
+              }
               className="
                 relative
                 flex
@@ -291,54 +330,137 @@ const MobileHeader = ({
                 strokeWidth={2}
               />
 
-              <span
-                className="
-                  absolute
-                  right-2
-                  top-2
-                  h-1.5
-                  w-1.5
-                  rounded-full
-                  bg-rose-500
-                  ring-2
-                  ring-[var(--surface)]
-                "
-              />
-            </motion.button>
+              {/* ALERT DOT */}
 
-            {/* PROFILE */}
-
-            <motion.button
-              type="button"
-              whileTap={{
-                scale: 0.9,
-              }}
-              onClick={() =>
-                navigate(
-                  "/collector/settings"
-                )
-              }
-              className="
-                flex
-                h-10
-                w-10
-                items-center
-                justify-center
-                rounded-xl
-                bg-gradient-to-br
-                from-indigo-500
-                to-violet-500
-                text-xs
-                font-black
-                text-white
-                shadow-md
-                shadow-indigo-500/20
-              "
-            >
-              {initials}
+              {alerts.length >
+                0 && (
+                <span
+                  className="
+                    absolute
+                    right-2
+                    top-2
+                    h-1.5
+                    w-1.5
+                    rounded-full
+                    bg-[#E6A43B]
+                    ring-2
+                    ring-[var(--surface)]
+                  "
+                />
+              )}
             </motion.button>
           </div>
         </div>
+
+        {/* ====================================================
+            WEATHER POPOVER
+        ==================================================== */}
+
+        <AnimatePresence>
+          {showWeather && (
+            <>
+              {/* BACKDROP */}
+
+              <motion.button
+                type="button"
+                aria-label="Close weather"
+                initial={{
+                  opacity: 0,
+                }}
+                animate={{
+                  opacity: 1,
+                }}
+                exit={{
+                  opacity: 0,
+                }}
+                onClick={() =>
+                  setShowWeather(
+                    false
+                  )
+                }
+                className="
+                  fixed
+                  inset-0
+                  z-40
+                  bg-black/[0.025]
+                  lg:hidden
+                "
+              />
+
+              {/* PANEL */}
+
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  y: -6,
+                  scale: 0.985,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                }}
+                exit={{
+                  opacity: 0,
+                  y: -6,
+                  scale: 0.985,
+                }}
+                transition={{
+                  duration: 0.2,
+                  ease: [
+                    0.22,
+                    1,
+                    0.36,
+                    1,
+                  ],
+                }}
+                className="
+                  absolute
+                  left-0
+                  right-0
+                  top-[calc(100%+8px)]
+                  z-50
+                  max-h-[calc(100vh-90px)]
+                  overflow-y-auto
+                  rounded-[24px]
+                  border
+                  border-[var(--border)]
+                  bg-[var(--surface)]
+                  p-3
+                  shadow-2xl
+                  shadow-[rgba(18,63,45,0.10)]
+                "
+              >
+                <WeatherNoticeMobile
+                  summary={
+                    summary
+                  }
+                  alerts={
+                    alerts
+                  }
+                  loading={
+                    loading
+                  }
+                  notificationPermission={
+                    notificationPermission
+                  }
+                  onEnableNotifications={
+                    requestNotificationPermission
+                  }
+                  onRefresh={
+                    checkWeather
+                  }
+                  soundEnabled={
+                    soundEnabled
+                  }
+                  onEnableSound={
+                    enableAlertSound
+                  }
+                />
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </motion.div>
     </header>
   );

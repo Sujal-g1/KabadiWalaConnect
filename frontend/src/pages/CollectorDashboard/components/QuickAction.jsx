@@ -35,10 +35,7 @@ const QuickAction = () => {
         hover:shadow-[0_28px_75px_rgba(3,20,12,0.52)]
       "
     >
-      {/* ======================================================
-          MAIN DARK GRADIENT
-      ====================================================== */}
-
+          {/* MAIN DARK GRADIENT */}
       <div
         className="
           absolute
@@ -47,10 +44,7 @@ const QuickAction = () => {
         "
       />
 
-      {/* ======================================================
-          SECONDARY DEPTH LAYER
-      ====================================================== */}
-
+          {/* SECONDARY DEPTH LAYER */}
       <div
         className="
           pointer-events-none
@@ -60,12 +54,9 @@ const QuickAction = () => {
         "
       />
 
-      {/* ======================================================
-          TOP LEFT GREEN LIGHT
-      ====================================================== */}
 
-      <motion.div
-        variants={{
+          {/* TOP LEFT GREEN LIGHT */}
+      <motion.div variants={{
           initial: {
             x: -15,
             y: -15,
@@ -97,12 +88,8 @@ const QuickAction = () => {
         "
       />
 
-      {/* ======================================================
-          BOTTOM RIGHT TEAL LIGHT
-      ====================================================== */}
-
-      <motion.div
-        variants={{
+          {/* BOTTOM RIGHT TEAL LIGHT */}
+      <motion.div variants={{
           initial: {
             x: 15,
             y: 15,
@@ -134,12 +121,8 @@ const QuickAction = () => {
         "
       />
 
-      {/* ======================================================
-          DIAGONAL LIGHT STREAK
-      ====================================================== */}
-
-      <motion.div
-        variants={{
+     {/* DIAGONAL LIGHT STREAK */}
+      <motion.div variants={{
           initial: {
             x: "-140%",
             opacity: 0,
@@ -168,12 +151,9 @@ const QuickAction = () => {
         "
       />
 
-      {/* ======================================================
-          VERY SUBTLE DIAGONAL LINE
-      ====================================================== */}
 
-      <div
-        className="
+    {/* VERY SUBTLE DIAGONAL LINE */}
+      <div className="
           pointer-events-none
           absolute
           -left-[15%]
@@ -188,12 +168,8 @@ const QuickAction = () => {
         "
       />
 
-      {/* ======================================================
-          TOP HIGHLIGHT
-      ====================================================== */}
-
-      <div
-        className="
+      {/* TOP HIGHLIGHT */}
+      <div className="
           pointer-events-none
           absolute
           left-7
@@ -207,10 +183,7 @@ const QuickAction = () => {
         "
       />
 
-      {/* ======================================================
-          CONTENT
-      ====================================================== */}
-
+          {/* CONTENT */}
       <div
         className="
           relative
@@ -417,10 +390,7 @@ const QuickAction = () => {
         
       </div>
 
-      {/* ======================================================
-          GIANT DECORATIVE PLUS
-      ====================================================== */}
-
+          {/* GIANT DECORATIVE PLUS */}
       <motion.div
         variants={{
           initial: {

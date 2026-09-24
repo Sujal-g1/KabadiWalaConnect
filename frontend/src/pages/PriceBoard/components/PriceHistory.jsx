@@ -1,8 +1,12 @@
 import {
-  useId,
-  useMemo,
-  useState,
-} from "react";
+  Activity,
+  ArrowDownRight,
+  ArrowUpRight,
+  CalendarDays,
+  Clock3,
+  Minus,
+  TrendingUp,
+} from "lucide-react";
 
 import {
   Area,
@@ -15,739 +19,508 @@ import {
 } from "recharts";
 
 import {
-  ArrowDownRight,
-  ArrowUpRight,
-  Minus,
-  TrendingUp,
-  Activity,
-} from "lucide-react";
+  useMemo,
+  useState,
+} from "react";
 
-import { motion } from "framer-motion";
-
-import useTranslation from "../../../i18n/useTranslation";
+const RANGE_OPTIONS = [
+  { label: "7D", value: 7 },
+  { label: "30D", value: 30 },
+  { label: "90D", value: 90 },
+];
 
 const PriceHistory = ({
   history = [],
   material,
   subcategory,
 }) => {
-  const { t } =
-    useTranslation();
-
   const [range, setRange] =
     useState(30);
 
-  const gradientId =
-    `priceGradient-${useId()}`;
+  const prepared = useMemo(() => {
+    const sorted = [...history].sort(
+      (a, b) =>
+        new Date(a.recordedAt) -
+        new Date(b.recordedAt)
+    );
 
-  /* ==========================================================
-     FILTER HISTORY
-  ========================================================== */
+    const visible = sorted.slice(
+      -range
+    );
 
-  const filteredHistory =
-    useMemo(() => {
-      if (!history.length) {
-        return [];
-      }
-
-      const sorted =
-        [...history].sort(
-          (a, b) =>
-            new Date(
-              a.recordedAt
-            ) -
-            new Date(
-              b.recordedAt
-            )
+    return visible.map(
+      (item, index) => {
+        const date = new Date(
+          item.recordedAt
         );
 
-      return sorted.slice(
-        -range
-      );
-    }, [
-      history,
-      range,
-    ]);
+        return {
+          ...item,
 
-  /* ==========================================================
-     CHART DATA
-  ========================================================== */
+          index,
 
-  const chartData =
-    useMemo(() => {
-      return filteredHistory.map(
-        (item) => ({
-          date: new Date(
-            item.recordedAt
-          ).toLocaleDateString(
-            "en-IN",
-            {
-              day: "2-digit",
-              month: "short",
-            }
-          ),
+          displayDate:
+            date.toLocaleDateString(
+              "en-IN",
+              {
+                day: "2-digit",
+                month: "short",
+              }
+            ),
 
-          fullDate: new Date(
-            item.recordedAt
-          ).toLocaleDateString(
-            "en-IN",
-            {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            }
-          ),
-
-          price: Number(
-            item.price
-          ),
-        })
-      );
-    }, [
-      filteredHistory,
-    ]);
-
-  /* ==========================================================
-     STATISTICS
-  ========================================================== */
-
-  const statistics =
-    useMemo(() => {
-      if (
-        !filteredHistory.length
-      ) {
-        return null;
+          displayFullDate:
+            date.toLocaleDateString(
+              "en-IN",
+              {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              }
+            ),
+        };
       }
+    );
+  }, [history, range]);
 
-      const values =
-        filteredHistory.map(
-          (item) =>
-            Number(item.price)
-        );
+  const today = useMemo(
+    () =>
+      prepared.find(
+        (item) => item.isToday
+      ) ||
+      prepared.at(-1),
+    [prepared]
+  );
 
-      const current =
-        values[
-          values.length - 1
-        ];
+  const previous = useMemo(() => {
+    if (!today) return null;
 
-      const previous =
-        values.length > 1
-          ? values[
-              values.length - 2
-            ]
-          : current;
+    const index =
+      prepared.findIndex(
+        (item) =>
+          item.id === today.id
+      );
 
-      const highest =
-        Math.max(...values);
+    return index > 0
+      ? prepared[index - 1]
+      : null;
+  }, [prepared, today]);
 
-      const lowest =
-        Math.min(...values);
+  const currentPrice =
+    today?.price ?? 0;
 
-      const average =
-        values.reduce(
-          (sum, value) =>
-            sum + value,
+  const previousPrice =
+    previous?.price ??
+    today?.previousClose ??
+    currentPrice;
+
+  const change =
+    previousPrice > 0
+      ? ((currentPrice -
+          previousPrice) /
+          previousPrice) *
+        100
+      : today?.changePercent || 0;
+
+  const direction =
+    change > 0.05
+      ? "up"
+      : change < -0.05
+        ? "down"
+        : "flat";
+
+  const highest =
+    prepared.length
+      ? Math.max(
+          ...prepared.map(
+            (item) =>
+              Number(item.price) || 0
+          )
+        )
+      : currentPrice;
+
+  const lowest =
+    prepared.length
+      ? Math.min(
+          ...prepared.map(
+            (item) =>
+              Number(item.price) || 0
+          )
+        )
+      : currentPrice;
+
+  const average =
+    prepared.length
+      ? prepared.reduce(
+          (sum, item) =>
+            sum +
+            Number(item.price || 0),
           0
-        ) / values.length;
+        ) / prepared.length
+      : currentPrice;
 
-      const change =
-        previous !== 0
-          ? ((current -
-              previous) /
-              previous) *
-            100
-          : 0;
-
-      const periodChange =
-        values[0] !== 0
-          ? ((current -
-              values[0]) /
-              values[0]) *
-            100
-          : 0;
-
-      return {
-        current,
-        previous,
-        highest,
-        lowest,
-        average,
-        change,
-        periodChange,
-      };
-    }, [
-      filteredHistory,
-    ]);
-
-  /* ==========================================================
-     EMPTY
-  ========================================================== */
-
-  if (!history.length) {
+  if (!prepared.length) {
     return (
-      <section
+      <div
         className="
-          rounded-[24px]
-          border
-          border-[var(--border)]
+          rounded-[28px]
+          border border-[var(--border)]
           bg-[var(--surface)]
-          p-5
-          shadow-sm
+          p-6
+          shadow-[0_12px_35px_rgba(18,63,45,0.07)]
         "
       >
         <div className="flex items-center gap-3">
-          <div
-            className="
-              flex
-              h-10
-              w-10
-              shrink-0
-              items-center
-              justify-center
-              rounded-xl
-              bg-[var(--accent)]
-              text-[var(--primary)]
-            "
-          >
-            <TrendingUp size={18} />
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--accent)] text-[var(--primary)]">
+            <Activity size={19} />
           </div>
 
           <div>
-            <h2 className="font-bold">
-              {t(
-                "priceBoard.priceHistory"
-              )}
-            </h2>
+            <p className="text-sm font-bold">
+              No history available
+            </p>
 
-            <p
-              className="
-                mt-1
-                text-xs
-                text-[var(--muted)]
-              "
-            >
-              No historical data available.
+            <p className="mt-1 text-xs text-[var(--muted)]">
+              Price history will appear here once a
+              material is selected.
             </p>
           </div>
         </div>
-      </section>
+      </div>
     );
   }
-
-  /* ==========================================================
-     MAIN
-  ========================================================== */
 
   return (
     <section
       className="
         overflow-hidden
-        rounded-[26px]
-        border
-        border-[var(--border)]
-        bg-[var(--surface)]
-        shadow-sm
+        rounded-[28px]
+        border border-[var(--border)]
+        bg-[linear-gradient(135deg,var(--surface)_0%,var(--surface)_72%,var(--accent)_155%)]
+        shadow-[0_14px_40px_rgba(18,63,45,0.08)]
       "
     >
-      {/* ====================================================
-          HEADER
-      ==================================================== */}
+      {/* Header */}
+      <div className="border-b border-[var(--border)] px-5 py-5 sm:px-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span
+                className="
+                  inline-flex items-center gap-1.5 rounded-full
+                  border border-[#35A873]/25
+                  bg-[linear-gradient(135deg,#DDF4E7,#8DCEAA)]
+                  px-2.5 py-1
+                  text-[9px] font-bold uppercase tracking-[0.12em]
+                  text-[#123F2D]
+                  shadow-[0_5px_14px_rgba(18,63,45,0.12)]
+                "
+              >
+                <TrendingUp size={11} />
+                Market trend
+              </span>
 
-      <div
-        className="
-          p-4
-          sm:p-5
-        "
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-3">
-            <div
-              className="
-                flex
-                h-10
-                w-10
-                shrink-0
-                items-center
-                justify-center
-                rounded-xl
-                bg-[var(--accent)]
-                text-[var(--primary)]
-              "
-            >
-              <Activity size={17} />
-            </div>
-
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h2
+              {today?.isToday && (
+                <span
                   className="
-                    truncate
-                    text-sm
-                    font-bold
-                    text-[var(--foreground)]
+                    inline-flex items-center gap-1.5 rounded-full
+                    border border-[#35A873]/20
+                    bg-[#123F2D]
+                    px-2.5 py-1
+                    text-[9px] font-bold uppercase tracking-[0.12em]
+                    text-[#DDF7E8]
+                    shadow-[0_5px_14px_rgba(18,63,45,0.15)]
                   "
                 >
-                  {t(
-                    "priceBoard.priceHistory"
-                  )}
-                </h2>
-              </div>
-
-              <p
-                className="
-                  mt-0.5
-                  truncate
-                  text-[11px]
-                  text-[var(--muted)]
-                "
-              >
-                {material}
-                {subcategory
-                  ? ` · ${subcategory}`
-                  : ""}
-              </p>
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#65D39A]" />
+                  Live today
+                </span>
+              )}
             </div>
-          </div>
 
-          {/* RANGE */}
+            <h3 className="mt-3 text-lg font-extrabold tracking-tight text-[var(--foreground)] sm:text-xl">
+              {subcategory || material}
+            </h3>
+
+            <p className="mt-1 text-xs text-[var(--muted)]">
+              {material}
+              {subcategory ? " · " : ""}
+              {subcategory}
+            </p>
+          </div>
 
           <div
             className="
-              flex
-              shrink-0
-              rounded-xl
-              border
-              border-[var(--border)]
-              bg-[var(--background)]
-              p-1
-            "
-          >
-            {[7, 30, 90].map(
-              (days) => (
-                <button
-                  key={days}
-                  type="button"
-                  onClick={() =>
-                    setRange(days)
-                  }
-                  className={`
-                    rounded-lg
-                    px-2
-                    py-1.5
-                    text-[10px]
-                    font-bold
-                    transition
-
-                    ${
-                      range ===
-                      days
-                        ? `
-                          bg-[var(--primary)]
-                          text-[var(--primary-foreground)]
-                          shadow-sm
-                        `
-                        : `
-                          text-[var(--muted)]
-                        `
-                    }
-                  `}
-                >
-                  {days}D
-                </button>
-              )
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* ====================================================
-          STATISTICS
-      ==================================================== */}
-
-      {statistics && (
-        <div
-          className="
-            grid
-            grid-cols-2
-            gap-2
-            px-4
-            sm:grid-cols-4
-            sm:px-5
-          "
-        >
-          <Stat
-            label="Current"
-            value={`₹${Math.round(
-              statistics.current
-            ).toLocaleString(
-              "en-IN"
-            )}`}
-            highlight
-          />
-
-          <Stat
-            label="Average"
-            value={`₹${Math.round(
-              statistics.average
-            ).toLocaleString(
-              "en-IN"
-            )}`}
-          />
-
-          <Stat
-            label="Highest"
-            value={`₹${Math.round(
-              statistics.highest
-            ).toLocaleString(
-              "en-IN"
-            )}`}
-          />
-
-          <Stat
-            label="Lowest"
-            value={`₹${Math.round(
-              statistics.lowest
-            ).toLocaleString(
-              "en-IN"
-            )}`}
-          />
-        </div>
-      )}
-
-      {/* ====================================================
-          CHANGE
-      ==================================================== */}
-
-      {statistics && (
-        <div className="px-4 pt-4 sm:px-5">
-          <div
-            className="
-              flex
-              items-center
-              justify-between
-              gap-3
               rounded-2xl
-              border
-              border-[var(--border)]
-              bg-[var(--background)]
-              px-3.5
-              py-3
+              border border-[var(--border)]
+              bg-[var(--surface)]
+              px-4 py-3
+              shadow-[0_8px_24px_rgba(18,63,45,0.05)]
             "
           >
-            <div className="min-w-0">
-              <p
-                className="
-                  text-[10px]
-                  font-semibold
-                  uppercase
-                  tracking-wider
-                  text-[var(--muted)]
-                "
-              >
-                Change over {range} days
-              </p>
+            <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
+              <CalendarDays size={13} />
+              Current rate
+            </div>
 
-              <p
-                className="
-                  mt-1
-                  truncate
-                  text-xs
-                  font-semibold
-                "
-              >
-                ₹
-                {Math.round(
-                  statistics.lowest
-                ).toLocaleString(
-                  "en-IN"
-                )}
-                {" – "}
-                ₹
-                {Math.round(
-                  statistics.highest
-                ).toLocaleString(
-                  "en-IN"
-                )}
-              </p>
+            <div className="mt-1 flex items-end gap-2">
+              <span className="text-2xl font-black tracking-tight text-[var(--foreground)]">
+                ₹{Number(currentPrice).toFixed(0)}
+              </span>
+
+              <span className="pb-1 text-[10px] font-semibold text-[var(--muted)]">
+                / kg
+              </span>
             </div>
 
             <div
               className={`
-                flex
-                shrink-0
-                items-center
-                gap-1
-                text-sm
-                font-extrabold
-
+                mt-1 inline-flex items-center gap-1 text-xs font-bold
                 ${
-                  statistics.periodChange >
-                  0
-                    ? "text-[var(--primary)]"
-                    : statistics.periodChange <
-                        0
-                      ? "text-[var(--danger)]"
+                  direction === "up"
+                    ? "text-[#18794E]"
+                    : direction === "down"
+                      ? "text-[#B34A45]"
                       : "text-[var(--muted)]"
                 }
               `}
             >
-              {statistics.periodChange >
-                0 && (
-                <ArrowUpRight
-                  size={16}
-                />
+              {direction === "up" ? (
+                <ArrowUpRight size={14} />
+              ) : direction === "down" ? (
+                <ArrowDownRight size={14} />
+              ) : (
+                <Minus size={14} />
               )}
 
-              {statistics.periodChange <
-                0 && (
-                <ArrowDownRight
-                  size={16}
-                />
-              )}
-
-              {statistics.periodChange ===
-                0 && (
-                <Minus size={16} />
-              )}
-
-              {statistics.periodChange >
-              0
-                ? "+"
-                : ""}
-              {statistics.periodChange.toFixed(
-                1
-              )}
-              %
+              {Math.abs(change).toFixed(2)}%
+              <span className="font-medium">
+                vs previous point
+              </span>
             </div>
           </div>
         </div>
-      )}
-
-      {/* ====================================================
-          CHART
-      ==================================================== */}
-
-      <div
-        className="
-          mt-3
-          h-[240px]
-          w-full
-          px-1
-          sm:h-[290px]
-          sm:px-3
-        "
-      >
-        <ResponsiveContainer
-          width="100%"
-          height="100%"
-        >
-          <AreaChart
-            data={chartData}
-            margin={{
-              top: 16,
-              right: 8,
-              left: -20,
-              bottom: 4,
-            }}
-          >
-            <defs>
-              <linearGradient
-                id={gradientId}
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1"
-              >
-                <stop
-                  offset="0%"
-                  stopColor="var(--primary)"
-                  stopOpacity={0.22}
-                />
-
-                <stop
-                  offset="100%"
-                  stopColor="var(--primary)"
-                  stopOpacity={0.01}
-                />
-              </linearGradient>
-            </defs>
-
-            <CartesianGrid
-              stroke="var(--border)"
-              strokeDasharray="4 5"
-              vertical={false}
-            />
-
-            <XAxis
-              dataKey="date"
-              tick={{
-                fill: "var(--muted)",
-                fontSize: 9,
-              }}
-              axisLine={false}
-              tickLine={false}
-              minTickGap={28}
-            />
-
-            <YAxis
-              tick={{
-                fill: "var(--muted)",
-                fontSize: 9,
-              }}
-              axisLine={false}
-              tickLine={false}
-              width={44}
-              domain={["auto", "auto"]}
-              tickFormatter={(value) =>
-                `₹${Math.round(
-                  value
-                )}`
-              }
-            />
-
-            <Tooltip
-              cursor={{
-                stroke:
-                  "var(--border)",
-              }}
-              contentStyle={{
-                background:
-                  "var(--surface)",
-                border:
-                  "1px solid var(--border)",
-                borderRadius:
-                  "14px",
-                color:
-                  "var(--foreground)",
-                boxShadow:
-                  "0 12px 30px rgba(0,0,0,0.08)",
-                padding:
-                  "10px 12px",
-              }}
-              labelStyle={{
-                color:
-                  "var(--muted)",
-                marginBottom: 4,
-                fontSize: 10,
-              }}
-              formatter={(
-                value
-              ) => [
-                `₹${Math.round(
-                  value
-                )} / kg`,
-                "Price",
-              ]}
-            />
-
-            <Area
-              type="monotone"
-              dataKey="price"
-              stroke="var(--primary)"
-              fill={`url(#${gradientId})`}
-              strokeWidth={2.5}
-              dot={false}
-              activeDot={{
-                r: 5,
-                fill: "var(--primary)",
-                stroke:
-                  "var(--surface)",
-                strokeWidth: 2,
-              }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
       </div>
 
-      {/* ====================================================
-          FOOTER
-      ==================================================== */}
+      {/* Chart */}
+      <div className="px-3 pb-2 pt-4 sm:px-5">
+        <div className="h-[280px] w-full sm:h-[330px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              data={prepared}
+              margin={{
+                top: 10,
+                right: 12,
+                left: 0,
+                bottom: 0,
+              }}
+            >
+              <defs>
+                <linearGradient
+                  id="priceAreaGradient"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop
+                    offset="0%"
+                    stopColor="#18794E"
+                    stopOpacity={0.28}
+                  />
+                  <stop
+                    offset="100%"
+                    stopColor="#18794E"
+                    stopOpacity={0.02}
+                  />
+                </linearGradient>
+              </defs>
 
-      <div
-        className="
-          flex
-          items-center
-          justify-between
-          gap-3
-          border-t
-          border-[var(--border)]
-          px-4
-          py-3.5
-          text-[10px]
-          text-[var(--muted)]
-          sm:px-5
-        "
-      >
-        <span>
-          {filteredHistory.length} records
-        </span>
+              <CartesianGrid
+                vertical={false}
+                stroke="rgba(18,63,45,0.08)"
+                strokeDasharray="4 5"
+              />
 
-        <span>
-          Reference market data
-        </span>
+              <XAxis
+                dataKey="displayDate"
+                tick={{
+                  fontSize: 10,
+                  fill: "var(--muted)",
+                }}
+                axisLine={false}
+                tickLine={false}
+                minTickGap={22}
+              />
+
+              <YAxis
+                width={42}
+                tick={{
+                  fontSize: 10,
+                  fill: "var(--muted)",
+                }}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(value) =>
+                  `₹${Math.round(value)}`
+                }
+              />
+
+              <Tooltip
+                cursor={{
+                  stroke: "rgba(24,121,78,0.20)",
+                  strokeWidth: 1,
+                }}
+                contentStyle={{
+                  borderRadius: 16,
+                  border:
+                    "1px solid rgba(18,63,45,0.10)",
+                  boxShadow:
+                    "0 14px 35px rgba(18,63,45,0.12)",
+                  fontSize: 12,
+                  background:
+                    "rgba(255,255,255,0.96)",
+                }}
+                formatter={(value) => [
+                  `₹${Number(value).toFixed(2)}/kg`,
+                  "Price",
+                ]}
+                labelFormatter={(_, payload) =>
+                  payload?.[0]?.payload
+                    ?.displayFullDate || ""
+                }
+              />
+
+              <Area
+                type="monotone"
+                dataKey="price"
+                stroke="#18794E"
+                strokeWidth={3}
+                fill="url(#priceAreaGradient)"
+                activeDot={{
+                  r: 6,
+                  strokeWidth: 3,
+                  stroke: "#fff",
+                  fill: "#18794E",
+                }}
+                dot={(props) => {
+                  const isToday =
+                    props.payload?.isToday;
+
+                  if (!isToday) {
+                    return null;
+                  }
+
+                  return (
+                    <circle
+                      cx={props.cx}
+                      cy={props.cy}
+                      r={7}
+                      fill="#18794E"
+                      stroke="#fff"
+                      strokeWidth={3}
+                    />
+                  );
+                }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-2 border-t border-[var(--border)] px-4 py-4 sm:grid-cols-4 sm:px-5">
+        <Metric
+          label="High"
+          value={`₹${highest.toFixed(0)}`}
+        />
+
+        <Metric
+          label="Low"
+          value={`₹${lowest.toFixed(0)}`}
+        />
+
+        <Metric
+          label="Average"
+          value={`₹${average.toFixed(0)}`}
+        />
+
+        <Metric
+          label="Today"
+          value={`₹${currentPrice.toFixed(0)}`}
+          live
+        />
+      </div>
+
+      {/* Range */}
+      <div className="flex items-center justify-between gap-3 border-t border-[var(--border)] px-5 py-4 sm:px-6">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--muted)]">
+            View period
+          </p>
+
+          <p className="mt-1 flex items-center gap-1.5 text-xs text-[var(--muted)]">
+            <Clock3 size={12} />
+            Latest point is today's dynamic snapshot
+          </p>
+        </div>
+
+        <div className="flex items-center rounded-xl border border-[var(--border)] bg-[var(--surface)] p-1">
+          {RANGE_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() =>
+                setRange(option.value)
+              }
+              className={`
+                rounded-lg px-2.5 py-1.5 text-[10px] font-bold
+                transition
+                ${
+                  range === option.value
+                    ? "bg-[#123F2D] text-white shadow-[0_5px_14px_rgba(18,63,45,0.15)]"
+                    : "text-[var(--muted)] hover:bg-[var(--surface-soft)]"
+                }
+              `}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
       </div>
     </section>
   );
 };
 
-/* ============================================================
-   STAT
-============================================================ */
-
-const Stat = ({
+const Metric = ({
   label,
   value,
-  highlight = false,
-}) => {
-  return (
-    <div
-      className={`
-        rounded-2xl
-        border
-        px-3
-        py-3
+  live = false,
+}) => (
+  <div
+    className="
+      rounded-2xl
+      border border-[var(--border)]
+      bg-[var(--surface)]
+      px-3 py-3
+    "
+  >
+    <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
+      {label}
+    </p>
 
+    <p
+      className={`
+        mt-1 text-sm font-extrabold
         ${
-          highlight
-            ? `
-              border-[var(--primary)]/20
-              bg-[var(--accent)]
-            `
-            : `
-              border-[var(--border)]
-              bg-[var(--background)]
-            `
+          live
+            ? "text-[#18794E]"
+            : "text-[var(--foreground)]"
         }
       `}
     >
-      <p
-        className="
-          text-[9px]
-          font-semibold
-          uppercase
-          tracking-wider
-          text-[var(--muted)]
-        "
-      >
-        {label}
-      </p>
-
-      <p
-        className={`
-          mt-1
-          text-sm
-          font-extrabold
-          ${
-            highlight
-              ? "text-[var(--primary)]"
-              : "text-[var(--foreground)]"
-          }
-        `}
-      >
-        {value}
-      </p>
-    </div>
-  );
-};
+      {value}
+    </p>
+  </div>
+);
 
 export default PriceHistory;

@@ -51,12 +51,12 @@ const useRegionLanguage = () => {
         const regionalLanguage =
           getLanguageForState(stateCode);
 
-        console.log(
-          "Language selected from stored region:",
-          stateCode,
-          "→",
-          regionalLanguage
-        );
+        // console.log(
+        //   "Language selected from stored region:",
+        //   stateCode,
+        //   "→",
+        //   regionalLanguage
+        // );
 
         setLanguage(
           regionalLanguage,

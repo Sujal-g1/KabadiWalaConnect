@@ -1,4 +1,6 @@
-import prisma from "../../config/prisma.js";
+import {
+  getDynamicPrice,
+} from "./price.engine.js";
 
 const calculateValuation = async ({
   material,
@@ -7,11 +9,15 @@ const calculateValuation = async ({
   weight,
 }) => {
   if (!material) {
-    throw new Error("Material is required");
+    throw new Error(
+      "Material is required"
+    );
   }
 
   if (!location) {
-    throw new Error("Location is required");
+    throw new Error(
+      "Location is required"
+    );
   }
 
   if (
@@ -26,67 +32,53 @@ const calculateValuation = async ({
 
   const numericWeight = Number(weight);
 
-  const where = {
-    material: {
-      equals: material,
-      mode: "insensitive",
-    },
-
-    location: {
-      equals: location,
-      mode: "insensitive",
-    },
-  };
-
-  if (subcategory) {
-    where.subcategory = {
-      equals: subcategory,
-      mode: "insensitive",
-    };
+  if (!Number.isFinite(numericWeight)) {
+    throw new Error(
+      "Weight must be a valid number"
+    );
   }
 
-  const latestPrice =
-    await prisma.priceHistory.findFirst({
-      where,
-      orderBy: {
-        recordedAt: "desc",
-      },
+  const currentPrice =
+    getDynamicPrice({
+      material,
+      subcategory,
+      location,
     });
 
-  if (!latestPrice) {
+  if (!currentPrice) {
     throw new Error(
       "No market price available for this material and location"
     );
   }
 
   const estimatedValue =
-    numericWeight * latestPrice.price;
+    numericWeight *
+    currentPrice.price;
 
   return {
-    material: latestPrice.material,
-    subcategory: latestPrice.subcategory,
-
-    location: latestPrice.location,
+    material: currentPrice.material,
+    subcategory: currentPrice.subcategory,
+    location: currentPrice.location,
 
     weight: numericWeight,
 
-    rate: latestPrice.price,
-
-    unit: latestPrice.unit,
+    rate: currentPrice.price,
+    unit: currentPrice.unit,
 
     estimatedValue: Number(
       estimatedValue.toFixed(2)
     ),
 
     marketRange: {
-      min: latestPrice.minPrice,
-      max: latestPrice.maxPrice,
+      min: currentPrice.minPrice,
+      max: currentPrice.maxPrice,
     },
 
-    source: latestPrice.source,
+    trend: currentPrice.trend,
+    changePercent: currentPrice.changePercent,
 
-    priceRecordedAt:
-      latestPrice.recordedAt,
+    source: currentPrice.source,
+    priceRecordedAt: currentPrice.recordedAt,
   };
 };
 
