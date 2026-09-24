@@ -22,8 +22,7 @@ import useAuthStore from "../../store/authStore";
 import useRegionStore from "../../store/regionStore";
 import useTranslation from "../../i18n/useTranslation";
 import useWeatherAlerts from "../../hooks/useWeatherAlerts";
-
-import WeatherNoticeMobile from "../../../src/components/Weather/WeatherNoticeMobile";
+import WeatherNoticeMobile from "../../components/Weather/WeatherNoticeMobile";
 
 const MobileHeader = ({
   onMenuClick,
@@ -295,7 +294,7 @@ const MobileHeader = ({
             className="
               shrink-0
             "
-          >
+        >
             <motion.button
               type="button"
               whileTap={{

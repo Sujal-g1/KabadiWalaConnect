@@ -10,7 +10,8 @@ import { useNavigate } from "react-router-dom";
 import useAuthStore from "../../../store/authStore";
 import useRegionStore from "../../../store/regionStore";
 import useWeatherAlerts from "../../../hooks/useWeatherAlerts";
-import WeatherNotice from "../../../components/weather/WeatherNotice.jsx";
+import WeatherNotice from "../../../components/Weather/WeatherNotice.jsx";
+
 import EWasteAIButton from "../../../components/EWasteAIButton.jsx";
 import { useState } from "react";
 
