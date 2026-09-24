@@ -467,6 +467,315 @@ start: {
       },
     },
   },
+
+  recyclers: {
+  badge: "Recycler Network",
+
+  title: "Find Recyclers Near You",
+
+  subtitle:
+    "Discover nearby recyclers, compare services, and find the right buyer for your e-waste.",
+
+  detectingLocation:
+    "Detecting location...",
+
+  useMyLocation:
+    "Use my location",
+
+  searchPlaceholder:
+    "Search recycler, city, or area...",
+
+  searchRadius:
+    "Search radius",
+
+  radius:
+    "radius",
+
+  filters:
+    "Filters",
+
+  material:
+    "Material",
+
+  payment:
+    "Payment",
+
+  pickup:
+    "Pickup",
+
+  doorstep:
+    "Doorstep",
+
+  verified:
+    "Verified",
+
+  clearFilters:
+    "Clear filters",
+
+  sort:
+    "Sort",
+
+  sortOptions: {
+    distance: "Nearest",
+    pickup: "Pickup",
+    verified: "Verified",
+  },
+
+  recyclersFound:
+    "recyclers found",
+
+  within:
+    "Within",
+
+  map:
+    "Map",
+
+  list:
+    "List",
+
+  youAreHere:
+    "You are here",
+
+  pickupAvailable:
+    "Pickup available",
+
+  noPickup:
+    "No pickup",
+
+  kmAway:
+    "km away",
+
+  acceptedMaterials:
+    "Accepted materials",
+
+  viewDetails:
+    "View details",
+
+  locationFallback:
+    "Showing the nearest demo location because your exact location was unavailable.",
+
+  retry:
+    "Retry",
+
+  noResultsTitle:
+    "No recyclers found",
+
+  noResultsDescription:
+    "Try increasing the search radius or changing your filters.",
+
+  showMore:
+    "Show more recyclers",
+
+    exactLocation:
+  "Your current device location is being used.",
+
+approximateLocation:
+  "Exact location is unavailable. An approximate nearby area is being shown.",
+
+yourLocation:
+  "Your location",
+
+approximateArea:
+  "Approximate area",
+
+locationDetected:
+  "Your current location was detected.",
+
+you:
+  "You",
+
+pending:
+  "Pending",
+recyclerDetails: {
+  back: "Back to recyclers",
+
+  notFoundTitle:
+    "Recycler not found",
+
+  notFoundDescription:
+    "This recycler could not be found in the current network.",
+
+  status:
+    "Status",
+
+  verifiedFacility:
+    "Verified facility",
+
+  verificationPending:
+    "Verification pending",
+
+  location:
+    "Location",
+
+  locationAvailable:
+    "Facility coordinates are available for map-based discovery.",
+
+  acceptedMaterials:
+    "Accepted materials",
+
+  pickup:
+    "Pickup services",
+
+  minimumPickup:
+    "Minimum pickup quantity",
+
+  paymentMethods:
+    "Payment methods",
+
+  serviceArea:
+    "Service area",
+
+  serviceRadius:
+    "Service radius",
+
+  serviceRadiusDescription:
+    "Typical area served by this recycler.",
+
+  operation:
+    "Facility information",
+
+  active:
+    "Active",
+
+  source:
+    "Network source",
+
+  demo:
+    "Demo recycler",
+
+  platformRecycler:
+    "Platform recycler",
+
+  contactRecycler:
+    "Contact recycler",
+},
+
+  materials: {
+    all: "All materials",
+    mobile: "Mobile phones",
+    laptop: "Laptops",
+    computer: "Computers",
+    pcb: "PCBs",
+    cables: "Cables",
+    battery: "Batteries",
+    monitor: "Monitors",
+    printer: "Printers",
+  },
+
+  payments: {
+    all: "All payment methods",
+    upi: "UPI",
+    bank: "Bank transfer",
+    cash: "Cash",
+  },
+
+  
+},
+
+  recyclerDetails: {
+  back: "Back",
+  openMaps: "Open Maps",
+
+  notFoundTitle: "Recycler not found",
+  notFoundDescription:
+    "This recycler is no longer available or could not be found.",
+
+  heroDescription:
+    "A nearby recycling partner for your collected e-waste. Review what they accept, how pickup works and how you can complete the handover.",
+
+  verified: "Verified",
+  pending: "Verification pending",
+
+  facilityStatus: "Facility status",
+
+  pickupAvailable: "Pickup available",
+  noPickup: "Pickup unavailable",
+
+  doorstepAvailable: "Doorstep pickup available",
+  doorstepUnavailable: "Doorstep pickup unavailable",
+
+  minimum: "minimum",
+  minimumPickup: "Minimum pickup",
+  serviceRadius: "Service radius",
+
+  materialTypes: "Material types",
+  paymentOptions: "Payment options",
+
+  verifiedFacility: "Verified facility",
+  verificationPending: "Verification pending",
+
+  materialsEyebrow: "WHAT THEY ACCEPT",
+  acceptedMaterials: "Accepted materials",
+  materialsDescription:
+    "Review the e-waste categories this recycler is configured to collect before creating or handing over a lot.",
+  accepted: "Accepted for collection",
+
+  locationEyebrow: "WHERE THEY ARE",
+  location: "Location",
+  locationDescription:
+    "See the facility location and the configured pickup coverage around it.",
+  mapUnavailable:
+    "Map location is not available for this recycler.",
+
+  serviceCoverage: "Service coverage",
+  coverage: "coverage",
+
+  collectionEyebrow: "HOW COLLECTION WORKS",
+  collection: "Collection & pickup",
+  collectionDescription:
+    "Check pickup availability and the minimum quantity before arranging your handover.",
+
+  serviceEyebrow: "PICKUP COVERAGE",
+  serviceArea: "Service area",
+  serviceRadiusDescription:
+    "Pickup coverage is configured around the recycler facility. Confirm the exact pickup point before handover.",
+
+  handoverEyebrow: "NEXT STEPS",
+  handoverChecklist: "Before you hand over",
+  handoverDescription:
+    "Use this quick checklist to avoid surprises during pickup and payment.",
+
+  checkMaterial:
+    "Confirm that your material is included in the accepted categories.",
+  checkPickup:
+    "Confirm whether pickup or doorstep collection is available.",
+  checkPayment:
+    "Confirm the payment method you want to receive.",
+  checkWeight:
+    "Check that your lot meets the minimum pickup quantity.",
+
+  paymentEyebrow: "HOW YOU GET PAID",
+  paymentMethods: "Payment methods",
+  paymentDescription:
+    "Available payment methods currently configured for this recycler.",
+  paymentAccepted:
+    "Accepted by this recycler",
+
+  verificationEyebrow: "TRUST & STATUS",
+  verification: "Verification",
+
+  verifiedDescription:
+    "This recycler has a verified status on the platform.",
+
+  pendingDescription:
+    "This recycler has not completed platform verification yet.",
+
+  source: "Source",
+  demo: "Demo listing",
+  platformRecycler: "Platform recycler",
+
+  nextStepEyebrow: "NEXT STEP",
+
+  readyTitle:
+    "Ready to work with this recycler?",
+
+  readyDescription:
+    "Review the accepted materials, pickup conditions and payment methods before arranging your handover.",
+
+  getDirections: "Get directions",
+  contactRecycler: "Contact recycler",
+},
+
 };
 
 export default en;

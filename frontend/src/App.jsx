@@ -34,6 +34,8 @@ import RecyclerDashboard from "./Recycler/pages/RecyclerDashboard";
 import EWasteAI from "./pages/EWasteAI";
 import LearningPage from "./pages/Learning/LearningPage";
 import useRegionLanguage from "./hooks/useRegionLanguage";
+import Recyclers from "./pages/CollectorDashboard/Recyclers";
+import RecyclerDetails from "./pages/CollectorDashboard/RecyclerDetails";
 // import RecyclerMarketplace from "./Recycler/pages/RecyclerMarketplace";
 // import RecyclerOffers from "./Recycler/pages/RecyclerOffers";
 // import RecyclerPickups from "./pages/Recycler/RecyclerPickups";
@@ -120,6 +122,16 @@ const App = () => {
           path="/collector/valuation"
           element={<CollectorValuation />}
         />
+
+        <Route
+        path="/collector/recyclers"
+        element={<Recyclers />}
+      />
+
+      <Route
+      path="/collector/recyclers/:id"
+      element={<RecyclerDetails />}
+    />
 
         {/* Valuation Test */}
         <Route

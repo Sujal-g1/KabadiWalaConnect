@@ -470,7 +470,7 @@ export default function useWeatherAlerts() {
             body:
               alert.message,
             icon:
-              "/favicon.ico",
+              "/weatherFavicon.ico",
             tag: `eco-mitra-weather-${alert.type}`,
           }
         );

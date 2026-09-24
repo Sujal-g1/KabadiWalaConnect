@@ -601,6 +601,349 @@ start: {
     "कलेक्टर पार्टनर्स से सत्यापित रिसाइकिल होने वाली सामग्री प्राप्त करें।",
 },
 
+recyclers: {
+  badge: "रीसायक्लर नेटवर्क",
+
+  title: "अपने पास रीसायक्लर खोजें",
+
+  subtitle:
+    "पास के रीसायक्लर देखें, उनकी सुविधाओं की तुलना करें और अपने ई-वेस्ट के लिए सही खरीदार खोजें।",
+
+  detectingLocation:
+    "स्थान खोजा जा रहा है...",
+
+  useMyLocation:
+    "मेरा स्थान इस्तेमाल करें",
+
+  searchPlaceholder:
+    "रीसायक्लर, शहर या क्षेत्र खोजें...",
+
+  searchRadius:
+    "खोज की दूरी",
+
+  radius:
+    "दायरा",
+
+  filters:
+    "फ़िल्टर",
+
+  material:
+    "सामग्री",
+
+  payment:
+    "भुगतान",
+
+  pickup:
+    "पिकअप",
+
+  doorstep:
+    "घर से पिकअप",
+
+  verified:
+    "सत्यापित",
+
+  clearFilters:
+    "फ़िल्टर हटाएं",
+
+  sort:
+    "क्रम",
+
+  sortOptions: {
+    distance: "सबसे पास",
+    pickup: "पिकअप",
+    verified: "सत्यापित",
+  },
+
+  recyclersFound:
+    "रीसायक्लर मिले",
+
+  within:
+    "दूरी",
+
+  map:
+    "मैप",
+
+  list:
+    "सूची",
+
+  youAreHere:
+    "आप यहाँ हैं",
+
+  pickupAvailable:
+    "पिकअप उपलब्ध",
+
+  noPickup:
+    "पिकअप उपलब्ध नहीं",
+
+  kmAway:
+    "किमी दूर",
+
+  acceptedMaterials:
+    "स्वीकार की जाने वाली सामग्री",
+
+  viewDetails:
+    "विवरण देखें",
+
+  locationFallback:
+    "आपका सटीक स्थान उपलब्ध नहीं था, इसलिए निकटतम डेमो स्थान दिखाया जा रहा है।",
+
+  retry:
+    "फिर कोशिश करें",
+
+  noResultsTitle:
+    "कोई रीसायक्लर नहीं मिला",
+
+  noResultsDescription:
+    "खोज की दूरी बढ़ाएं या फ़िल्टर बदलें।",
+
+  showMore:
+    "और रीसायक्लर देखें",
+
+  materials: {
+    all: "सभी सामग्री",
+    mobile: "मोबाइल फोन",
+    laptop: "लैपटॉप",
+    computer: "कंप्यूटर",
+    pcb: "पीसीबी",
+    cables: "केबल",
+    battery: "बैटरी",
+    monitor: "मॉनिटर",
+    printer: "प्रिंटर",
+  },
+
+  payments: {
+    all: "सभी भुगतान तरीके",
+    upi: "यूपीआई",
+    bank: "बैंक ट्रांसफर",
+    cash: "नकद",
+  },
+
+  recyclers: {
+  badge: "रीसायक्लर नेटवर्क",
+  title: "अपने पास रीसायक्लर खोजें",
+  subtitle:
+    "पास के रीसायक्लर देखें, उनकी सुविधाओं की तुलना करें और अपने ई-कचरे के लिए सही खरीदार खोजें।",
+
+  detectingLocation: "स्थान खोजा जा रहा है...",
+  useMyLocation: "मेरा स्थान इस्तेमाल करें",
+
+  searchPlaceholder: "रीसायक्लर, शहर या क्षेत्र खोजें...",
+  searchRadius: "खोज की दूरी",
+  radius: "दायरा",
+  filters: "फ़िल्टर",
+
+  material: "सामग्री",
+  payment: "भुगतान",
+  pickup: "पिकअप",
+  doorstep: "घर से पिकअप",
+  verified: "सत्यापित",
+  pending: "सत्यापन लंबित",
+
+  clearFilters: "फ़िल्टर हटाएं",
+  sort: "क्रम",
+
+  sortOptions: {
+    distance: "सबसे पास",
+    pickup: "पिकअप उपलब्ध",
+    verified: "सत्यापित",
+  },
+
+  recyclersFound: "रीसायक्लर मिले",
+  within: "दूरी",
+  map: "मैप",
+  list: "सूची",
+
+  youAreHere: "आप यहाँ हैं",
+  yourLocation: "आपका स्थान",
+
+  approximateArea: "अनुमानित क्षेत्र",
+  exactLocation:
+    "आपके डिवाइस का वर्तमान स्थान इस्तेमाल किया जा रहा है।",
+  approximateLocation:
+    "सटीक स्थान उपलब्ध नहीं है। अनुमानित क्षेत्र दिखाया जा रहा है।",
+  locationDetected: "आपका वर्तमान स्थान मिल गया है.",
+  locationFallback:
+    "आपका सटीक स्थान उपलब्ध नहीं था, इसलिए पास का अनुमानित क्षेत्र दिखाया जा रहा है।",
+
+  retry: "फिर कोशिश करें",
+  you: "आप",
+
+  pickupAvailable: "पिकअप उपलब्ध",
+  noPickup: "पिकअप उपलब्ध नहीं",
+
+  kmAway: "किमी दूर",
+
+  acceptedMaterials: "स्वीकार की जाने वाली सामग्री",
+  viewDetails: "विवरण देखें",
+
+  noResultsTitle: "कोई रीसायक्लर नहीं मिला",
+  noResultsDescription:
+    "खोज की दूरी बढ़ाएं या फ़िल्टर बदलें।",
+
+  showMore: "और रीसायक्लर देखें",
+
+  materials: {
+    all: "सभी सामग्री",
+    mobile: "मोबाइल फोन",
+    laptop: "लैपटॉप",
+    computer: "कंप्यूटर",
+    pcb: "पीसीबी",
+    cables: "केबल",
+    battery: "बैटरी",
+    monitor: "मॉनिटर",
+    printer: "प्रिंटर",
+  },
+
+  payments: {
+    all: "सभी भुगतान तरीके",
+    upi: "यूपीआई",
+    bank: "बैंक ट्रांसफर",
+    cash: "नकद",
+  },
+},
+
+recyclerDetails: {
+  back: "वापस",
+  notFoundTitle: "रीसायक्लर नहीं मिला",
+  notFoundDescription:
+    "यह रीसायक्लर उपलब्ध नहीं है या इसे हटा दिया गया है।",
+
+  status: "स्थिति",
+  verifiedFacility: "सत्यापित सुविधा",
+  verificationPending: "सत्यापन लंबित",
+
+  location: "स्थान",
+  locationAvailable: "स्थान उपलब्ध",
+
+  acceptedMaterials: "स्वीकार की जाने वाली सामग्री",
+  pickup: "पिकअप",
+  minimumPickup: "न्यूनतम पिकअप मात्रा",
+  paymentMethods: "भुगतान के तरीके",
+
+  serviceArea: "सेवा क्षेत्र",
+  serviceRadius: "सेवा दायरा",
+  serviceRadiusDescription:
+    "रीसायक्लर इस दायरे के भीतर पिकअप सेवा प्रदान करता है।",
+
+  operation: "संचालन स्थिति",
+  active: "सक्रिय",
+
+  source: "स्रोत",
+  demo: "डेमो रीसायक्लर",
+  platformRecycler: "प्लेटफ़ॉर्म रीसायक्लर",
+
+  contactRecycler: "रीसायक्लर से संपर्क करें",
+},
+},
+
+recyclerDetails: {
+  back: "वापस",
+  openMaps: "मैप खोलें",
+
+  notFoundTitle: "रीसायक्लर नहीं मिला",
+  notFoundDescription:
+    "यह रीसायक्लर अब उपलब्ध नहीं है या इसे खोजा नहीं जा सका।",
+
+  heroDescription:
+    "आपके एकत्र किए गए ई-कचरे के लिए पास का रीसायक्लिंग पार्टनर। पहले देखें कि क्या स्वीकार किया जाता है, पिकअप कैसे होगा और हैंडओवर कैसे पूरा किया जा सकता है।",
+
+  verified: "सत्यापित",
+  pending: "सत्यापन लंबित",
+
+  facilityStatus: "सुविधा की स्थिति",
+
+  pickupAvailable: "पिकअप उपलब्ध",
+  noPickup: "पिकअप उपलब्ध नहीं",
+
+  doorstepAvailable: "घर से पिकअप उपलब्ध",
+  doorstepUnavailable: "घर से पिकअप उपलब्ध नहीं",
+
+  minimum: "न्यूनतम",
+  minimumPickup: "न्यूनतम पिकअप",
+  serviceRadius: "सेवा दायरा",
+
+  materialTypes: "सामग्री के प्रकार",
+  paymentOptions: "भुगतान विकल्प",
+
+  verifiedFacility: "सत्यापित सुविधा",
+  verificationPending: "सत्यापन लंबित",
+
+  materialsEyebrow: "क्या-क्या स्वीकार किया जाता है",
+  acceptedMaterials: "स्वीकार की जाने वाली सामग्री",
+  materialsDescription:
+    "लॉट बनाने या हैंडओवर करने से पहले देखें कि यह रीसायक्लर किन ई-कचरा श्रेणियों को स्वीकार करता है।",
+  accepted: "संग्रह के लिए स्वीकार्य",
+
+  locationEyebrow: "कहाँ स्थित है",
+  location: "स्थान",
+  locationDescription:
+    "सुविधा का स्थान और उसके आसपास निर्धारित पिकअप कवरेज देखें.",
+  mapUnavailable:
+    "इस रीसायक्लर के लिए मैप लोकेशन उपलब्ध नहीं है।",
+
+  serviceCoverage: "सेवा कवरेज",
+  coverage: "कवरेज",
+
+  collectionEyebrow: "पिकअप कैसे होगा",
+  collection: "कलेक्शन और पिकअप",
+  collectionDescription:
+    "हैंडओवर तय करने से पहले पिकअप उपलब्धता और न्यूनतम मात्रा जांचें।",
+
+  serviceEyebrow: "पिकअप कवरेज",
+  serviceArea: "सेवा क्षेत्र",
+  serviceRadiusDescription:
+    "पिकअप कवरेज रीसायक्लर की सुविधा के आसपास निर्धारित है। हैंडओवर से पहले सटीक पिकअप स्थान की पुष्टि करें।",
+
+  handoverEyebrow: "अगले कदम",
+  handoverChecklist: "हैंडओवर से पहले",
+  handoverDescription:
+    "पिकअप और भुगतान के दौरान किसी परेशानी से बचने के लिए इस छोटी चेकलिस्ट का उपयोग करें।",
+
+  checkMaterial:
+    "पुष्टि करें कि आपकी सामग्री स्वीकार की जाने वाली श्रेणियों में शामिल है।",
+
+  checkPickup:
+    "पुष्टि करें कि पिकअप या घर से पिकअप उपलब्ध है।",
+
+  checkPayment:
+    "वह भुगतान तरीका तय करें जिसमें आप भुगतान लेना चाहते हैं।",
+
+  checkWeight:
+    "जांचें कि आपका लॉट न्यूनतम पिकअप मात्रा को पूरा करता है।",
+
+  paymentEyebrow: "भुगतान कैसे मिलेगा",
+  paymentMethods: "भुगतान के तरीके",
+  paymentDescription:
+    "इस रीसायक्लर के लिए वर्तमान में उपलब्ध भुगतान विकल्प।",
+
+  paymentAccepted:
+    "इस रीसायक्लर द्वारा स्वीकार्य",
+
+  verificationEyebrow: "विश्वास और स्थिति",
+  verification: "सत्यापन",
+
+  verifiedDescription:
+    "इस रीसायक्लर की स्थिति प्लेटफ़ॉर्म पर सत्यापित है।",
+
+  pendingDescription:
+    "इस रीसायक्लर का प्लेटफ़ॉर्म सत्यापन अभी पूरा नहीं हुआ है।",
+
+  source: "स्रोत",
+  demo: "डेमो लिस्टिंग",
+  platformRecycler: "प्लेटफ़ॉर्म रीसायक्लर",
+
+  nextStepEyebrow: "अगला कदम",
+
+  readyTitle:
+    "क्या आप इस रीसायक्लर के साथ आगे बढ़ना चाहते हैं?",
+
+  readyDescription:
+    "हैंडओवर तय करने से पहले स्वीकार की जाने वाली सामग्री, पिकअप शर्तों और भुगतान के तरीकों की समीक्षा करें।",
+
+  getDirections: "दिशा देखें",
+  contactRecycler: "रीसायक्लर से संपर्क करें",
+},
+
 };
 
 export default hi;

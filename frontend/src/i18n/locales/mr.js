@@ -459,8 +459,348 @@ start: {
     },
   },
 
+  recyclers: {
+  badge: "रीसायकलर नेटवर्क",
 
+  title: "तुमच्या जवळील रीसायकलर शोधा",
 
+  subtitle:
+    "जवळील रीसायकलर पहा, त्यांच्या सुविधा तुलना करा आणि तुमच्या ई-कचऱ्यासाठी योग्य खरेदीदार शोधा.",
+
+  detectingLocation:
+    "स्थान शोधत आहे...",
+
+  useMyLocation:
+    "माझे स्थान वापरा",
+
+  searchPlaceholder:
+    "रीसायकलर, शहर किंवा परिसर शोधा...",
+
+  searchRadius:
+    "शोध क्षेत्र",
+
+  radius:
+    "क्षेत्र",
+
+  filters:
+    "फिल्टर",
+
+  material:
+    "साहित्य",
+
+  payment:
+    "पेमेंट",
+
+  pickup:
+    "पिकअप",
+
+  doorstep:
+    "घरून पिकअप",
+
+  verified:
+    "सत्यापित",
+
+  clearFilters:
+    "फिल्टर साफ करा",
+
+  sort:
+    "क्रम",
+
+  sortOptions: {
+    distance: "सर्वात जवळचे",
+    pickup: "पिकअप",
+    verified: "सत्यापित",
+  },
+
+  recyclersFound:
+    "रीसायकलर सापडले",
+
+  within:
+    "अंतर",
+
+  map:
+    "नकाशा",
+
+  list:
+    "यादी",
+
+  youAreHere:
+    "तुम्ही येथे आहात",
+
+  pickupAvailable:
+    "पिकअप उपलब्ध",
+
+  noPickup:
+    "पिकअप उपलब्ध नाही",
+
+  kmAway:
+    "किमी दूर",
+
+  acceptedMaterials:
+    "स्वीकारले जाणारे साहित्य",
+
+  viewDetails:
+    "तपशील पहा",
+
+  locationFallback:
+    "तुमचे अचूक स्थान उपलब्ध नसल्यामुळे जवळचे डेमो स्थान दाखवले जात आहे.",
+
+  retry:
+    "पुन्हा प्रयत्न करा",
+
+  noResultsTitle:
+    "रीसायकलर सापडले नाहीत",
+
+  noResultsDescription:
+    "शोध क्षेत्र वाढवा किंवा फिल्टर बदला.",
+
+  showMore:
+    "अधिक रीसायकलर पहा",
+
+  materials: {
+    all: "सर्व साहित्य",
+    mobile: "मोबाइल फोन",
+    laptop: "लॅपटॉप",
+    computer: "कॉम्प्युटर",
+    pcb: "पीसीबी",
+    cables: "केबल्स",
+    battery: "बॅटरी",
+    monitor: "मॉनिटर",
+    printer: "प्रिंटर",
+  },
+
+  payments: {
+    all: "सर्व पेमेंट पद्धती",
+    upi: "यूपीआय",
+    bank: "बँक ट्रान्सफर",
+    cash: "रोख",
+  },
+
+  recyclers: {
+  badge: "रीसायकलर नेटवर्क",
+  title: "तुमच्या जवळील रीसायकलर शोधा",
+  subtitle:
+    "जवळील रीसायकलर पाहा, त्यांच्या सुविधा तपासा आणि तुमच्या ई-कचऱ्यासाठी योग्य खरेदीदार शोधा.",
+
+  detectingLocation: "स्थान शोधले जात आहे...",
+  useMyLocation: "माझे स्थान वापरा",
+
+  searchPlaceholder: "रीसायकलर, शहर किंवा परिसर शोधा...",
+  searchRadius: "शोध अंतर",
+  radius: "अंतर",
+  filters: "फिल्टर",
+
+  material: "साहित्य",
+  payment: "पेमेंट",
+  pickup: "पिकअप",
+  doorstep: "घरून पिकअप",
+  verified: "सत्यापित",
+  pending: "सत्यापन प्रलंबित",
+
+  clearFilters: "फिल्टर हटवा",
+  sort: "क्रम",
+
+  sortOptions: {
+    distance: "सर्वात जवळचे",
+    pickup: "पिकअप उपलब्ध",
+    verified: "सत्यापित",
+  },
+
+  recyclersFound: "रीसायकलर सापडले",
+  within: "अंतर",
+  map: "नकाशा",
+  list: "यादी",
+
+  youAreHere: "तुम्ही येथे आहात",
+  yourLocation: "तुमचे स्थान",
+
+  approximateArea: "अंदाजे क्षेत्र",
+  exactLocation:
+    "तुमच्या डिव्हाइसचे सध्याचे स्थान वापरले जात आहे.",
+  approximateLocation:
+    "अचूक स्थान उपलब्ध नाही. अंदाजे क्षेत्र दाखवले जात आहे.",
+  locationDetected: "तुमचे सध्याचे स्थान मिळाले आहे.",
+  locationFallback:
+    "तुमचे अचूक स्थान उपलब्ध नव्हते, त्यामुळे जवळील अंदाजे क्षेत्र दाखवले जात आहे.",
+
+  retry: "पुन्हा प्रयत्न करा",
+  you: "तुम्ही",
+
+  pickupAvailable: "पिकअप उपलब्ध",
+  noPickup: "पिकअप उपलब्ध नाही",
+
+  kmAway: "किमी दूर",
+
+  acceptedMaterials: "स्वीकारले जाणारे साहित्य",
+  viewDetails: "तपशील पहा",
+
+  noResultsTitle: "कोणताही रीसायकलर सापडला नाही",
+  noResultsDescription:
+    "शोधाचे अंतर वाढवा किंवा फिल्टर बदला.",
+
+  showMore: "आणखी रीसायकलर पहा",
+
+  materials: {
+    all: "सर्व साहित्य",
+    mobile: "मोबाईल फोन",
+    laptop: "लॅपटॉप",
+    computer: "कॉम्प्युटर",
+    pcb: "पीसीबी",
+    cables: "केबल",
+    battery: "बॅटरी",
+    monitor: "मॉनिटर",
+    printer: "प्रिंटर",
+  },
+
+  payments: {
+    all: "सर्व पेमेंट पद्धती",
+    upi: "यूपीआय",
+    bank: "बँक ट्रान्सफर",
+    cash: "रोख",
+  },
+},
+
+recyclerDetails: {
+  back: "मागे",
+  notFoundTitle: "रीसायकलर सापडला नाही",
+  notFoundDescription:
+    "हा रीसायकलर उपलब्ध नाही किंवा हटवला गेला आहे.",
+
+  status: "स्थिती",
+  verifiedFacility: "सत्यापित सुविधा",
+  verificationPending: "सत्यापन प्रलंबित",
+
+  location: "स्थान",
+  locationAvailable: "स्थान उपलब्ध",
+
+  acceptedMaterials: "स्वीकारले जाणारे साहित्य",
+  pickup: "पिकअप",
+  minimumPickup: "किमान पिकअप प्रमाण",
+  paymentMethods: "पेमेंट पद्धती",
+
+  serviceArea: "सेवा क्षेत्र",
+  serviceRadius: "सेवा अंतर",
+  serviceRadiusDescription:
+    "रीसायकलर या अंतराच्या आत पिकअप सेवा प्रदान करतो.",
+
+  operation: "कार्यरत स्थिती",
+  active: "सक्रिय",
+
+  source: "स्रोत",
+  demo: "डेमो रीसायकलर",
+  platformRecycler: "प्लॅटफॉर्म रीसायकलर",
+
+  contactRecycler: "रीसायकलरशी संपर्क करा",
+},
+},
+
+recyclerDetails: {
+  back: "मागे",
+  openMaps: "नकाशा उघडा",
+
+  notFoundTitle: "रीसायकलर सापडला नाही",
+  notFoundDescription:
+    "हा रीसायकलर आता उपलब्ध नाही किंवा शोधता आला नाही.",
+
+  heroDescription:
+    "तुमच्या गोळा केलेल्या ई-कचऱ्यासाठी जवळचा रीसायकलिंग पार्टनर. कोणते साहित्य स्वीकारले जाते, पिकअप कसा होईल आणि हँडओव्हर कसा पूर्ण करायचा हे आधी तपासा.",
+
+  verified: "सत्यापित",
+  pending: "सत्यापन प्रलंबित",
+
+  facilityStatus: "सुविधेची स्थिती",
+
+  pickupAvailable: "पिकअप उपलब्ध",
+  noPickup: "पिकअप उपलब्ध नाही",
+
+  doorstepAvailable: "घरून पिकअप उपलब्ध",
+  doorstepUnavailable: "घरून पिकअप उपलब्ध नाही",
+
+  minimum: "किमान",
+  minimumPickup: "किमान पिकअप",
+  serviceRadius: "सेवा अंतर",
+
+  materialTypes: "साहित्याचे प्रकार",
+  paymentOptions: "पेमेंट पर्याय",
+
+  verifiedFacility: "सत्यापित सुविधा",
+  verificationPending: "सत्यापन प्रलंबित",
+
+  materialsEyebrow: "काय स्वीकारले जाते",
+  acceptedMaterials: "स्वीकारले जाणारे साहित्य",
+  materialsDescription:
+    "लॉट तयार करण्यापूर्वी किंवा हँडओव्हर करण्यापूर्वी हा रीसायकलर कोणत्या ई-कचरा श्रेणी स्वीकारतो ते तपासा.",
+  accepted: "संग्रहासाठी स्वीकार्य",
+
+  locationEyebrow: "कुठे आहे",
+  location: "स्थान",
+  locationDescription:
+    "सुविधेचे स्थान आणि त्याभोवतीचे निर्धारित पिकअप कव्हरेज पहा.",
+  mapUnavailable:
+    "या रीसायकलरसाठी नकाशावरील स्थान उपलब्ध नाही.",
+
+  serviceCoverage: "सेवा कव्हरेज",
+  coverage: "कव्हरेज",
+
+  collectionEyebrow: "पिकअप कसा होतो",
+  collection: "कलेक्शन आणि पिकअप",
+  collectionDescription:
+    "हँडओव्हर ठरवण्यापूर्वी पिकअप उपलब्धता आणि किमान प्रमाण तपासा.",
+
+  serviceEyebrow: "पिकअप कव्हरेज",
+  serviceArea: "सेवा क्षेत्र",
+  serviceRadiusDescription:
+    "पिकअप कव्हरेज रीसायकलरच्या सुविधेभोवती निश्चित केलेले आहे. हँडओव्हरपूर्वी अचूक पिकअप ठिकाणाची पुष्टी करा.",
+
+  handoverEyebrow: "पुढील पायऱ्या",
+  handoverChecklist: "हँडओव्हरपूर्वी",
+  handoverDescription:
+    "पिकअप आणि पेमेंटच्या वेळी अडचण टाळण्यासाठी ही छोटी चेकलिस्ट वापरा.",
+
+  checkMaterial:
+    "तुमचे साहित्य स्वीकारल्या जाणाऱ्या श्रेणीमध्ये आहे याची खात्री करा.",
+
+  checkPickup:
+    "पिकअप किंवा घरून पिकअप उपलब्ध आहे याची खात्री करा.",
+
+  checkPayment:
+    "तुम्हाला कोणत्या पेमेंट पद्धतीने पैसे घ्यायचे आहेत ते ठरवा.",
+
+  checkWeight:
+    "तुमचे लॉट किमान पिकअप प्रमाण पूर्ण करते का ते तपासा.",
+
+  paymentEyebrow: "पेमेंट कसे मिळेल",
+  paymentMethods: "पेमेंट पद्धती",
+  paymentDescription:
+    "या रीसायकलरसाठी सध्या उपलब्ध पेमेंट पर्याय.",
+
+  paymentAccepted:
+    "या रीसायकलरकडून स्वीकार्य",
+
+  verificationEyebrow: "विश्वास आणि स्थिती",
+  verification: "सत्यापन",
+
+  verifiedDescription:
+    "या रीसायकलरची स्थिती प्लॅटफॉर्मवर सत्यापित आहे.",
+
+  pendingDescription:
+    "या रीसायकलरचे प्लॅटफॉर्म सत्यापन अद्याप पूर्ण झालेले नाही.",
+
+  source: "स्रोत",
+  demo: "डेमो लिस्टिंग",
+  platformRecycler: "प्लॅटफॉर्म रीसायकलर",
+
+  nextStepEyebrow: "पुढील पाऊल",
+
+  readyTitle:
+    "या रीसायकलरसह पुढे जायचे आहे?",
+
+  readyDescription:
+    "हँडओव्हर ठरवण्यापूर्वी स्वीकारले जाणारे साहित्य, पिकअपच्या अटी आणि पेमेंट पद्धती तपासा.",
+
+  getDirections: "मार्गदर्शन मिळवा",
+  contactRecycler: "रीसायकलरशी संपर्क करा",
+},
 };
 
 export default mr;
