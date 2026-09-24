@@ -28,9 +28,7 @@ import logo from "../../assets/images/logo.webp";
 
 import useAuthStore from "../../store/authStore";
 import useTranslation from "../../i18n/useTranslation";
-import {
-  logoutFirebase,
-} from "../../services/auth/googleAuth";
+import { logoutFirebase, } from "../../services/auth/googleAuth";
 
 const Sidebar = ({
   collapsed,
@@ -44,8 +42,7 @@ const Sidebar = ({
     clearUser,
   } = useAuthStore();
 
-  const { t } =
-    useTranslation();
+  const { t } = useTranslation();
 
   /* ==========================================================
      NAVIGATION
@@ -53,9 +50,7 @@ const Sidebar = ({
 
   const mainItems = [
     {
-      label: t(
-        "navigation.dashboard"
-      ),
+      label: t( "navigation.dashboard"),
       icon: LayoutDashboard,
       path: "/collector",
     },
@@ -680,7 +675,7 @@ const Sidebar = ({
                     text-[var(--foreground)]
                   "
                 >
-                  Kabadiwala
+                  {t("start.titleLine1")}
                 </p>
 
                 <p
@@ -692,7 +687,7 @@ const Sidebar = ({
                     text-[var(--muted)]
                   "
                 >
-                  Connect
+                  {t("start.titleLine2")}
                 </p>
               </motion.div>
             )}
@@ -872,7 +867,7 @@ const Sidebar = ({
                 tracking-tight
               "
             >
-              Create New Lot
+            {t("common.createNewLot")}
             </span>
 
             <ChevronRight

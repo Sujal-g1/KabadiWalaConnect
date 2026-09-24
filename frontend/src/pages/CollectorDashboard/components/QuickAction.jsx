@@ -7,9 +7,11 @@ import {
 
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import useTranslation from "../../../i18n/useTranslation";
 
 const QuickAction = () => {
   const navigate = useNavigate();
+const {t} = useTranslation();
 
   return (
     <motion.button
@@ -308,7 +310,7 @@ const QuickAction = () => {
             />
 
             <span>
-              Quick action
+             {t("quickActions.title")}
             </span>
           </div>
         </div>
@@ -327,7 +329,7 @@ const QuickAction = () => {
               sm:text-2xl
             "
           >
-            Add new e-waste
+            {t("quickActions.addNewEWaste")}
           </p>
 
           <p
@@ -339,9 +341,7 @@ const QuickAction = () => {
               text-white/[0.68]
             "
           >
-            Photograph your material,
-            identify it, and create a
-            digital collection lot.
+            {t("quickActions.description")}
           </p>
 
           {/* CTA */}
@@ -378,7 +378,7 @@ const QuickAction = () => {
             "
           >
             <span>
-              Create Lot
+              {t("quickActions.createLot")}
             </span>
 
             <ArrowUpRight

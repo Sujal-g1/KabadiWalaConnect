@@ -14,26 +14,29 @@ common: {
   no: "नाही",
   today: "आज",
   viewAll: "सर्व पहा",
+  logout:"बाहेर पडा",
+  createNewLot: "नवीन लॉट तयार करा"
 },
 
-dashboard: {
-  greeting: "नमस्कार",
-  sellEwaste: "ई-कचरा विका",
-  sellEwasteSubtitle: "फोटो घ्या आणि लॉट तयार करा",
-  todaysPrices: "आजचे दर",
-  activeLots: "सक्रिय लॉट",
-  nearbyRecyclers: "जवळचे रिसायकलर्स",
-  payments: "पेमेंट",
-  earnings: "माझी कमाई",
-  safety: "सुरक्षितता",
-  recentTransactions: "अलीकडील गतिविधी",
-  totalEarnings: "एकूण कमाई",
-  pendingPayments: "बाकी पेमेंट",
-  todayEarnings: "आजची कमाई",
-  verifiedRecycler: "सत्यापित रिसायकलर",
-  pickupAvailable: "पिकअप उपलब्ध",
-  viewAll: "सर्व पहा",
-},
+  dashboard: {
+    greeting: "नमस्कार",
+    sellEwaste: "ई-कचरा विका",
+    sellEwasteSubtitle: "फोटो घ्या आणि लॉट तयार करा",
+    todaysPrices: "आजचे दर",
+    activeLots: "सक्रिय लॉट",
+    nearbyRecyclers: "जवळचे रिसायकलर्स",
+    payments: "पेमेंट",
+    earnings: "माझी कमाई",
+    safety: "सुरक्षितता",
+    recentTransactions: "अलीकडील गतिविधी",
+    totalEarnings: "एकूण कमाई",
+    pendingPayments: "बाकी पेमेंट",
+    todayEarnings: "आजची कमाई",
+    verifiedRecycler: "सत्यापित रिसायकलर",
+    pickupAvailable: "पिकअप उपलब्ध",
+    viewAll: "सर्व पहा",
+    happen:"तुमच्या संकलनात (कलेक्शनमध्ये) काय घडत आहे ते येथे आहे."
+  },
 
   language: {
     english: "English",
@@ -50,6 +53,12 @@ dashboard: {
     welcomeBack: "पुन्हा स्वागत आहे",
   },
 
+  "quickActions": {
+    "title": "जलद कृती",
+    "addNewEWaste": "नवीन ई-कचरा जोडा",
+    "description": "तुमच्या साहित्याचा फोटो घ्या, त्याची ओळख पटवा आणि डिजिटल कलेक्शन लॉट तयार करा",
+    "createLot": "लॉट तयार करा"
+},
 
   lot: {
     title: "ई-कचऱ्याचा लॉट तयार करा",
@@ -89,6 +98,9 @@ dashboard: {
     falling: "कमी होत आहे",
     stable: "स्थिर",
     lastUpdated: "शेवटचे अपडेट",
+    "localPriceBoard": "स्थानिक दर फलक",
+    "currentBuyingPrices": "सध्याचे खरेदी दर",
+    "seeAll": "सर्व पहा"
   },
 
   priceBoard: {
@@ -178,16 +190,22 @@ dashboard: {
     completed: "पूर्ण झाले",
     cancelled: "रद्द झाले",
   },
-  navigation: {
-  home: "होम",
-  lots: "लॉट",
-  prices: "दर",
-  recyclers: "रिसायकलर्स",
-  earnings: "कमाई",
-  profile: "प्रोफाइल",
-  settings: "सेटिंग्ज",
-},
 
+  navigation: {
+  "home": "होम",
+  "myLots": "माझे लॉट्स",
+  "prices": "दर सूची",
+  "recyclers": "रिसायकलर्स",
+  "earnings": "कमाई",
+  "profile": "प्रोफाइल",
+  "settings": "सेटिंग्ज",
+  "dashboard": "डॅशबोर्ड",
+  "rewards": "बक्षिसे",
+  "transactions": "व्यवहार",
+  "main": "मुख्य",
+    "activity": "उपक्रम",
+    "account": "खाते"
+},
 start: {
   logoAlt: "कबाडीवाला कनेक्ट लोगो",
 
@@ -801,6 +819,21 @@ recyclerDetails: {
   getDirections: "मार्गदर्शन मिळवा",
   contactRecycler: "रीसायकलरशी संपर्क करा",
 },
+
+  "greetings": {
+    "morning": "शुभ सकाळ",
+    "afternoon": "शुभ दुपार",
+    "evening": "शुभ संध्याकाळ",
+    "night": "शुभ रात्री"
+},
+
+
+  "earnings": {
+    "thisMonthEarnings": "या महिन्याची कमाई",
+    "comparedWithLastMonth": "मागील महिन्याच्या तुलनेत",
+    "viewDetails": "तपशील पहा"
+  }
+
 };
 
 export default mr;

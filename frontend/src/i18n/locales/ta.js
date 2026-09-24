@@ -87,6 +87,27 @@ const ta = {
   recyclerDescription:
     "சேகரிப்பாளர் கூட்டாளர்களிடமிருந்து சரிபார்க்கப்பட்ட மறுசுழற்சி செய்யக்கூடிய பொருட்களைப் பெறுங்கள்.",
 },
+
+navigation: {
+  "home": "முகப்பு",
+  "myLots": "எனது லாட்கள்",
+  "prices": "விலை பட்டியல்",
+  "recyclers": "மறுசுழற்சியாளர்கள்",
+  "earnings": "சம்பாத்தியம்",
+  "profile": "சுயவிவரம்",
+  "settings": "அமைப்புகள்",
+  "dashboard": "டாஷ்போர்டு",
+  "rewards": "பரிசுகள்",
+  "transactions": "பரிவர்த்தனைகள்",
+  "main": "முதன்மை",
+  "activity": "செயல்பாடு",
+  "account": "கணக்கு"
+},
+
+common:{
+  "logout": "லாக் அவுட்",
+  "createNewLot": "புதிய லாட் உருவாக்கு",
+}
 };
 
 export default ta;

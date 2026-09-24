@@ -14,11 +14,13 @@ import WeatherNotice from "../../../components/Weather/WeatherNotice.jsx";
 
 import EWasteAIButton from "../../../components/EWasteAIButton.jsx";
 import { useState } from "react";
+import useTranslation from "../../../i18n/useTranslation.js";
 
 const DashboardHeader = () => {
   const navigate = useNavigate();
 
   const { user } = useAuthStore();
+    const { t } = useTranslation();
 
    const [showNotifications, setShowNotifications] = useState(false);
 
@@ -60,23 +62,23 @@ const DashboardHeader = () => {
      GREETING
   ========================================================== */
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
+ const getGreeting = () => {
+  const hour = new Date().getHours();
 
-    if (hour < 12) {
-      return "Good Morning";
-    }
+  if (hour < 12) {
+    return t("greetings.morning");
+  }
 
-    if (hour < 17) {
-      return "Good Afternoon";
-    }
+  if (hour < 17) {
+    return t("greetings.afternoon");
+  }
 
-    if (hour < 21) {
-      return "Good Evening";
-    }
+  if (hour < 21) {
+    return t("greetings.evening");
+  }
 
-    return "Good Night";
-  };
+  return t("greetings.night");
+};
 
   /* ==========================================================
      LOCATION LABEL
@@ -218,7 +220,7 @@ const DashboardHeader = () => {
             text-[var(--muted)]
           "
         >
-          Here's what's happening with your collection.
+          {t("dashboard.happen")}
         </p>
       </div>
 

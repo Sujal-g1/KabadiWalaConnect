@@ -1,4 +1,5 @@
 const hi = {
+
 common: {
   continue: "जारी रखें",
   back: "पीछे",
@@ -14,7 +15,10 @@ common: {
   no: "नहीं",
   today: "आज",
   viewAll: "सभी देखें",
+  logout:"बाहर निकलें",
+  createNewLot: "नया लॉट बनाएं"
 },
+
 dashboard: {
   greeting: "नमस्ते",
   sellEwaste: "ई-कचरा बेचें",
@@ -32,6 +36,7 @@ dashboard: {
   verifiedRecycler: "सत्यापित रिसाइक्लर",
   pickupAvailable: "पिकअप उपलब्ध",
   viewAll: "सभी देखें",
+  happen:"यहाँ आपके संग्रह में चल रही गतिविधियों का विवरण है।",
 },
 
   language: {
@@ -47,6 +52,13 @@ dashboard: {
     logout: "लॉगआउट",
     collectorAccess: "कलेक्टर प्रवेश",
     welcomeBack: "वापस स्वागत है",
+  },
+
+  "quickActions": {
+    "title": "त्वरित कार्रवाई",
+    "addNewEWaste": "नया ई-कचरा जोड़ें",
+    "description": "अपनी सामग्री का फोटो लें, उसकी पहचान करें और एक डिजिटल कलेक्शन लॉट बनाएं",
+    "createLot": "लॉट बनाएं"
   },
 
 
@@ -88,6 +100,9 @@ dashboard: {
     falling: "घट रहा है",
     stable: "स्थिर",
     lastUpdated: "आखिरी अपडेट",
+     "localPriceBoard": "स्थानीय मूल्य बोर्ड",
+    "currentBuyingPrices": "वर्तमान खरीद दरें",
+    "seeAll": "सभी देखें"
   },
 
   priceBoard: {
@@ -178,14 +193,21 @@ dashboard: {
     completed: "पूरा हुआ",
     cancelled: "रद्द हुआ",
   },
+
   navigation: {
-  home: "होम",
-  lots: "लॉट",
-  prices: "भाव",
-  recyclers: "रिसाइक्लर",
-  earnings: "कमाई",
-  profile: "प्रोफाइल",
-  settings: "सेटिंग्स",
+  "home": "होम",
+  "myLots": "माय लॉट्स",
+  "prices": "दर सूची",
+  "recyclers": "रिसाइकलर्स",
+  "earnings": "कमाई",
+  "profile": "प्रोफ़ाइल",
+  "settings": "सेटिंग्स",
+  "dashboard": "डैशबोर्ड",
+  "rewards": "पुरस्कार",
+  "transactions": "लेन-देन",
+  "main": "मुख्य",
+    "activity": "उपक्रम",
+    "account": "खाते"
 },
 
 learning: {
@@ -943,6 +965,20 @@ recyclerDetails: {
   getDirections: "दिशा देखें",
   contactRecycler: "रीसायक्लर से संपर्क करें",
 },
+
+  "greetings": {
+    "morning": "शुभ प्रभात",
+    "afternoon": "शुभ दोपहर",
+    "evening": "शुभ संध्या",
+    "night": "शुभ रात्रि"
+  },
+
+  "earnings": {
+    "thisMonthEarnings": "इस महीने की कमाई",
+    "comparedWithLastMonth": "पिछले महीने की तुलना में",
+    "viewDetails": "विवरण देखें"
+}
+
 
 };
 

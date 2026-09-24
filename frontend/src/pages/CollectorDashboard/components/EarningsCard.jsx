@@ -14,8 +14,12 @@ import {
 import { motion } from "framer-motion";
 
 import { monthlyEarnings } from "../dashboardData";
+import useTranslation from "../../../i18n/useTranslation";
 
 const EarningsCard = () => {
+
+  const {t} = useTranslation();
+
   return (
     <motion.section
       initial={{
@@ -49,9 +53,7 @@ const EarningsCard = () => {
       {/* ======================================================
           TOP ACCENT
       ====================================================== */}
-
-      <div
-        className="
+    <div className="
           pointer-events-none
           absolute
           left-8
@@ -157,7 +159,7 @@ const EarningsCard = () => {
             </span>
 
             <span>
-              This month's earnings
+              {t("earnings.thisMonthEarnings")}
             </span>
           </div>
 
@@ -213,7 +215,7 @@ const EarningsCard = () => {
               text-[var(--muted-foreground)]
             "
           >
-            Compared with last month
+            {t("earnings.comparedWithLastMonth")}
           </p>
         </div>
 
@@ -245,7 +247,7 @@ const EarningsCard = () => {
           "
         >
           <span>
-            View details
+            {t("earnings.viewDetails")}
           </span>
 
           <ArrowUpRight

@@ -14,6 +14,8 @@ const en = {
   no: "No",
   today: "Today",
   viewAll: "View All",
+  logout:"Log Out",
+  createNewLot: "Create New Lot"
 },
 dashboard: {
   greeting: "Welcome",
@@ -32,7 +34,15 @@ dashboard: {
   verifiedRecycler: "Verified Recycler",
   pickupAvailable: "Pickup Available",
   viewAll: "View All",
+  happen:"Here's what's happening with your collection."
 },
+
+  "greetings": {
+    "morning": "Good Morning",
+    "afternoon": "Good Afternoon",
+    "evening": "Good Evening",
+    "night": "Good Night"
+  },
 
   language: {
     english: "English",
@@ -47,6 +57,13 @@ dashboard: {
     logout: "Logout",
     collectorAccess: "Collector Access",
     welcomeBack: "Welcome back",
+  },
+
+  "quickActions": {
+    "title": "Quick Action",
+    "addNewEWaste": "Add new e-waste",
+    "description": "Photograph your material, identify it, and create a digital collection lot",
+    "createLot": "Create Lot"
   },
 
 
@@ -88,6 +105,9 @@ dashboard: {
     falling: "Falling",
     stable: "Stable",
     lastUpdated: "Last updated",
+    "localPriceBoard": "Local price board",
+    "currentBuyingPrices": "Current buying prices",
+    "seeAll": "See all"
   },
 
   priceBoard: {
@@ -180,12 +200,18 @@ dashboard: {
 
   navigation: {
   home: "Home",
-  lots: "Lots",
+  myLots: "Lots",
   prices: "Prices",
   recyclers: "Recyclers",
   earnings: "Earnings",
   profile: "Profile",
   settings: "Settings",
+  dashboard:"Dashboard",
+  rewards:"Rewards",
+  transactions:"Transactions",
+  main: "Main",
+  activity: "Activity",
+    account: "Accountk"
 },
 
 start: {
@@ -775,6 +801,12 @@ recyclerDetails: {
   getDirections: "Get directions",
   contactRecycler: "Contact recycler",
 },
+
+"earnings": {
+    "thisMonthEarnings": "This month's earnings",
+    "comparedWithLastMonth": "Compared with last month",
+    "viewDetails": "View details"
+  }
 
 };
 

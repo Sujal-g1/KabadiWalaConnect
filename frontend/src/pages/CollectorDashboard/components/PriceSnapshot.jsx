@@ -9,9 +9,11 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 import { priceSnapshot } from "../dashboardData";
+import useTranslation from "../../../i18n/useTranslation";
 
 const PriceSnapshot = () => {
   const navigate = useNavigate();
+  const {t} = useTranslation();
 
   return (
     <motion.section
@@ -93,7 +95,7 @@ const PriceSnapshot = () => {
                 text-[var(--foreground)]
               "
             >
-              Local price board
+                {t("prices.localPriceBoard")}
             </p>
 
             <p
@@ -104,7 +106,7 @@ const PriceSnapshot = () => {
                 text-[var(--muted)]
               "
             >
-              Current buying prices
+             {t("prices.currentBuyingPrices")}
             </p>
           </div>
 
@@ -133,7 +135,7 @@ const PriceSnapshot = () => {
               hover:shadow-[0_8px_18px_rgba(18,63,45,0.08)]
             "
           >
-            <span>See all</span>
+            <span> {t("prices.seeAll")}</span>
 
             <ArrowRight
               size={14}
